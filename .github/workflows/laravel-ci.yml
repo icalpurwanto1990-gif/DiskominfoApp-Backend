@@ -1,0 +1,57 @@
+name: Laravel Backend CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, xml, ctype, iconv, mysql, sqlite, pdo_sqlite, bcmath, gd, zip
+        coverage: none
+
+    - name: Copy Environment File
+      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+    - name: Get Composer Cache Directory
+      id: composer-cache
+      run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+    - name: Cache Composer Dependencies
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-composer-
+
+    - name: Install Composer Dependencies
+      run: composer install --prefer-dist --no-ansi --no-interaction --no-progress
+
+    - name: Generate Application Key
+      run: php artisan key:generate
+
+    - name: Create SQLite Database for Testing
+      run: |
+        mkdir -p database
+        touch database/database.sqlite
+
+    - name: Run Linting (Laravel Pint)
+      run: ./vendor/bin/pint --test
+
+    - name: Run Migrations & Execute Tests
+      env:
+        DB_CONNECTION: sqlite
+        DB_DATABASE: database/database.sqlite
+      run: php artisan test

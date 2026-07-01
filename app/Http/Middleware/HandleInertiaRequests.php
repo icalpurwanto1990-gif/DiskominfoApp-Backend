@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Illuminate\Http\Request;
+use Inertia\Middleware;
+
+class HandleInertiaRequests extends Middleware
+{
+    /**
+     * The root template that is loaded on the first page visit.
+     *
+     * @var string
+     */
+    protected $rootView = 'app';
+
+    /**
+     * Determine the current asset version.
+     */
+    public function version(Request $request): ?string
+    {
+        return parent::version($request);
+    }
+
+    /**
+     * Define the data that is shared by default.
+     *
+     * @return array<string, mixed>
+     */
+    public function share(Request $request): array
+    {
+        return array_merge(parent::share($request), [
+            'auth' => [
+                'user' => $request->user(),
+            ],
+            'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
+            ],
+            'menus' => fn () => \App\Models\Menu::active()
+                ->topLevel()
+                ->with(['children' => fn ($q) => $q->active()])
+                ->orderBy('sort_order')
+                ->get()
+                ->map(fn ($menu) => [
+                    'id' => $menu->id,
+                    'label' => $menu->label,
+                    'url' => $menu->url,
+                    'target' => $menu->target,
+                    'children' => $menu->children->map(fn ($child) => [
+                        'id' => $child->id,
+                        'label' => $child->label,
+                        'url' => $child->url,
+                        'target' => $child->target,
+                    ]),
+                ]),
+            'partnerLinks' => fn () => \App\Models\PartnerLink::where('active', true)
+                ->orderBy('orderIndex')
+                ->get()
+                ->map(fn ($link) => [
+                    'id' => $link->id,
+                    'name' => $link->name,
+                    'short' => $link->short,
+                    'url' => $link->url,
+                    'color' => $link->color,
+                    'logo' => $link->logo,
+                    'desc' => $link->desc,
+                ]),
+            'socialMedia' => fn () => \App\Models\SocialMedia::where('active', true)
+                ->orderBy('orderIndex')
+                ->get()
+                ->map(fn ($sm) => [
+                    'id' => $sm->id,
+                    'platform' => $sm->platform,
+                    'url' => $sm->url,
+                ]),
+        ]);
+    }
+}
