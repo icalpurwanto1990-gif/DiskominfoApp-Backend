@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\ContactComplaint;
 use App\Filament\Resources\ContactComplaintResource\Pages;
+use App\Models\ContactComplaint;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,9 +15,13 @@ class ContactComplaintResource extends Resource
     protected static ?string $model = ContactComplaint::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
+
     protected static ?string $navigationLabel = 'Pengaduan Masyarakat';
+
     protected static ?string $modelLabel = 'Pengaduan';
+
     protected static ?string $pluralModelLabel = 'Pengaduan';
+
     protected static ?string $navigationGroup = 'Layanan Publik';
 
     public static function form(Form $form): Form
@@ -61,7 +65,7 @@ class ContactComplaintResource extends Resource
                             ->label('Catatan Tanggapan / Tindak Lanjut')
                             ->placeholder('Tuliskan respon resmi atau langkah tindak lanjut yang telah dilakukan...'),
                     ])
-                    ->columns(1)
+                    ->columns(1),
             ]);
     }
 

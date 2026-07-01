@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('dokumen_ktp')->nullable();
             $table->string('status')->default('DRAFT');
             $table->text('catatan_admin')->nullable();
-            
+
             // PostgreSQL compatibility: createdAt & updatedAt
             $table->timestamp('createdAt')->useCurrent();
             $table->timestamp('updatedAt')->useCurrent()->useCurrentOnUpdate();

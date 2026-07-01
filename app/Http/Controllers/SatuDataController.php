@@ -22,8 +22,8 @@ class SatuDataController extends Controller
 
             if ($q) {
                 $query->where(function ($sub) use ($q) {
-                    $sub->where('title', 'ilike', '%' . $q . '%')
-                        ->orWhere('description', 'ilike', '%' . $q . '%');
+                    $sub->where('title', 'ilike', '%'.$q.'%')
+                        ->orWhere('description', 'ilike', '%'.$q.'%');
                 });
             }
 
@@ -61,9 +61,9 @@ class SatuDataController extends Controller
                         ['bulan' => 'September', 'pengajuan' => 60, 'disetujui' => 58],
                         ['bulan' => 'Oktober', 'pengajuan' => 15, 'disetujui' => 15],
                         ['bulan' => 'November', 'pengajuan' => 22, 'disetujui' => 22],
-                        ['bulan' => 'Desember', 'pengajuan' => 11, 'disetujui' => 11]
+                        ['bulan' => 'Desember', 'pengajuan' => 11, 'disetujui' => 11],
                     ],
-                ]
+                ],
             ];
 
             if ($q) {

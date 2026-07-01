@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\AppStatistic;
 use App\Filament\Resources\AppStatisticResource\Pages;
+use App\Models\AppStatistic;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,9 +15,13 @@ class AppStatisticResource extends Resource
     protected static ?string $model = AppStatistic::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
+
     protected static ?string $navigationLabel = 'Statistik Landing Page';
+
     protected static ?string $modelLabel = 'Statistik';
+
     protected static ?string $pluralModelLabel = 'Statistik';
+
     protected static ?string $navigationGroup = 'Kinerja SPBE';
 
     public static function getFriendlyLabel(string $key): string
@@ -52,7 +56,7 @@ class AppStatisticResource extends Resource
                             ->helperText('Nilai integer saat ini untuk statistik terpilih.')
                             ->label('Nilai Statistik (Value)'),
                     ])
-                    ->columns(1)
+                    ->columns(1),
             ]);
     }
 

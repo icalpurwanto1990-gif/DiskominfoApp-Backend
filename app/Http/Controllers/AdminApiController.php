@@ -20,9 +20,9 @@ use App\Models\SurveyResponse;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AdminApiController extends Controller
 {
@@ -35,16 +35,16 @@ class AdminApiController extends Controller
             $adminName = $request->header('X-Admin-Name', 'Administrator');
             $adminRole = $request->header('X-Admin-Role', 'ADMIN');
             AuditLog::create([
-                'id'        => (string) Str::uuid(),
-                'userId'    => auth()->id(),
-                'action'    => $action,
-                'details'   => "[$module] $description (Aktor: $adminName, Role: $adminRole)",
+                'id' => (string) Str::uuid(),
+                'userId' => auth()->id(),
+                'action' => $action,
+                'details' => "[$module] $description (Aktor: $adminName, Role: $adminRole)",
                 'ipAddress' => $request->ip(),
                 'createdAt' => now(),
             ]);
         } catch (\Exception $e) {
             // Log write failure should never break the main operation
-            \Log::warning('AuditLog write failed: ' . $e->getMessage());
+            \Log::warning('AuditLog write failed: '.$e->getMessage());
         }
     }
 
@@ -70,7 +70,7 @@ class AdminApiController extends Controller
                     'pendingPpid' => $pendingPpid,
                     'pendingService' => $pendingService,
                     'totalUsers' => $totalUsers,
-                ]
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -113,6 +113,7 @@ class AdminApiController extends Controller
             );
 
             $this->logAudit($request, $validated['id'] ? 'UPDATE' : 'CREATE', 'BANNER', "Banner '{$validated['title']}' berhasil disimpan.");
+
             return response()->json(['success' => true, 'banner' => $banner]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -127,6 +128,7 @@ class AdminApiController extends Controller
                 $this->logAudit(request(), 'DELETE', 'BANNER', "Banner ID '{$id}' dihapus.");
                 $banner->delete();
             }
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -146,7 +148,8 @@ class AdminApiController extends Controller
                     ['value' => $value ?? '']
                 );
             }
-            $this->logAudit($request, 'UPDATE', 'PROFIL', "Sambutan Kepala Dinas / Profil Dinas diperbarui.");
+            $this->logAudit($request, 'UPDATE', 'PROFIL', 'Sambutan Kepala Dinas / Profil Dinas diperbarui.');
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -198,6 +201,7 @@ class AdminApiController extends Controller
                 $staff->delete();
                 $this->logAudit(request(), 'DELETE', 'PROFIL', "Data pegawai/staf '{$name}' dihapus.");
             }
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -231,12 +235,12 @@ class AdminApiController extends Controller
             // Simple check to prevent slug duplication
             $existing = Post::where('slug', $slug)->where('id', '!=', $id)->first();
             if ($existing) {
-                $slug .= '-' . rand(10, 99);
+                $slug .= '-'.rand(10, 99);
             }
 
             // Find current user or fallback to first superadmin/user
             $authorId = auth()->id();
-            if (!$authorId) {
+            if (! $authorId) {
                 $author = User::where('role', 'SUPERADMIN')->orWhere('role', 'ADMIN')->first();
                 $authorId = $author ? $author->id : (User::first()->id ?? null);
             }
@@ -260,6 +264,7 @@ class AdminApiController extends Controller
             }
 
             $this->logAudit($request, $validated['id'] ? 'UPDATE' : 'CREATE', 'BERITA', "Post '{$validated['title']}' berhasil disimpan.");
+
             return response()->json(['success' => true, 'post' => Post::with(['category', 'tags'])->find($post->id)]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -276,6 +281,7 @@ class AdminApiController extends Controller
                 $post->delete();
                 $this->logAudit(request(), 'DELETE', 'BERITA', "Post '{$title}' dihapus.");
             }
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -302,7 +308,7 @@ class AdminApiController extends Controller
                 ['id' => $id],
                 [
                     'name' => $validated['name'],
-                    'slug' => $slug
+                    'slug' => $slug,
                 ]
             );
 
@@ -321,6 +327,7 @@ class AdminApiController extends Controller
                 $cat->delete();
                 $this->logAudit(request(), 'DELETE', 'BERITA', "Kategori berita '{$name}' dihapus.");
             }
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -347,7 +354,7 @@ class AdminApiController extends Controller
                 ['id' => $id],
                 [
                     'name' => $validated['name'],
-                    'slug' => $slug
+                    'slug' => $slug,
                 ]
             );
 
@@ -366,6 +373,7 @@ class AdminApiController extends Controller
                 $tag->delete();
                 $this->logAudit(request(), 'DELETE', 'BERITA', "Tag berita '{$name}' dihapus.");
             }
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -470,6 +478,7 @@ class AdminApiController extends Controller
                 $doc->delete();
                 $this->logAudit(request(), 'DELETE', 'PPID', "Dokumen PPID '{$title}' dihapus.");
             }
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -526,6 +535,7 @@ class AdminApiController extends Controller
                 $service->delete();
                 $this->logAudit(request(), 'DELETE', 'LAYANAN', "Layanan digital '{$title}' dihapus.");
             }
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -609,6 +619,7 @@ class AdminApiController extends Controller
                 $dataset->delete();
                 $this->logAudit(request(), 'DELETE', 'SATU_DATA', "Dataset '{$title}' dihapus.");
             }
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -665,6 +676,7 @@ class AdminApiController extends Controller
                 $infra->delete();
                 $this->logAudit(request(), 'DELETE', 'GIS', "Titik sebaran GIS '{$name}' dihapus.");
             }
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -678,6 +690,7 @@ class AdminApiController extends Controller
     {
         try {
             $media = Media::orderBy('createdAt', 'desc')->get();
+
             return response()->json($media);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -708,6 +721,7 @@ class AdminApiController extends Controller
             );
 
             $this->logAudit($request, $validated['id'] ? 'UPDATE' : 'CREATE', 'MEDIA', "Media database '{$validated['title']}' ({$validated['type']}) disimpan.");
+
             return response()->json(['success' => true, 'media' => $media]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -724,6 +738,7 @@ class AdminApiController extends Controller
                 $media->delete();
                 $this->logAudit(request(), 'DELETE', 'MEDIA', "Media database '{$title}' ({$type}) dihapus.");
             }
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -737,7 +752,7 @@ class AdminApiController extends Controller
     {
         try {
             $dir = public_path('uploads');
-            if (!File::exists($dir)) {
+            if (! File::exists($dir)) {
                 File::makeDirectory($dir, 0755, true);
             }
 
@@ -748,7 +763,7 @@ class AdminApiController extends Controller
                 $filename = $file->getFilename();
                 $mediaList[] = [
                     'name' => $filename,
-                    'url' => '/uploads/' . $filename,
+                    'url' => '/uploads/'.$filename,
                     'size' => $file->getSize(),
                     'updatedAt' => date('Y-m-d H:i:s', $file->getMTime()),
                 ];
@@ -768,16 +783,16 @@ class AdminApiController extends Controller
     public function uploadMediaFile(Request $request)
     {
         try {
-            if (!$request->hasFile('file')) {
+            if (! $request->hasFile('file')) {
                 return response()->json(['success' => false, 'error' => 'No file uploaded'], 400);
             }
 
             $file = $request->file('file');
-            $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9.]/', '_', $file->getClientOriginalName());
-            
+            $filename = time().'_'.preg_replace('/[^a-zA-Z0-9.]/', '_', $file->getClientOriginalName());
+
             $file->move(public_path('uploads'), $filename);
 
-            $url = '/uploads/' . $filename;
+            $url = '/uploads/'.$filename;
             $this->logAudit($request, 'CREATE', 'MEDIA', "File media '{$filename}' diunggah ke server.");
 
             return response()->json([
@@ -785,9 +800,9 @@ class AdminApiController extends Controller
                 'media' => [
                     'name' => $filename,
                     'url' => $url,
-                    'size' => File::size(public_path('uploads/' . $filename)),
-                    'updatedAt' => date('Y-m-d H:i:s')
-                ]
+                    'size' => File::size(public_path('uploads/'.$filename)),
+                    'updatedAt' => date('Y-m-d H:i:s'),
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -799,14 +814,15 @@ class AdminApiController extends Controller
         try {
             // sanitize filename to prevent dir traversal
             $filename = basename($filename);
-            $filePath = public_path('uploads/' . $filename);
-            
+            $filePath = public_path('uploads/'.$filename);
+
             if (File::exists($filePath)) {
                 File::delete($filePath);
                 $this->logAudit(request(), 'DELETE', 'MEDIA', "Media file '{$filename}' dihapus.");
+
                 return response()->json(['success' => true]);
             }
-            
+
             return response()->json(['success' => false, 'error' => 'File tidak ditemukan.'], 404);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -836,7 +852,7 @@ class AdminApiController extends Controller
             ]);
 
             $id = $validated['id'] ?? (string) Str::uuid();
-            
+
             // Check if email already exists
             $existing = User::where('email', $validated['email'])->where('id', '!=', $id)->first();
             if ($existing) {
@@ -852,7 +868,7 @@ class AdminApiController extends Controller
                 'instansi' => $validated['instansi'] ?? '',
             ];
 
-            if (!empty($validated['password'])) {
+            if (! empty($validated['password'])) {
                 $updateData['password'] = Hash::make($validated['password']);
             }
 
@@ -880,6 +896,7 @@ class AdminApiController extends Controller
                 $user->delete();
                 $this->logAudit(request(), 'DELETE', 'USER', "Akun user '{$name}' dihapus.");
             }
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -904,7 +921,7 @@ class AdminApiController extends Controller
                 $search = $request->query('search');
                 $query->where(function ($q) use ($search) {
                     $q->where('description', 'LIKE', "%{$search}%")
-                      ->orWhere('adminName', 'LIKE', "%{$search}%");
+                        ->orWhere('adminName', 'LIKE', "%{$search}%");
                 });
             }
 
@@ -940,7 +957,7 @@ class AdminApiController extends Controller
             $responses = $query->get();
 
             // Summary stats
-            $total   = $responses->count();
+            $total = $responses->count();
             $avgRating = $total > 0 ? round($responses->avg('rating'), 2) : 0;
             $distribution = [];
             for ($i = 1; $i <= 5; $i++) {
@@ -953,13 +970,13 @@ class AdminApiController extends Controller
                 ->values();
 
             return response()->json([
-                'success'      => true,
-                'responses'    => $responses,
-                'summary'      => [
-                    'total'        => $total,
-                    'avgRating'    => $avgRating,
+                'success' => true,
+                'responses' => $responses,
+                'summary' => [
+                    'total' => $total,
+                    'avgRating' => $avgRating,
                     'distribution' => $distribution,
-                    'categories'   => $categories,
+                    'categories' => $categories,
                 ],
             ]);
         } catch (\Exception $e) {
@@ -975,6 +992,7 @@ class AdminApiController extends Controller
                 $response->delete();
                 $this->logAudit(request(), 'DELETE', 'SURVEY', "Respons survey ID '{$id}' dihapus.");
             }
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);

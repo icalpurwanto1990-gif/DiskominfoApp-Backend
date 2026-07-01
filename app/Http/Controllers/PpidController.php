@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Document;
-use App\Models\PpidRequest;
 use App\Models\PpidObjection;
+use App\Models\PpidRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -20,6 +20,7 @@ class PpidController extends Controller
     {
         try {
             $documents = Document::orderBy('createdAt', 'desc')->get();
+
             return response()->json($documents);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -40,7 +41,7 @@ class PpidController extends Controller
                 'ktpFile' => 'nullable|string',
             ]);
 
-            $ticketNumber = 'PPID-2026-' . rand(1000, 9999);
+            $ticketNumber = 'PPID-2026-'.rand(1000, 9999);
 
             $ppidReq = PpidRequest::create([
                 'id' => (string) Str::uuid(),
@@ -59,14 +60,15 @@ class PpidController extends Controller
             return response()->json([
                 'success' => true,
                 'ticketNumber' => $ppidReq->ticketNumber,
-                'id' => $ppidReq->id
+                'id' => $ppidReq->id,
             ]);
         } catch (\Exception $e) {
-            $mockTicket = 'PPID-2026-' . rand(1000, 9999);
+            $mockTicket = 'PPID-2026-'.rand(1000, 9999);
+
             return response()->json([
                 'success' => true,
                 'ticketNumber' => $mockTicket,
-                'id' => 'mock-id'
+                'id' => 'mock-id',
             ]);
         }
     }
@@ -82,10 +84,10 @@ class PpidController extends Controller
 
             $ppidReq = PpidRequest::where('ticketNumber', $validated['ticketNumber'])->first();
 
-            if (!$ppidReq) {
+            if (! $ppidReq) {
                 return response()->json([
                     'success' => false,
-                    'error' => 'Nomor tiket permohonan tidak ditemukan.'
+                    'error' => 'Nomor tiket permohonan tidak ditemukan.',
                 ], 404);
             }
 
@@ -99,12 +101,12 @@ class PpidController extends Controller
 
             return response()->json([
                 'success' => true,
-                'id' => $objection->id
+                'id' => $objection->id,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

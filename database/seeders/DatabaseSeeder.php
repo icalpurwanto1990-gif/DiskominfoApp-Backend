@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -27,7 +28,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@banggaikep.go.id'],
             [
                 'name' => 'Administrator Diskominfo',
-                'password' => \Illuminate\Support\Facades\Hash::make('adminpassword2026'),
+                'password' => Hash::make('adminpassword2026'),
                 'role' => 'SUPERADMIN',
                 'nip' => '198504122010011002',
                 'jabatan' => 'Pranata Komputer Madya',
@@ -39,7 +40,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'budi@banggaikep.go.id'],
             [
                 'name' => 'Budi Setiawan',
-                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'password' => Hash::make('password'),
                 'role' => 'USER',
                 'nip' => '199208152018021001',
                 'jabatan' => 'Staf Bidang Aptika',

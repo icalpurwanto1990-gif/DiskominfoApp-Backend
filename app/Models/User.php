@@ -4,21 +4,22 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Panel;
 
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasUuids;
+    use HasFactory, HasUuids, Notifiable;
 
     protected $table = 'User';
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     /**
@@ -61,6 +62,7 @@ class User extends Authenticatable implements FilamentUser
     }
 
     const CREATED_AT = 'createdAt';
+
     const UPDATED_AT = 'updatedAt';
 
     public function getRememberToken()

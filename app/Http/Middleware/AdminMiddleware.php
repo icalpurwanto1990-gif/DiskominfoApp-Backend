@@ -12,13 +12,14 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         // 1. Check if user is logged in
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'error' => 'Unauthorized. Silakan login terlebih dahulu.'
+                    'error' => 'Unauthorized. Silakan login terlebih dahulu.',
                 ], 401);
             }
+
             return redirect()->route('login');
         }
 
@@ -28,13 +29,14 @@ class AdminMiddleware
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'error' => 'Forbidden. Anda tidak memiliki hak akses admin.'
+                    'error' => 'Forbidden. Anda tidak memiliki hak akses admin.',
                 ], 403);
             }
             // Logout user from session and redirect to login
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
+
             return redirect()->route('login')->withErrors(['email' => 'Hanya admin yang diizinkan mengakses panel ini.']);
         }
 

@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\AuditLog;
-use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class ServiceRequest extends Model
 {
@@ -14,6 +14,7 @@ class ServiceRequest extends Model
     protected $table = 'ServiceRequest';
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -35,6 +36,7 @@ class ServiceRequest extends Model
     ];
 
     const CREATED_AT = 'createdAt';
+
     const UPDATED_AT = 'updatedAt';
 
     public function handledBy()
@@ -54,25 +56,25 @@ class ServiceRequest extends Model
         $this->save();
 
         // 1. Build notification message text
-        $messageText = "";
-        $target = "user";
+        $messageText = '';
+        $target = 'user';
 
         switch ($newStatus) {
             case 'PENDING':
                 $messageText = "Tiket pengajuan layanan Anda (#{$this->ticketNumber}) telah diterima dan dalam antrian verifikasi.";
-                $target = "both";
+                $target = 'both';
                 break;
             case 'DITOLAK':
-                $messageText = "⚠️ Tiket pengajuan layanan Anda (#{$this->ticketNumber}) ditolak oleh Admin.\n\nAlasan: " . ($catatan ?: $this->notes);
-                $target = "user";
+                $messageText = "⚠️ Tiket pengajuan layanan Anda (#{$this->ticketNumber}) ditolak oleh Admin.\n\nAlasan: ".($catatan ?: $this->notes);
+                $target = 'user';
                 break;
             case 'DIPROSES':
-                $messageText = "Tiket pengajuan layanan Anda (#{$this->ticketNumber}) telah disetujui dan sedang diproses oleh Tim IT Diskominfo." . ($catatan ? "\n\nCatatan: {$catatan}" : "");
-                $target = "user";
+                $messageText = "Tiket pengajuan layanan Anda (#{$this->ticketNumber}) telah disetujui dan sedang diproses oleh Tim IT Diskominfo.".($catatan ? "\n\nCatatan: {$catatan}" : '');
+                $target = 'user';
                 break;
             case 'SELESAI':
-                $messageText = "✅ Selamat! Pengajuan layanan Anda (#{$this->ticketNumber}) telah selesai diproses." . ($catatan ? "\n\nCatatan Tanggapan: {$catatan}" : "");
-                $target = "user";
+                $messageText = "✅ Selamat! Pengajuan layanan Anda (#{$this->ticketNumber}) telah selesai diproses.".($catatan ? "\n\nCatatan Tanggapan: {$catatan}" : '');
+                $target = 'user';
                 break;
         }
 
@@ -85,7 +87,7 @@ class ServiceRequest extends Model
             'action_taken' => "Mengubah status tiket menjadi {$newStatus}",
             'notes' => $catatan ?: $this->notes,
             'notification_target' => $target,
-            'message_text' => $messageText
+            'message_text' => $messageText,
         ];
 
         // 3. Save to AuditLog
@@ -93,19 +95,19 @@ class ServiceRequest extends Model
             $adminName = ($actor === 'ADMIN') ? (auth()->user()->name ?? 'System Admin') : $this->applicantName;
             $adminRole = ($actor === 'ADMIN') ? (auth()->user()->role ?? 'ADMIN') : 'USER';
             AuditLog::create([
-                'id'        => (string) \Illuminate\Support\Str::uuid(),
-                'userId'    => ($actor === 'ADMIN') ? auth()->id() : null,
-                'action'    => 'UPDATE_STATUS',
-                'details'   => "[SERVICE_REQUEST] Tiket Layanan #{$this->ticketNumber} status diubah ke {$newStatus} oleh {$actor}. Catatan: " . ($catatan ?: 'Tanpa catatan') . " (Aktor: {$adminName}, Role: {$adminRole})",
+                'id' => (string) Str::uuid(),
+                'userId' => ($actor === 'ADMIN') ? auth()->id() : null,
+                'action' => 'UPDATE_STATUS',
+                'details' => "[SERVICE_REQUEST] Tiket Layanan #{$this->ticketNumber} status diubah ke {$newStatus} oleh {$actor}. Catatan: ".($catatan ?: 'Tanpa catatan')." (Aktor: {$adminName}, Role: {$adminRole})",
                 'ipAddress' => request()->ip() ?: '127.0.0.1',
                 'createdAt' => now(),
             ]);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error("Gagal mencatat log audit Layanan: " . $e->getMessage());
+            Log::error('Gagal mencatat log audit Layanan: '.$e->getMessage());
         }
 
         // 4. Log payload for n8n/webhook simulation
-        \Illuminate\Support\Facades\Log::info("SERVICE_AGENT_WEBHOOK_EVENT: " . json_encode($jsonPayload));
+        Log::info('SERVICE_AGENT_WEBHOOK_EVENT: '.json_encode($jsonPayload));
 
         return $jsonPayload;
     }

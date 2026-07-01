@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\PartnerLink;
 use App\Filament\Resources\PartnerLinkResource\Pages;
+use App\Models\PartnerLink;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,9 +15,13 @@ class PartnerLinkResource extends Resource
     protected static ?string $model = PartnerLink::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-link';
+
     protected static ?string $navigationLabel = 'Link Mitra';
+
     protected static ?string $modelLabel = 'Link Mitra';
+
     protected static ?string $pluralModelLabel = 'Link Mitra';
+
     protected static ?string $navigationGroup = 'Konten Portal';
 
     public static function form(Form $form): Form
@@ -60,7 +64,7 @@ class PartnerLinkResource extends Resource
                             ->default(0)
                             ->label('Urutan Tampil (Order Index)'),
                     ])
-                    ->columns(2)
+                    ->columns(2),
             ]);
     }
 

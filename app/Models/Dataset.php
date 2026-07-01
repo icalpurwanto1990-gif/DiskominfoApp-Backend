@@ -12,6 +12,7 @@ class Dataset extends Model
     protected $table = 'Dataset';
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -33,5 +34,6 @@ class Dataset extends Model
     ];
 
     const CREATED_AT = 'createdAt';
+
     const UPDATED_AT = 'updatedAt';
 }

@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Media;
 use App\Filament\Resources\MediaResource\Pages;
+use App\Models\Media;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,9 +15,13 @@ class MediaResource extends Resource
     protected static ?string $model = Media::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-film';
+
     protected static ?string $navigationLabel = 'Galeri & Media Center';
+
     protected static ?string $modelLabel = 'Media';
+
     protected static ?string $pluralModelLabel = 'Media';
+
     protected static ?string $navigationGroup = 'Konten Portal';
 
     public static function form(Form $form): Form

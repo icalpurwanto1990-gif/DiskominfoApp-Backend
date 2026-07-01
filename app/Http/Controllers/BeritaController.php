@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Post;
 use App\Models\Category;
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -12,6 +12,7 @@ class BeritaController extends Controller
     public function index()
     {
         $categories = Category::orderBy('name', 'asc')->get();
+
         return Inertia::render('Berita', [
             'categories' => $categories,
         ]);
@@ -25,7 +26,7 @@ class BeritaController extends Controller
             }])
             ->first();
 
-        if (!$post) {
+        if (! $post) {
             abort(404);
         }
 
@@ -55,8 +56,8 @@ class BeritaController extends Controller
 
         if ($q) {
             $query->where(function ($sub) use ($q) {
-                $sub->where('title', 'ilike', '%' . $q . '%')
-                    ->orWhere('content', 'ilike', '%' . $q . '%');
+                $sub->where('title', 'ilike', '%'.$q.'%')
+                    ->orWhere('content', 'ilike', '%'.$q.'%');
             });
         }
 
@@ -77,7 +78,7 @@ class BeritaController extends Controller
         $query->orderBy('createdAt', 'desc');
 
         if ($limit && is_numeric($limit)) {
-            $query->limit((int)$limit);
+            $query->limit((int) $limit);
         }
 
         $posts = $query->get();

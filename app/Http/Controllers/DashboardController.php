@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\AppStatistic;
 use App\Models\Dataset;
+use App\Models\DigitalService;
 use App\Models\ServiceRequest;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -28,7 +28,7 @@ class DashboardController extends Controller
             // Count actual data from DB
             $actualSrvRequestCount = ServiceRequest::count();
             $actualCompletedTteCount = ServiceRequest::where('serviceType', 'TTE')->where('status', 'SELESAI')->count();
-            $actualDigitalServiceCount = \App\Models\DigitalService::where('active', true)->count();
+            $actualDigitalServiceCount = DigitalService::where('active', true)->count();
 
             $stats = [
                 'TOTAL_VISITORS' => $statsMap['TOTAL_VISITORS'] ?? 14258,
@@ -51,7 +51,7 @@ class DashboardController extends Controller
                 'September' => 'Sep',
                 'Oktober' => 'Okt',
                 'November' => 'Nov',
-                'Desember' => 'Des'
+                'Desember' => 'Des',
             ];
 
             $tteMonthlyData = [
@@ -73,10 +73,10 @@ class DashboardController extends Controller
             if ($tteDataset && is_array($tteDataset->jsonData)) {
                 $mapped = [];
                 foreach ($tteDataset->jsonData as $row) {
-                    $row = (array)$row;
+                    $row = (array) $row;
                     $bulan = $row['bulan'] ?? '';
                     $label = $monthMap[$bulan] ?? substr($bulan, 0, 3);
-                    $value = (int)($row['disetujui'] ?? $row['value'] ?? 0);
+                    $value = (int) ($row['disetujui'] ?? $row['value'] ?? 0);
                     $mapped[] = ['label' => $label, 'value' => $value];
                 }
                 if (count($mapped) > 0) {
@@ -113,7 +113,7 @@ class DashboardController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

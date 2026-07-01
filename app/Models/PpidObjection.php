@@ -12,6 +12,7 @@ class PpidObjection extends Model
     protected $table = 'PPIDObjection';
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -24,6 +25,7 @@ class PpidObjection extends Model
     ];
 
     const CREATED_AT = 'createdAt';
+
     const UPDATED_AT = 'updatedAt';
 
     public function request()

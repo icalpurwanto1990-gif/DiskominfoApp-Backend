@@ -2,24 +2,29 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\ServiceRequest;
 use App\Filament\Resources\ServiceRequestResource\Pages;
+use App\Models\ServiceRequest;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
-use Filament\Notifications\Notification;
+use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
 
 class ServiceRequestResource extends Resource
 {
     protected static ?string $model = ServiceRequest::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-ticket';
+
     protected static ?string $navigationLabel = 'Tiket Pengajuan OPD';
+
     protected static ?string $modelLabel = 'Tiket';
+
     protected static ?string $pluralModelLabel = 'Tiket';
+
     protected static ?string $navigationGroup = 'Pelayanan';
 
     public static function form(Form $form): Form
@@ -58,7 +63,7 @@ class ServiceRequestResource extends Resource
                         Forms\Components\Placeholder::make('dynamic_details_links')
                             ->label('Unduh Berkas Pendukung (Jika Ada)')
                             ->content(function ($record) {
-                                if (!$record || empty($record->details)) {
+                                if (! $record || empty($record->details)) {
                                     return 'Tidak ada berkas pendukung.';
                                 }
                                 $links = [];
@@ -71,7 +76,8 @@ class ServiceRequestResource extends Resource
                                 if (empty($links)) {
                                     return 'Tidak ada berkas pendukung.';
                                 }
-                                return new \Illuminate\Support\HtmlString(implode('<br>', $links));
+
+                                return new HtmlString(implode('<br>', $links));
                             })
                             ->columnSpanFull(),
                     ]),
@@ -124,7 +130,7 @@ class ServiceRequestResource extends Resource
             ->defaultSort('createdAt', 'desc')
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                
+
                 // 1. Approve Action (PENDING -> DIPROSES)
                 Action::make('approve')
                     ->label('Setujui & Proses')
@@ -139,10 +145,10 @@ class ServiceRequestResource extends Resource
                     ])
                     ->action(function (ServiceRequest $record, array $data) {
                         $record->triggerStatusTransition('DIPROSES', 'ADMIN', $data['catatan_proses'] ?? null);
-                        
+
                         Notification::make()
                             ->title('Pengajuan Disetujui')
-                            ->body('Status tiket #' . $record->ticketNumber . ' kini DIPROSES.')
+                            ->body('Status tiket #'.$record->ticketNumber.' kini DIPROSES.')
                             ->success()
                             ->send();
                     }),
@@ -161,10 +167,10 @@ class ServiceRequestResource extends Resource
                     ])
                     ->action(function (ServiceRequest $record, array $data) {
                         $record->triggerStatusTransition('DITOLAK', 'ADMIN', $data['catatan_penolakan']);
-                        
+
                         Notification::make()
                             ->title('Pengajuan Ditolak')
-                            ->body('Pemberitahuan penolakan tiket #' . $record->ticketNumber . ' telah dikirim.')
+                            ->body('Pemberitahuan penolakan tiket #'.$record->ticketNumber.' telah dikirim.')
                             ->danger()
                             ->send();
                     }),
@@ -183,10 +189,10 @@ class ServiceRequestResource extends Resource
                     ])
                     ->action(function (ServiceRequest $record, array $data) {
                         $record->triggerStatusTransition('SELESAI', 'ADMIN', $data['catatan_penyelesaian'] ?? null);
-                        
+
                         Notification::make()
                             ->title('Layanan Selesai')
-                            ->body('Tiket #' . $record->ticketNumber . ' telah ditandai SELESAI.')
+                            ->body('Tiket #'.$record->ticketNumber.' telah ditandai SELESAI.')
                             ->success()
                             ->send();
                     }),
@@ -206,10 +212,10 @@ class ServiceRequestResource extends Resource
                     ->action(function (ServiceRequest $record, array $data) {
                         $record->notes = $data['notes'];
                         $record->save();
-                        
+
                         Notification::make()
                             ->title('Tanggapan Diperbarui')
-                            ->body('Catatan tanggapan untuk tiket #' . $record->ticketNumber . ' berhasil disimpan.')
+                            ->body('Catatan tanggapan untuk tiket #'.$record->ticketNumber.' berhasil disimpan.')
                             ->success()
                             ->send();
                     }),

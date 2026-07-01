@@ -3,20 +3,24 @@
 namespace App\Filament\Pages;
 
 use App\Models\ProfileContent;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Pages\Page;
-use Filament\Actions\Action;
 use Filament\Notifications\Notification;
+use Filament\Pages\Page;
 
 class ManageProfile extends Page implements Forms\Contracts\HasForms
 {
     use Forms\Concerns\InteractsWithForms;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
+
     protected static ?string $navigationLabel = 'Profil Dinas';
+
     protected static ?string $title = 'Kelola Profil Dinas';
+
     protected static ?string $navigationGroup = 'Profil & Kepegawaian';
+
     protected static ?int $navigationSort = 1;
 
     protected static string $view = 'filament.pages.manage-profile';
@@ -102,7 +106,7 @@ class ManageProfile extends Page implements Forms\Contracts\HasForms
                                     ->helperText('Unggah gambar bagan struktur organisasi (Rekomendasi format PNG/JPG transparan)'),
                             ]),
                     ])
-                    ->columnSpanFull()
+                    ->columnSpanFull(),
             ])
             ->statePath('data');
     }
@@ -124,7 +128,7 @@ class ManageProfile extends Page implements Forms\Contracts\HasForms
             if (is_array($value)) {
                 $value = reset($value);
             }
-            
+
             ProfileContent::updateOrCreate(
                 ['key' => $key],
                 ['value' => $value ?? '']

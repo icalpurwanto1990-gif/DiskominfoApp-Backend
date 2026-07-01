@@ -12,8 +12,10 @@ class AuditLog extends Model
     protected $table = 'AuditLog';
 
     protected $keyType = 'string';
+
     public $incrementing = false;
-    public $timestamps   = false; // We manage createdAt manually
+
+    public $timestamps = false; // We manage createdAt manually
 
     protected $fillable = [
         'id',
@@ -29,6 +31,7 @@ class AuditLog extends Model
     ];
 
     const CREATED_AT = 'createdAt';
+
     const UPDATED_AT = null;
 
     public function user()

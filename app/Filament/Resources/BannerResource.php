@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Banner;
 use App\Filament\Resources\BannerResource\Pages;
+use App\Models\Banner;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,9 +15,13 @@ class BannerResource extends Resource
     protected static ?string $model = Banner::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-presentation-chart-bar';
+
     protected static ?string $navigationLabel = 'Banner (Slider Hero)';
+
     protected static ?string $modelLabel = 'Banner';
+
     protected static ?string $pluralModelLabel = 'Banner';
+
     protected static ?string $navigationGroup = 'Konten Portal';
 
     public static function form(Form $form): Form

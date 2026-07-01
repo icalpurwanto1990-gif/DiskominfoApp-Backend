@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditLog;
 use App\Models\PpidRequest;
 use App\Models\ServiceRequest;
 use App\Models\TteRequest;
-use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -16,7 +16,7 @@ class UserController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login');
         }
 
@@ -40,25 +40,25 @@ class UserController extends Controller
         $ppidTicketNumbers = $ppidRequests->pluck('ticketNumber')->toArray();
         $tteIds = $tteRequests->pluck('id')->toArray();
 
-        $auditLogs = AuditLog::where(function($query) use ($serviceTicketNumbers, $ppidTicketNumbers, $tteIds) {
+        $auditLogs = AuditLog::where(function ($query) use ($serviceTicketNumbers, $ppidTicketNumbers, $tteIds) {
             $hasCondition = false;
-            if (!empty($serviceTicketNumbers)) {
-                $query->where(function($q) use ($serviceTicketNumbers) {
+            if (! empty($serviceTicketNumbers)) {
+                $query->where(function ($q) use ($serviceTicketNumbers) {
                     foreach ($serviceTicketNumbers as $num) {
                         $q->orWhere('details', 'like', "%#{$num}%");
                     }
                 });
                 $hasCondition = true;
             }
-            if (!empty($ppidTicketNumbers)) {
+            if (! empty($ppidTicketNumbers)) {
                 if ($hasCondition) {
-                    $query->orWhere(function($q) use ($ppidTicketNumbers) {
+                    $query->orWhere(function ($q) use ($ppidTicketNumbers) {
                         foreach ($ppidTicketNumbers as $num) {
                             $q->orWhere('details', 'like', "%#{$num}%");
                         }
                     });
                 } else {
-                    $query->where(function($q) use ($ppidTicketNumbers) {
+                    $query->where(function ($q) use ($ppidTicketNumbers) {
                         foreach ($ppidTicketNumbers as $num) {
                             $q->orWhere('details', 'like', "%#{$num}%");
                         }
@@ -66,15 +66,15 @@ class UserController extends Controller
                     $hasCondition = true;
                 }
             }
-            if (!empty($tteIds)) {
+            if (! empty($tteIds)) {
                 if ($hasCondition) {
-                    $query->orWhere(function($q) use ($tteIds) {
+                    $query->orWhere(function ($q) use ($tteIds) {
                         foreach ($tteIds as $id) {
                             $q->orWhere('details', 'like', "%#{$id}%");
                         }
                     });
                 } else {
-                    $query->where(function($q) use ($tteIds) {
+                    $query->where(function ($q) use ($tteIds) {
                         foreach ($tteIds as $id) {
                             $q->orWhere('details', 'like', "%#{$id}%");
                         }
@@ -82,12 +82,12 @@ class UserController extends Controller
                     $hasCondition = true;
                 }
             }
-            if (!$hasCondition) {
+            if (! $hasCondition) {
                 $query->whereRaw('1 = 0');
             }
         })
-        ->orderBy('createdAt', 'desc')
-        ->get();
+            ->orderBy('createdAt', 'desc')
+            ->get();
 
         return Inertia::render('User/Dashboard', [
             'serviceRequests' => $serviceRequests,
@@ -100,7 +100,7 @@ class UserController extends Controller
     public function getRequests()
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 401);
         }
 
@@ -121,25 +121,25 @@ class UserController extends Controller
         $ppidTicketNumbers = $ppidRequests->pluck('ticketNumber')->toArray();
         $tteIds = $tteRequests->pluck('id')->toArray();
 
-        $auditLogs = AuditLog::where(function($query) use ($serviceTicketNumbers, $ppidTicketNumbers, $tteIds) {
+        $auditLogs = AuditLog::where(function ($query) use ($serviceTicketNumbers, $ppidTicketNumbers, $tteIds) {
             $hasCondition = false;
-            if (!empty($serviceTicketNumbers)) {
-                $query->where(function($q) use ($serviceTicketNumbers) {
+            if (! empty($serviceTicketNumbers)) {
+                $query->where(function ($q) use ($serviceTicketNumbers) {
                     foreach ($serviceTicketNumbers as $num) {
                         $q->orWhere('details', 'like', "%#{$num}%");
                     }
                 });
                 $hasCondition = true;
             }
-            if (!empty($ppidTicketNumbers)) {
+            if (! empty($ppidTicketNumbers)) {
                 if ($hasCondition) {
-                    $query->orWhere(function($q) use ($ppidTicketNumbers) {
+                    $query->orWhere(function ($q) use ($ppidTicketNumbers) {
                         foreach ($ppidTicketNumbers as $num) {
                             $q->orWhere('details', 'like', "%#{$num}%");
                         }
                     });
                 } else {
-                    $query->where(function($q) use ($ppidTicketNumbers) {
+                    $query->where(function ($q) use ($ppidTicketNumbers) {
                         foreach ($ppidTicketNumbers as $num) {
                             $q->orWhere('details', 'like', "%#{$num}%");
                         }
@@ -147,15 +147,15 @@ class UserController extends Controller
                     $hasCondition = true;
                 }
             }
-            if (!empty($tteIds)) {
+            if (! empty($tteIds)) {
                 if ($hasCondition) {
-                    $query->orWhere(function($q) use ($tteIds) {
+                    $query->orWhere(function ($q) use ($tteIds) {
                         foreach ($tteIds as $id) {
                             $q->orWhere('details', 'like', "%#{$id}%");
                         }
                     });
                 } else {
-                    $query->where(function($q) use ($tteIds) {
+                    $query->where(function ($q) use ($tteIds) {
                         foreach ($tteIds as $id) {
                             $q->orWhere('details', 'like', "%#{$id}%");
                         }
@@ -163,12 +163,12 @@ class UserController extends Controller
                     $hasCondition = true;
                 }
             }
-            if (!$hasCondition) {
+            if (! $hasCondition) {
                 $query->whereRaw('1 = 0');
             }
         })
-        ->orderBy('createdAt', 'desc')
-        ->get();
+            ->orderBy('createdAt', 'desc')
+            ->get();
 
         return response()->json([
             'success' => true,
@@ -182,7 +182,7 @@ class UserController extends Controller
     public function storeTteRequest(Request $request)
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 401);
         }
 
@@ -218,14 +218,14 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'message' => $status === 'PENDING' ? 'Permohonan TTE ASN berhasil dikirim!' : 'Draf permohonan berhasil disimpan.',
-            'tteRequest' => $tteRequest
+            'tteRequest' => $tteRequest,
         ]);
     }
 
     public function updateTteRequest(Request $request)
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 401);
         }
 
@@ -275,7 +275,7 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'message' => $newStatus === 'PENDING' ? 'Permohonan TTE ASN berhasil diajukan ulang!' : 'Perubahan draf berhasil disimpan.',
-            'tteRequest' => $tteRequest
+            'tteRequest' => $tteRequest,
         ]);
     }
 }

@@ -1,22 +1,22 @@
 <?php
 
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\MediaController;
-use App\Http\Controllers\ProfilController;
-use App\Http\Controllers\SurveyController;
-use App\Http\Controllers\AiChatController;
-use App\Http\Controllers\BeritaController;
-use App\Http\Controllers\PpidController;
-use App\Http\Controllers\LayananController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\SatuDataController;
-use App\Http\Controllers\GisController;
-use App\Http\Controllers\KontakController;
-use App\Http\Controllers\UploadController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminApiController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AiChatController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BeritaController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GisController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\KontakController;
+use App\Http\Controllers\LayananController;
+use App\Http\Controllers\MediaController;
+use App\Http\Controllers\PpidController;
+use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\SatuDataController;
+use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\UploadController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Client Frontend Views (Inertia Render)
@@ -62,7 +62,6 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/audit-log', [AdminController::class, 'auditLog'])->name('admin.auditlog');
 });
 */
-
 
 // User Dashboard Portal Routes (Applicants & OPDs)
 Route::middleware(['auth'])->group(function () {
@@ -139,8 +138,3 @@ Route::prefix('api')->group(function () {
         Route::delete('/survey-responses/{id}', [AdminApiController::class, 'deleteSurveyResponse']);
     });
 });
-
-
-
-
-

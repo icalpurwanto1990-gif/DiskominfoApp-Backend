@@ -12,6 +12,7 @@ class DigitalService extends Model
     protected $table = 'DigitalService';
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -31,5 +32,6 @@ class DigitalService extends Model
     ];
 
     const CREATED_AT = 'createdAt';
+
     const UPDATED_AT = 'updatedAt';
 }

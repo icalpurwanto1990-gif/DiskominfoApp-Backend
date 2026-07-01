@@ -7,7 +7,6 @@ use App\Models\Banner;
 use App\Models\DigitalService;
 use App\Models\Post;
 use App\Models\ProfileContent;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class HomeController extends Controller
@@ -16,7 +15,7 @@ class HomeController extends Controller
     {
         // 1. Fetch statistics
         $dbStats = AppStatistic::all();
-        
+
         // 2. Fetch banners
         $banners = Banner::where('active', true)
             ->orderBy('orderIndex', 'asc')
@@ -37,7 +36,7 @@ class HomeController extends Controller
         // 4. Fetch welcome speech
         $speechKeys = ['sambutan_teks', 'sambutan_nama', 'sambutan_jabatan', 'sambutan_foto'];
         $dbSpeech = ProfileContent::whereIn('key', $speechKeys)->get();
-        
+
         $welcomeSpeech = [
             'teks' => 'Kami berkomitmen mewujudkan tata kelola pemerintahan yang bersih, efektif, transparan, dan akuntabel melalui Sistem Pemerintahan Berbasis Elektronik (SPBE). Portal ini merupakan wujud nyata integrasi layanan publik digital guna melayani aparatur pemerintah serta seluruh lapisan masyarakat di Kabupaten Banggai Kepulauan secara cepat, aman, dan inklusif.',
             'nama' => 'Ir. H. Sudirman L. Hasan, M.Si',
@@ -46,13 +45,19 @@ class HomeController extends Controller
         ];
 
         foreach ($dbSpeech as $item) {
-            if ($item->key === 'sambutan_teks' && $item->value) $welcomeSpeech['teks'] = $item->value;
-            if ($item->key === 'sambutan_nama' && $item->value) $welcomeSpeech['nama'] = $item->value;
-            if ($item->key === 'sambutan_jabatan' && $item->value) $welcomeSpeech['jabatan'] = $item->value;
+            if ($item->key === 'sambutan_teks' && $item->value) {
+                $welcomeSpeech['teks'] = $item->value;
+            }
+            if ($item->key === 'sambutan_nama' && $item->value) {
+                $welcomeSpeech['nama'] = $item->value;
+            }
+            if ($item->key === 'sambutan_jabatan' && $item->value) {
+                $welcomeSpeech['jabatan'] = $item->value;
+            }
             if ($item->key === 'sambutan_foto' && $item->value) {
                 $val = $item->value;
-                if (!str_starts_with($val, 'http') && !str_starts_with($val, '/')) {
-                    $val = '/uploads/' . $val;
+                if (! str_starts_with($val, 'http') && ! str_starts_with($val, '/')) {
+                    $val = '/uploads/'.$val;
                 }
                 $welcomeSpeech['foto'] = $val;
             }
@@ -81,11 +86,11 @@ class HomeController extends Controller
             ->get();
 
         return Inertia::render('Home', [
-            'dbStats'             => $dbStats,
-            'sliderImages'        => $banners,
-            'dbServices'          => $dbServices,
-            'welcomeSpeech'       => $welcomeSpeech,
-            'latestNewsItems'     => $latestNewsItems,
+            'dbStats' => $dbStats,
+            'sliderImages' => $banners,
+            'dbServices' => $dbServices,
+            'welcomeSpeech' => $welcomeSpeech,
+            'latestNewsItems' => $latestNewsItems,
             'latestAnnouncements' => $latestAnnouncements,
         ]);
 

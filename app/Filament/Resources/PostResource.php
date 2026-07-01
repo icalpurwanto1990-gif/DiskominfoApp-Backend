@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Post;
-use App\Models\Category;
 use App\Filament\Resources\PostResource\Pages;
+use App\Models\Post;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -17,9 +16,13 @@ class PostResource extends Resource
     protected static ?string $model = Post::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
+
     protected static ?string $navigationLabel = 'Berita & Pengumuman';
+
     protected static ?string $modelLabel = 'Berita';
+
     protected static ?string $pluralModelLabel = 'Berita';
+
     protected static ?string $navigationGroup = 'Konten Portal';
 
     public static function form(Form $form): Form
@@ -33,8 +36,7 @@ class PostResource extends Resource
                             ->maxLength(255)
                             ->label('Judul Berita')
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => 
-                                $operation === 'create' ? $set('slug', Str::slug($state)) : null),
+                            ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
                         Forms\Components\TextInput::make('slug')
                             ->required()
                             ->maxLength(255)

@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Menu;
 use App\Filament\Resources\MenuResource\Pages;
+use App\Models\Menu;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,9 +15,13 @@ class MenuResource extends Resource
     protected static ?string $model = Menu::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-bars-3';
+
     protected static ?string $navigationLabel = 'Manajemen Menu';
+
     protected static ?string $modelLabel = 'Menu Navigasi';
+
     protected static ?string $pluralModelLabel = 'Menu Navigasi';
+
     protected static ?string $navigationGroup = 'Pengaturan Portal';
 
     public static function form(Form $form): Form
@@ -72,7 +76,7 @@ class MenuResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->label('Label Menu'),
-                
+
                 Tables\Columns\TextColumn::make('url')
                     ->searchable()
                     ->label('Link / URL')

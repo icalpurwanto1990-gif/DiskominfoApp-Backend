@@ -12,6 +12,7 @@ class SurveyResponse extends Model
     protected $table = 'SurveyResponse';
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -27,6 +28,8 @@ class SurveyResponse extends Model
 
     // Only createdAt is present in this table
     public $timestamps = true;
+
     const CREATED_AT = 'createdAt';
+
     const UPDATED_AT = null;
 }

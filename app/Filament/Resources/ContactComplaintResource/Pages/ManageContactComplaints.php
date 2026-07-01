@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\ContactComplaintResource\Pages;
 
 use App\Filament\Resources\ContactComplaintResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
 
 class ManageContactComplaints extends ManageRecords

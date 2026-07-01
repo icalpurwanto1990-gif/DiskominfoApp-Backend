@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Document;
 use App\Models\ProfileContent;
 use App\Models\Staff;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ProfilController extends Controller

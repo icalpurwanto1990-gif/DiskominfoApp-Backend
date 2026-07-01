@@ -12,6 +12,7 @@ class ProfileContent extends Model
     protected $table = 'ProfileContent';
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -21,5 +22,6 @@ class ProfileContent extends Model
     ];
 
     const CREATED_AT = 'createdAt';
+
     const UPDATED_AT = 'updatedAt';
 }

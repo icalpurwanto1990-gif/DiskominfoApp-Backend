@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\AuditLog;
 use App\Filament\Resources\AuditLogResource\Pages;
+use App\Models\AuditLog;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -13,10 +13,15 @@ class AuditLogResource extends Resource
     protected static ?string $model = AuditLog::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
+
     protected static ?string $navigationLabel = 'Log Audit Sistem';
+
     protected static ?string $modelLabel = 'Log Audit';
+
     protected static ?string $pluralModelLabel = 'Log Audit';
+
     protected static ?string $navigationGroup = 'Sistem & Keamanan';
+
     protected static ?int $navigationSort = 99;
 
     public static function table(Table $table): Table

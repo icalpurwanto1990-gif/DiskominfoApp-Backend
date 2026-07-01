@@ -12,6 +12,7 @@ class AppStatistic extends Model
     protected $table = 'AppStatistic';
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -26,6 +27,8 @@ class AppStatistic extends Model
 
     // Only updatedAt timestamp is present in this table
     public $timestamps = true;
+
     const CREATED_AT = null;
+
     const UPDATED_AT = 'updatedAt';
 }

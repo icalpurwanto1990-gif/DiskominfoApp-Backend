@@ -28,6 +28,7 @@ class ManageDigitalServices extends ManageRecords
                         }
                     }
                     unset($data['icon_type'], $data['preset_icon'], $data['custom_icon_path']);
+
                     return $data;
                 }),
         ];

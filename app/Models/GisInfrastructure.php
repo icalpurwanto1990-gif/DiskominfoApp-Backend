@@ -12,6 +12,7 @@ class GisInfrastructure extends Model
     protected $table = 'GISInfrastructure';
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -31,5 +32,6 @@ class GisInfrastructure extends Model
     ];
 
     const CREATED_AT = 'createdAt';
+
     const UPDATED_AT = 'updatedAt';
 }

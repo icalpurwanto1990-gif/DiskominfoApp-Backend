@@ -2,24 +2,28 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\TteRequest;
 use App\Filament\Resources\TteRequestResource\Pages;
+use App\Models\TteRequest;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
-use Filament\Notifications\Notification;
+use Filament\Tables\Table;
 
 class TteRequestResource extends Resource
 {
     protected static ?string $model = TteRequest::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
+
     protected static ?string $navigationLabel = 'Permohonan TTE ASN';
+
     protected static ?string $modelLabel = 'Tiket TTE';
+
     protected static ?string $pluralModelLabel = 'Permohonan TTE';
+
     protected static ?string $navigationGroup = 'Pelayanan';
 
     public static function form(Form $form): Form
@@ -62,7 +66,7 @@ class TteRequestResource extends Resource
                             ->disabled()
                             ->label('Catatan Alasan Revisi')
                             ->rows(3),
-                    ])->columns(1)
+                    ])->columns(1),
             ]);
     }
 
@@ -97,7 +101,7 @@ class TteRequestResource extends Resource
             ->defaultSort('createdAt', 'desc')
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                
+
                 // 1. Approve Action (PENDING -> DIPROSES)
                 Action::make('approve')
                     ->label('Setujui & Kirim ke BSrE')
@@ -107,7 +111,7 @@ class TteRequestResource extends Resource
                     ->requiresConfirmation()
                     ->action(function (TteRequest $record) {
                         $payload = $record->triggerStatusTransition('DIPROSES', 'ADMIN');
-                        
+
                         Notification::make()
                             ->title('Permohonan Disetujui')
                             ->body('Data ASN sedang diteruskan ke BSrE untuk penerbitan TTE.')
@@ -129,7 +133,7 @@ class TteRequestResource extends Resource
                     ])
                     ->action(function (TteRequest $record, array $data) {
                         $payload = $record->triggerStatusTransition('REVISI', 'ADMIN', $data['catatan_revisi']);
-                        
+
                         Notification::make()
                             ->title('Berkas Dikembalikan')
                             ->body('Pemberitahuan revisi telah dikirimkan ke ASN.')
@@ -146,7 +150,7 @@ class TteRequestResource extends Resource
                     ->requiresConfirmation()
                     ->action(function (TteRequest $record) {
                         $payload = $record->triggerStatusTransition('SELESAI', 'ADMIN');
-                        
+
                         Notification::make()
                             ->title('TTE Terbit & Selesai')
                             ->body('Sertifikat TTE ASN telah berhasil diterbitkan.')

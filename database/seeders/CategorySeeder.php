@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
 {
@@ -16,27 +15,27 @@ class CategorySeeder extends Seeder
     {
         $defaultCategories = [
             [
-                'name'       => 'Pengumuman',
-                'slug'       => 'pengumuman',
-                'isMenu'     => true,
+                'name' => 'Pengumuman',
+                'slug' => 'pengumuman',
+                'isMenu' => true,
                 'orderIndex' => 1,
             ],
             [
-                'name'       => 'Berita',
-                'slug'       => 'berita',
-                'isMenu'     => true,
+                'name' => 'Berita',
+                'slug' => 'berita',
+                'isMenu' => true,
                 'orderIndex' => 2,
             ],
             [
-                'name'       => 'Artikel',
-                'slug'       => 'artikel',
-                'isMenu'     => true,
+                'name' => 'Artikel',
+                'slug' => 'artikel',
+                'isMenu' => true,
                 'orderIndex' => 3,
             ],
             [
-                'name'       => 'Siaran Pers',
-                'slug'       => 'siaran-pers',
-                'isMenu'     => false,
+                'name' => 'Siaran Pers',
+                'slug' => 'siaran-pers',
+                'isMenu' => false,
                 'orderIndex' => 4,
             ],
         ];
@@ -45,8 +44,8 @@ class CategorySeeder extends Seeder
             Category::updateOrCreate(
                 ['slug' => $cat['slug']],
                 [
-                    'name'       => $cat['name'],
-                    'isMenu'     => $cat['isMenu'],
+                    'name' => $cat['name'],
+                    'isMenu' => $cat['isMenu'],
                     'orderIndex' => $cat['orderIndex'],
                 ]
             );

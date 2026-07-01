@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\GisInfrastructure;
 use App\Filament\Resources\GisInfrastructureResource\Pages;
+use App\Models\GisInfrastructure;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,9 +15,13 @@ class GisInfrastructureResource extends Resource
     protected static ?string $model = GisInfrastructure::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-map';
+
     protected static ?string $navigationLabel = 'Peta GIS Sebaran';
+
     protected static ?string $modelLabel = 'Titik Koordinat';
+
     protected static ?string $pluralModelLabel = 'Titik Koordinat';
+
     protected static ?string $navigationGroup = 'Portal Data';
 
     public static function form(Form $form): Form

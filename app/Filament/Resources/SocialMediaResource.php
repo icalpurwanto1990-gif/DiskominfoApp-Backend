@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\SocialMedia;
 use App\Filament\Resources\SocialMediaResource\Pages;
+use App\Models\SocialMedia;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,9 +15,13 @@ class SocialMediaResource extends Resource
     protected static ?string $model = SocialMedia::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-share';
+
     protected static ?string $navigationLabel = 'Media Sosial';
+
     protected static ?string $modelLabel = 'Media Sosial';
+
     protected static ?string $pluralModelLabel = 'Media Sosial';
+
     protected static ?string $navigationGroup = 'Konten Portal';
 
     public static function form(Form $form): Form
@@ -52,7 +56,7 @@ class SocialMediaResource extends Resource
                             ->default(0)
                             ->label('Urutan Tampil (Order Index)'),
                     ])
-                    ->columns(2)
+                    ->columns(2),
             ]);
     }
 

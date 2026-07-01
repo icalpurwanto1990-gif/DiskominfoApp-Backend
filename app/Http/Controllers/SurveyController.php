@@ -25,7 +25,7 @@ class SurveyController extends Controller
 
         return response()->json([
             'success' => true,
-            'survey' => $survey
+            'survey' => $survey,
         ]);
     }
 }

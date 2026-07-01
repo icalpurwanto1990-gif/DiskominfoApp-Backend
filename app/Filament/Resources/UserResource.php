@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\User;
 use App\Filament\Resources\UserResource\Pages;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -16,9 +16,13 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
+
     protected static ?string $navigationLabel = 'Manajemen Akun';
+
     protected static ?string $modelLabel = 'Akun';
+
     protected static ?string $pluralModelLabel = 'Akun';
+
     protected static ?string $navigationGroup = 'Sistem';
 
     public static function form(Form $form): Form

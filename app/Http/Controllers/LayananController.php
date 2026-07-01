@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DigitalService;
-use App\Models\ServiceRequest;
-use App\Models\PpidRequest;
-use App\Models\TteRequest;
 use App\Models\AppStatistic;
+use App\Models\DigitalService;
+use App\Models\PpidRequest;
+use App\Models\ServiceRequest;
+use App\Models\TteRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -22,6 +22,7 @@ class LayananController extends Controller
     {
         try {
             $services = DigitalService::where('active', true)->orderBy('createdAt', 'asc')->get();
+
             return response()->json($services);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
@@ -40,7 +41,7 @@ class LayananController extends Controller
                 'details' => 'nullable|array',
             ]);
 
-            $ticketNumber = 'SRV-2026-' . rand(1000, 9999);
+            $ticketNumber = 'SRV-2026-'.rand(1000, 9999);
 
             $newRequest = ServiceRequest::create([
                 'id' => (string) Str::uuid(),
@@ -63,7 +64,7 @@ class LayananController extends Controller
                     AppStatistic::create([
                         'id' => (string) Str::uuid(),
                         'key' => 'TOTAL_SERVICES_REQUESTED',
-                        'value' => 1
+                        'value' => 1,
                     ]);
                 }
             } catch (\Exception $e) {
@@ -73,12 +74,12 @@ class LayananController extends Controller
             return response()->json([
                 'success' => true,
                 'ticketNumber' => $newRequest->ticketNumber,
-                'id' => $newRequest->id
+                'id' => $newRequest->id,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -132,6 +133,7 @@ class LayananController extends Controller
             }
 
             $requests = ServiceRequest::orderBy('createdAt', 'desc')->get();
+
             return response()->json($requests);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);

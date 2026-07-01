@@ -12,6 +12,7 @@ class ContactComplaint extends Model
     protected $table = 'ContactComplaint';
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [

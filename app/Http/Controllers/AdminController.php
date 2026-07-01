@@ -16,7 +16,6 @@ use App\Models\ServiceRequest;
 use App\Models\Staff;
 use App\Models\Tag;
 use App\Models\User;
-use App\Models\SurveyResponse;
 use Inertia\Inertia;
 
 class AdminController extends Controller
@@ -29,7 +28,7 @@ class AdminController extends Controller
     public function banners()
     {
         return Inertia::render('Admin/Banners', [
-            'banners' => Banner::orderBy('orderIndex', 'asc')->get()
+            'banners' => Banner::orderBy('orderIndex', 'asc')->get(),
         ]);
     }
 
@@ -37,7 +36,7 @@ class AdminController extends Controller
     {
         return Inertia::render('Admin/ProfileStaff', [
             'profileContent' => ProfileContent::all()->pluck('value', 'key')->toArray(),
-            'staff' => Staff::orderBy('orderIndex', 'asc')->get()
+            'staff' => Staff::orderBy('orderIndex', 'asc')->get(),
         ]);
     }
 
@@ -46,7 +45,7 @@ class AdminController extends Controller
         return Inertia::render('Admin/Berita', [
             'posts' => Post::with(['category', 'tags'])->orderBy('createdAt', 'desc')->get(),
             'categories' => Category::orderBy('name', 'asc')->get(),
-            'tags' => Tag::orderBy('name', 'asc')->get()
+            'tags' => Tag::orderBy('name', 'asc')->get(),
         ]);
     }
 
@@ -55,7 +54,7 @@ class AdminController extends Controller
         return Inertia::render('Admin/Ppid', [
             'requests' => PpidRequest::orderBy('createdAt', 'desc')->get(),
             'objections' => PpidObjection::with('request')->orderBy('createdAt', 'desc')->get(),
-            'documents' => Document::orderBy('createdAt', 'desc')->get()
+            'documents' => Document::orderBy('createdAt', 'desc')->get(),
         ]);
     }
 
@@ -63,21 +62,21 @@ class AdminController extends Controller
     {
         return Inertia::render('Admin/Layanan', [
             'services' => DigitalService::orderBy('createdAt', 'asc')->get(),
-            'requests' => ServiceRequest::orderBy('createdAt', 'desc')->get()
+            'requests' => ServiceRequest::orderBy('createdAt', 'desc')->get(),
         ]);
     }
 
     public function satuData()
     {
         return Inertia::render('Admin/SatuData', [
-            'datasets' => Dataset::orderBy('createdAt', 'desc')->get()
+            'datasets' => Dataset::orderBy('createdAt', 'desc')->get(),
         ]);
     }
 
     public function gis()
     {
         return Inertia::render('Admin/Gis', [
-            'infrastructures' => GisInfrastructure::orderBy('createdAt', 'desc')->get()
+            'infrastructures' => GisInfrastructure::orderBy('createdAt', 'desc')->get(),
         ]);
     }
 
@@ -89,7 +88,7 @@ class AdminController extends Controller
     public function users()
     {
         return Inertia::render('Admin/Users', [
-            'users' => User::orderBy('createdAt', 'desc')->get()
+            'users' => User::orderBy('createdAt', 'desc')->get(),
         ]);
     }
 

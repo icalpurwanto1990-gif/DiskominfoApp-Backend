@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\DigitalService;
 use App\Filament\Resources\DigitalServiceResource\Pages;
+use App\Models\DigitalService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -18,9 +18,13 @@ class DigitalServiceResource extends Resource
     protected static ?string $model = DigitalService::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-cpu-chip';
+
     protected static ?string $navigationLabel = 'Katalog Layanan';
+
     protected static ?string $modelLabel = 'Layanan';
+
     protected static ?string $pluralModelLabel = 'Layanan';
+
     protected static ?string $navigationGroup = 'Layanan Digital';
 
     public static function form(Form $form): Form
@@ -171,14 +175,14 @@ class DigitalServiceResource extends Resource
                 Tables\Columns\TextColumn::make('icon')
                     ->label('Icon / Gambar')
                     ->formatStateUsing(function ($state) {
-                        return in_array($state, ['Globe', 'Shield', 'Video', 'Database', 'FileText']) 
-                            ? "Preset: {$state}" 
-                            : "Kustom (Gambar)";
+                        return in_array($state, ['Globe', 'Shield', 'Video', 'Database', 'FileText'])
+                            ? "Preset: {$state}"
+                            : 'Kustom (Gambar)';
                     })
                     ->badge()
                     ->color(function ($state) {
-                        return in_array($state, ['Globe', 'Shield', 'Video', 'Database', 'FileText']) 
-                            ? 'info' 
+                        return in_array($state, ['Globe', 'Shield', 'Video', 'Database', 'FileText'])
+                            ? 'info'
                             : 'success';
                     }),
                 Tables\Columns\IconColumn::make('active')
@@ -204,6 +208,7 @@ class DigitalServiceResource extends Resource
                             }
                         }
                         unset($data['icon_type'], $data['preset_icon'], $data['custom_icon_path']);
+
                         return $data;
                     }),
                 Tables\Actions\DeleteAction::make(),

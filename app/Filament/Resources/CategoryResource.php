@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Category;
 use App\Filament\Resources\CategoryResource\Pages;
+use App\Models\Category;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -16,9 +16,13 @@ class CategoryResource extends Resource
     protected static ?string $model = Category::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
+
     protected static ?string $navigationLabel = 'Kategori Berita';
+
     protected static ?string $modelLabel = 'Kategori';
+
     protected static ?string $pluralModelLabel = 'Kategori';
+
     protected static ?string $navigationGroup = 'Konten Portal';
 
     public static function form(Form $form): Form
@@ -32,8 +36,7 @@ class CategoryResource extends Resource
                             ->maxLength(255)
                             ->label('Nama Kategori')
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => 
-                                $operation === 'create' ? $set('slug', Str::slug($state)) : null),
+                            ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
                         Forms\Components\TextInput::make('slug')
                             ->required()
                             ->maxLength(255)
@@ -49,7 +52,7 @@ class CategoryResource extends Resource
                             ->default(0)
                             ->label('Urutan Tampil (Order Index)'),
                     ])
-                    ->columns(2)
+                    ->columns(2),
             ]);
     }
 

@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Dataset;
 use App\Filament\Resources\DatasetResource\Pages;
+use App\Models\Dataset;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -16,9 +16,13 @@ class DatasetResource extends Resource
     protected static ?string $model = Dataset::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-table-cells';
+
     protected static ?string $navigationLabel = 'Satu Data Sektoral';
+
     protected static ?string $modelLabel = 'Dataset';
+
     protected static ?string $pluralModelLabel = 'Dataset';
+
     protected static ?string $navigationGroup = 'Portal Data';
 
     public static function form(Form $form): Form
@@ -32,8 +36,7 @@ class DatasetResource extends Resource
                             ->maxLength(255)
                             ->label('Judul Dataset')
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => 
-                                $operation === 'create' ? $set('slug', Str::slug($state)) : null),
+                            ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
                         Forms\Components\TextInput::make('slug')
                             ->required()
                             ->maxLength(255)

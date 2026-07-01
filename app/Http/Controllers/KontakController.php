@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ContactComplaint;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class KontakController extends Controller
@@ -22,8 +24,8 @@ class KontakController extends Controller
             'message' => 'required|string',
         ]);
 
-        $complaint = \App\Models\ContactComplaint::create([
-            'id' => (string) \Illuminate\Support\Str::uuid(),
+        $complaint = ContactComplaint::create([
+            'id' => (string) Str::uuid(),
             'name' => $validated['name'],
             'phone' => $validated['phone'],
             'email' => $validated['email'],

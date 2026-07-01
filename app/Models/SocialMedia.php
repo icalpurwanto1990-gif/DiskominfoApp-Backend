@@ -12,6 +12,7 @@ class SocialMedia extends Model
     protected $table = 'SocialMedia';
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -28,5 +29,6 @@ class SocialMedia extends Model
     ];
 
     const CREATED_AT = 'createdAt';
+
     const UPDATED_AT = 'updatedAt';
 }

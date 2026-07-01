@@ -12,6 +12,7 @@ class Category extends Model
     protected $table = 'Category';
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [

@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Staff;
 use App\Filament\Resources\StaffResource\Pages;
+use App\Models\Staff;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,9 +15,13 @@ class StaffResource extends Resource
     protected static ?string $model = Staff::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
+
     protected static ?string $navigationLabel = 'Daftar Pegawai (BKN)';
+
     protected static ?string $modelLabel = 'Pegawai';
+
     protected static ?string $pluralModelLabel = 'Pegawai';
+
     protected static ?string $navigationGroup = 'Kepegawaian';
 
     public static function form(Form $form): Form
@@ -78,8 +82,9 @@ class StaffResource extends Resource
                 Tables\Columns\TextColumn::make('full_name')
                     ->label('Nama Lengkap & Gelar')
                     ->state(function (Staff $record): string {
-                        $front = $record->gelarDepan ? $record->gelarDepan . ' ' : '';
-                        $back = $record->gelarBelakang ? ', ' . $record->gelarBelakang : '';
+                        $front = $record->gelarDepan ? $record->gelarDepan.' ' : '';
+                        $back = $record->gelarBelakang ? ', '.$record->gelarBelakang : '';
+
                         return "{$front}{$record->name}{$back}";
                     })
                     ->searchable(['name', 'gelarDepan', 'gelarBelakang']),

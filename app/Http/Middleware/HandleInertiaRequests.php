@@ -2,6 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Menu;
+use App\Models\PartnerLink;
+use App\Models\SocialMedia;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -37,7 +40,7 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
-            'menus' => fn () => \App\Models\Menu::active()
+            'menus' => fn () => Menu::active()
                 ->topLevel()
                 ->with(['children' => fn ($q) => $q->active()])
                 ->orderBy('sort_order')
@@ -54,7 +57,7 @@ class HandleInertiaRequests extends Middleware
                         'target' => $child->target,
                     ]),
                 ]),
-            'partnerLinks' => fn () => \App\Models\PartnerLink::where('active', true)
+            'partnerLinks' => fn () => PartnerLink::where('active', true)
                 ->orderBy('orderIndex')
                 ->get()
                 ->map(fn ($link) => [
@@ -66,7 +69,7 @@ class HandleInertiaRequests extends Middleware
                     'logo' => $link->logo,
                     'desc' => $link->desc,
                 ]),
-            'socialMedia' => fn () => \App\Models\SocialMedia::where('active', true)
+            'socialMedia' => fn () => SocialMedia::where('active', true)
                 ->orderBy('orderIndex')
                 ->get()
                 ->map(fn ($sm) => [

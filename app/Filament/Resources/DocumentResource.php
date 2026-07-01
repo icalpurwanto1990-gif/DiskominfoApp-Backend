@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Document;
 use App\Filament\Resources\DocumentResource\Pages;
+use App\Models\Document;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,9 +15,13 @@ class DocumentResource extends Resource
     protected static ?string $model = Document::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-folder-open';
+
     protected static ?string $navigationLabel = 'Dokumen Informasi Publik';
+
     protected static ?string $modelLabel = 'Dokumen';
+
     protected static ?string $pluralModelLabel = 'Dokumen';
+
     protected static ?string $navigationGroup = 'Layanan PPID';
 
     public static function form(Form $form): Form

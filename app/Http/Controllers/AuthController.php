@@ -49,7 +49,7 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Pendaftaran berhasil. Silakan aktifkan akun Anda.',
-            'verification_link' => route('auth.verify', ['token' => $token])
+            'verification_link' => route('auth.verify', ['token' => $token]),
         ]);
     }
 
@@ -57,7 +57,7 @@ class AuthController extends Controller
     {
         $user = User::where('verification_token', $token)->first();
 
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login', ['error' => 'invalid_token']);
         }
 
@@ -82,7 +82,7 @@ class AuthController extends Controller
             if (is_null($user->email_verified_at)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Akun Anda belum aktif. Silakan verifikasi email Anda terlebih dahulu.'
+                    'message' => 'Akun Anda belum aktif. Silakan verifikasi email Anda terlebih dahulu.',
                 ], 422);
             }
 
@@ -99,13 +99,13 @@ class AuthController extends Controller
                     'nip' => $user->nip,
                     'jabatan' => $user->jabatan,
                     'instansi' => $user->instansi,
-                ]
+                ],
             ]);
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'Email atau password salah.'
+            'message' => 'Email atau password salah.',
         ], 422);
     }
 

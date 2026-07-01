@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\PpidRequest;
 use App\Filament\Resources\PpidRequestResource\Pages;
+use App\Models\PpidRequest;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,9 +15,13 @@ class PpidRequestResource extends Resource
     protected static ?string $model = PpidRequest::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
+
     protected static ?string $navigationLabel = 'Permohonan Informasi';
+
     protected static ?string $modelLabel = 'Permohonan';
+
     protected static ?string $pluralModelLabel = 'Permohonan';
+
     protected static ?string $navigationGroup = 'Pelayanan';
 
     public static function form(Form $form): Form

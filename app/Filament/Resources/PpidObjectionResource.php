@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\PpidObjectionResource\Pages;
 use App\Models\PpidObjection;
 use App\Models\PpidRequest;
-use App\Filament\Resources\PpidObjectionResource\Pages;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -16,9 +16,13 @@ class PpidObjectionResource extends Resource
     protected static ?string $model = PpidObjection::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-exclamation-triangle';
+
     protected static ?string $navigationLabel = 'Keberatan PPID';
+
     protected static ?string $modelLabel = 'Keberatan';
+
     protected static ?string $pluralModelLabel = 'Keberatan';
+
     protected static ?string $navigationGroup = 'Pelayanan';
 
     public static function form(Form $form): Form

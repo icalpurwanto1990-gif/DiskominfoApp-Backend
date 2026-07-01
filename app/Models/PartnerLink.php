@@ -12,6 +12,7 @@ class PartnerLink extends Model
     protected $table = 'PartnerLink';
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -32,13 +33,15 @@ class PartnerLink extends Model
     ];
 
     const CREATED_AT = 'createdAt';
+
     const UPDATED_AT = 'updatedAt';
 
     public function getLogoAttribute($value)
     {
-        if ($value && !str_starts_with($value, 'http://') && !str_starts_with($value, 'https://') && !str_starts_with($value, '/')) {
-            return '/uploads/' . $value;
+        if ($value && ! str_starts_with($value, 'http://') && ! str_starts_with($value, 'https://') && ! str_starts_with($value, '/')) {
+            return '/uploads/'.$value;
         }
+
         return $value;
     }
 }
