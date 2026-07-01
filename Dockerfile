@@ -1,3 +1,12 @@
+# Build assets stage
+FROM node:18-alpine AS assets-builder
+WORKDIR /app
+COPY package.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Final container stage
 FROM php:8.2-fpm-alpine
 
 # Install system dependencies
@@ -24,6 +33,9 @@ WORKDIR /var/www/html
 
 # Copy project files
 COPY . .
+
+# Copy built assets from builder stage
+COPY --from=assets-builder /app/public/build ./public/build
 
 # Install dependency composer
 RUN composer install --no-dev --optimize-autoloader --no-interaction
