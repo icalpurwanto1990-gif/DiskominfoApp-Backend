@@ -14,7 +14,6 @@ services:
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
-      - APP_KEY=${APP_KEY}
       - DB_CONNECTION=pgsql
       - DB_HOST=db
       - DB_PORT=5432
