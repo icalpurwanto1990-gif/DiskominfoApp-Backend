@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('TteRequest', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('user_id')->nullable();
+            $table->uuid('user_id')->nullable();
             $table->string('nama');
             $table->string('nip');
             $table->string('nik');
