@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, usePage } from "@inertiajs/react";
 import { Landmark, Mail, Phone, MapPin, MessageCircle, Globe, ArrowUpRight, Shield, Facebook, Instagram, Youtube, Twitter, Linkedin } from "lucide-react";
 import PartnerLinksSlider from "./PartnerLinksSlider";
@@ -6,6 +6,15 @@ import PartnerLinksSlider from "./PartnerLinksSlider";
 export const Footer = () => {
   const { props } = usePage();
   const socialMedia = props.socialMedia || [];
+
+  // Fetch layanan dari API agar footer selalu sinkron dengan database
+  const [footerServices, setFooterServices] = useState([]);
+  useEffect(() => {
+    fetch("/api/layanan")
+      .then((res) => res.ok ? res.json() : [])
+      .then((data) => setFooterServices(Array.isArray(data) ? data : []))
+      .catch(() => setFooterServices([]));
+  }, []);
 
   const fallbackSocialMedia = [
     { id: "fb", platform: "Facebook", url: "https://facebook.com" },
@@ -124,28 +133,44 @@ export const Footer = () => {
             </nav>
           </div>
 
-          {/* Services */}
+          {/* Services — Dinamis dari database via API /api/layanan */}
           <div className="flex flex-col gap-5">
             <h4 className="text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2">
               <span className="w-4 h-0.5 bg-emerald-500 rounded-full" />
-              Layanan OPD & ASN
+              Layanan OPD &amp; ASN
             </h4>
             <ul className="flex flex-col gap-2 text-xs">
-              {[
-                { href: "/layanan?type=tte", label: "Sertifikat Elektronik (TTE)" },
-                { href: "/layanan?type=email", label: "Email Instansi Pemerintah" },
-                { href: "/layanan?type=hosting", label: "Penyewaan Hosting Website" },
-                { href: "/layanan?type=zoom", label: "Permintaan Link Zoom Meeting" },
-                { href: "/layanan?type=subdomain", label: "Pengajuan Domain & Subdomain" },
-                { href: "/layanan?type=jaringan", label: "Aduan Gangguan Jaringan" },
-              ].map((item) => (
-                <li key={item.href}>
-                  <Link href={item.href} className="flex items-center gap-1.5 text-slate-500 hover:text-white transition group">
-                    <ArrowUpRight size={10} className="opacity-0 group-hover:opacity-100 text-emerald-500 transition flex-shrink-0" />
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
+              {footerServices.length > 0 ? (
+                footerServices.map((service) => {
+                  const isExternal = service.slug?.startsWith("http");
+                  const href = isExternal ? service.slug : `/layanan?type=${service.slug}`;
+                  return (
+                    <li key={service.id || service.slug}>
+                      {isExternal ? (
+                        <a
+                          href={href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 text-slate-500 hover:text-white transition group"
+                        >
+                          <ArrowUpRight size={10} className="opacity-0 group-hover:opacity-100 text-emerald-500 transition flex-shrink-0" />
+                          {service.title}
+                        </a>
+                      ) : (
+                        <Link href={href} className="flex items-center gap-1.5 text-slate-500 hover:text-white transition group">
+                          <ArrowUpRight size={10} className="opacity-0 group-hover:opacity-100 text-emerald-500 transition flex-shrink-0" />
+                          {service.title}
+                        </Link>
+                      )}
+                    </li>
+                  );
+                })
+              ) : (
+                // Fallback skeleton saat data sedang dimuat
+                [1, 2, 3, 4].map((i) => (
+                  <li key={i} className="h-3 bg-slate-800 rounded animate-pulse w-3/4" />
+                ))
+              )}
             </ul>
           </div>
 
