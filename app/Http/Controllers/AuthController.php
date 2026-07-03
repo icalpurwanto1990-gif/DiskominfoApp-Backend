@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -46,11 +47,42 @@ class AuthController extends Controller
             'verification_token' => $token,
         ]);
 
-        return response()->json([
+        try {
+            Mail::send([], [], function ($message) use ($user, $validated) {
+                $message->to($validated['email'])
+                    ->subject('Verifikasi Email - Portal Diskominfo Bangkep')
+                    ->html('
+                        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
+                            <div style="text-align: center; margin-bottom: 24px;">
+                                <h2 style="color: #059669; font-weight: 800; font-size: 24px; margin: 0;">Portal Diskominfo Bangkep</h2>
+                            </div>
+                            <p style="color: #334155; font-size: 16px; line-height: 1.6;">Halo ' . htmlspecialchars($user->name) . ',</p>
+                            <p style="color: #334155; font-size: 16px; line-height: 1.6;">Akun Anda telah berhasil dibuat. Silakan klik tombol di bawah ini untuk memverifikasi alamat email Anda dan mengaktifkan akun Anda:</p>
+                            <div style="margin: 32px 0; text-align: center;">
+                                <a href="' . route('auth.verify', ['token' => $user->verification_token]) . '" style="background-color: #059669; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; letter-spacing: 0.5px; text-transform: uppercase;">Aktifkan Akun Saya</a>
+                            </div>
+                            <p style="color: #64748b; font-size: 13px; line-height: 1.6; border-top: 1px solid #f1f5f9; padding-top: 16px; margin-top: 24px;">
+                                Jika tombol di atas tidak berfungsi, Anda juga dapat menyalin tautan berikut ke browser Anda:<br>
+                                <a href="' . route('auth.verify', ['token' => $user->verification_token]) . '" style="color: #3b82f6; word-break: break-all;">' . route('auth.verify', ['token' => $user->verification_token]) . '</a>
+                            </p>
+                            <p style="color: #94a3b8; font-size: 12px; text-align: center; margin-top: 32px;">&copy; ' . date('Y') . ' Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan</p>
+                        </div>
+                    ');
+            });
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Mail send failed: ' . $e->getMessage());
+        }
+
+        $responseData = [
             'success' => true,
-            'message' => 'Pendaftaran berhasil. Silakan aktifkan akun Anda.',
-            'verification_link' => route('auth.verify', ['token' => $token]),
-        ]);
+            'message' => 'Pendaftaran berhasil. Silakan cek kotak masuk email Anda (termasuk folder spam) untuk melakukan verifikasi akun.',
+        ];
+
+        if (config('app.env') === 'local') {
+            $responseData['verification_link'] = route('auth.verify', ['token' => $token]);
+        }
+
+        return response()->json($responseData);
     }
 
     public function verifyEmail($token)
