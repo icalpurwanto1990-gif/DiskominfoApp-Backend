@@ -169,13 +169,13 @@ class AuthController extends Controller
         if ($user) {
             $token = Str::random(60);
 
-            \DB::table('password_reset_tokens')->updateOrCreate(
-                ['email' => $request->email],
-                [
-                    'token'      => Hash::make($token),
-                    'created_at' => now(),
-                ]
-            );
+            // Query Builder doesn't support updateOrCreate() — use delete + insert instead
+            \DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+            \DB::table('password_reset_tokens')->insert([
+                'email'      => $request->email,
+                'token'      => Hash::make($token),
+                'created_at' => now(),
+            ]);
 
             $resetUrl   = url('/auth/reset-password/' . $token . '?email=' . urlencode($user->email));
             $userName   = htmlspecialchars($user->name);
