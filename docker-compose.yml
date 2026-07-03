@@ -9,6 +9,7 @@ services:
     volumes:
       - ./.env:/var/www/html/.env
       - ./public/uploads:/var/www/html/public/uploads
+      - ./storage:/var/www/html/storage
     depends_on:
       db:
         condition: service_healthy
