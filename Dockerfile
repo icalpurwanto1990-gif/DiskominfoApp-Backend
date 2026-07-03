@@ -46,6 +46,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 # Setup Nginx and Supervisor configuration
 COPY ./docker/nginx.conf /etc/nginx/nginx.conf
 COPY ./docker/supervisord.conf /etc/supervisord.conf
+COPY ./docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 
 # Set permissions
 RUN mkdir -p /var/www/html/public/uploads && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/uploads
