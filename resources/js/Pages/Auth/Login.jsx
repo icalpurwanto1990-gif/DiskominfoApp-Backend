@@ -130,7 +130,10 @@ export default function Login() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <label htmlFor="pass" className="text-slate-400 uppercase tracking-wider text-[10px] font-bold">Password</label>
+            <div className="flex justify-between items-center">
+              <label htmlFor="pass" className="text-slate-400 uppercase tracking-wider text-[10px] font-bold">Password</label>
+              <Link href="/auth/forgot-password" style={{ textShadow: "0 0 20px rgba(16,185,129,0.2)" }} className="text-[10px] text-emerald-500 hover:text-emerald-400 hover:underline uppercase tracking-wider font-extrabold transition-colors">Lupa Password?</Link>
+            </div>
             <div className="relative">
               <Lock size={16} className="absolute left-3.5 top-3.5 text-slate-500" />
               <input

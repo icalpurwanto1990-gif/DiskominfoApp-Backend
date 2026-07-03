@@ -14,13 +14,17 @@ return new class extends Migration
 
         Schema::create('AuditLog', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->uuid('userId')->nullable();
             $table->string('adminName')->default('System');
             $table->string('adminRole')->default('ADMIN');
             $table->string('action');        // CREATE, UPDATE, DELETE, LOGIN, LOGOUT, VIEW
-            $table->string('module');        // BERITA, BANNER, PPID, LAYANAN, USER, GIS, SATU_DATA, SURVEY, PROFIL, MEDIA
-            $table->text('description');
+            $table->string('module')->nullable();        // BERITA, BANNER, PPID, LAYANAN, USER, GIS, SATU_DATA, SURVEY, PROFIL, MEDIA
+            $table->text('description')->nullable();
+            $table->text('details')->nullable();
             $table->string('ipAddress')->nullable();
             $table->timestamp('createdAt')->useCurrent();
+
+            $table->foreign('userId')->references('id')->on('User')->onDelete('set null');
         });
     }
 

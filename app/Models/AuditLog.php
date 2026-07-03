@@ -20,7 +20,11 @@ class AuditLog extends Model
     protected $fillable = [
         'id',
         'userId',
+        'adminName',
+        'adminRole',
         'action',
+        'module',
+        'description',
         'details',
         'ipAddress',
         'createdAt',

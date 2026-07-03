@@ -44,6 +44,10 @@ Route::post('/api/auth/logout', [AuthController::class, 'logout'])->name('api.lo
 Route::get('/auth/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/api/auth/register', [AuthController::class, 'register'])->name('api.register');
 Route::get('/auth/verify/{token}', [AuthController::class, 'verifyEmail'])->name('auth.verify');
+Route::get('/auth/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
+Route::get('/auth/reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
+Route::post('/api/auth/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('api.password.email');
+Route::post('/api/auth/reset-password', [AuthController::class, 'resetPassword'])->name('api.password.update');
 
 // Admin Panel View Routes (Disabled to restore Filament admin panel)
 /*

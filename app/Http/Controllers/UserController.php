@@ -31,10 +31,11 @@ class UserController extends Controller
             ->get();
 
         // Fetch user's submitted TTE requests
-        $tteRequests = TteRequest::where('user_id', $user->id)
-            ->orWhere('nip', $user->nip)
-            ->orderBy('createdAt', 'desc')
-            ->get();
+        $tteRequestsQuery = TteRequest::where('user_id', $user->id);
+        if ($user->nip) {
+            $tteRequestsQuery->orWhere('nip', $user->nip);
+        }
+        $tteRequests = $tteRequestsQuery->orderBy('createdAt', 'desc')->get();
 
         $serviceTicketNumbers = $serviceRequests->pluck('ticketNumber')->toArray();
         $ppidTicketNumbers = $ppidRequests->pluck('ticketNumber')->toArray();
@@ -112,10 +113,11 @@ class UserController extends Controller
             ->orderBy('createdAt', 'desc')
             ->get();
 
-        $tteRequests = TteRequest::where('user_id', $user->id)
-            ->orWhere('nip', $user->nip)
-            ->orderBy('createdAt', 'desc')
-            ->get();
+        $tteRequestsQuery = TteRequest::where('user_id', $user->id);
+        if ($user->nip) {
+            $tteRequestsQuery->orWhere('nip', $user->nip);
+        }
+        $tteRequests = $tteRequestsQuery->orderBy('createdAt', 'desc')->get();
 
         $serviceTicketNumbers = $serviceRequests->pluck('ticketNumber')->toArray();
         $ppidTicketNumbers = $ppidRequests->pluck('ticketNumber')->toArray();

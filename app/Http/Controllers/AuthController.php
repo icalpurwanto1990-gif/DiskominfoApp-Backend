@@ -150,4 +150,94 @@ class AuthController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function showForgotPassword()
+    {
+        return Inertia::render('Auth/ForgotPassword');
+    }
+
+    public function showResetPassword($token)
+    {
+        return Inertia::render('Auth/ResetPassword', ['token' => $token]);
+    }
+
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
+            $token = Str::random(60);
+
+            \DB::table('password_reset_tokens')->updateOrCreate(
+                ['email' => $request->email],
+                [
+                    'token' => Hash::make($token),
+                    'created_at' => now()
+                ]
+            );
+
+            try {
+                Mail::send([], [], function ($message) use ($user, $token) {
+                    $message->to($user->email)
+                        ->subject('Atur Ulang Kata Sandi - Portal Diskominfo Bangkep')
+                        ->html('
+                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
+                                <div style="text-align: center; margin-bottom: 24px;">
+                                    <h2 style="color: #059669; font-weight: 800; font-size: 24px; margin: 0;">Portal Diskominfo Bangkep</h2>
+                                </div>
+                                <p style="color: #334155; font-size: 16px; line-height: 1.6;">Halo ' . htmlspecialchars($user->name) . ',</p>
+                                <p style="color: #334155; font-size: 16px; line-height: 1.6;">Kami menerima permintaan untuk mengatur ulang kata sandi akun Anda. Silakan klik tombol di bawah ini untuk melanjutkan:</p>
+                                <div style="margin: 32px 0; text-align: center;">
+                                    <a href="' . url('/auth/reset-password/' . $token . '?email=' . urlencode($user->email)) . '" style="background-color: #059669; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; letter-spacing: 0.5px; text-transform: uppercase;">Atur Ulang Kata Sandi</a>
+                                </div>
+                                <p style="color: #64748b; font-size: 13px; line-height: 1.6; border-top: 1px solid #f1f5f9; padding-top: 16px; margin-top: 24px;">
+                                    Jika tombol di atas tidak berfungsi, Anda juga dapat menyalin tautan berikut ke browser Anda:<br>
+                                    <a href="' . url('/auth/reset-password/' . $token . '?email=' . urlencode($user->email)) . '" style="color: #3b82f6; word-break: break-all;">' . url('/auth/reset-password/' . $token . '?email=' . urlencode($user->email)) . '</a>
+                                </p>
+                                <p style="color: #94a3b8; font-size: 12px; text-align: center; margin-top: 32px;">&copy; ' . date('Y') . ' Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan</p>
+                            </div>
+                        ');
+                });
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Reset password mail failed: ' . $e->getMessage());
+                return response()->json(['success' => false, 'message' => 'Gagal mengirim email reset password.'], 500);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tautan atur ulang kata sandi telah dikirim ke email Anda jika terdaftar.'
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string',
+            'email' => 'required|email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $record = \DB::table('password_reset_tokens')->where('email', $request->email)->first();
+
+        if (! $record || ! Hash::check($request->token, $record->token)) {
+            return response()->json(['success' => false, 'message' => 'Token reset password tidak valid atau kedaluwarsa.'], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        if (! $user) {
+            return response()->json(['success' => false, 'message' => 'User tidak ditemukan.'], 422);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        \DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kata sandi berhasil diperbarui. Silakan login kembali.'
+        ]);
+    }
 }
