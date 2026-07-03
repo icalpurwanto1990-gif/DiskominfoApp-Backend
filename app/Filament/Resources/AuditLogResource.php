@@ -12,6 +12,11 @@ class AuditLogResource extends Resource
 {
     protected static ?string $model = AuditLog::class;
 
+    public static function canViewAny(): bool
+    {
+        return in_array(auth()->user()->role, ['SUPERADMIN', 'ADMIN']);
+    }
+
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
 
     protected static ?string $navigationLabel = 'Log Audit Sistem';
