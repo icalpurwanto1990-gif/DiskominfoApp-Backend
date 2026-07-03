@@ -8,6 +8,7 @@ services:
     restart: always
     volumes:
       - ./.env:/var/www/html/.env
+      - ./public/uploads:/var/www/html/public/uploads
     depends_on:
       db:
         condition: service_healthy
