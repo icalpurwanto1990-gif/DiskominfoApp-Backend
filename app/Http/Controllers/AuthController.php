@@ -48,7 +48,7 @@ class AuthController extends Controller
         ]);
 
         try {
-            Mail::send([], [], function ($message) use ($user, $validated) {
+            Mail::send([], [], function ($message) use ($user, $token, $validated) {
                 $message->to($validated['email'])
                     ->subject('Verifikasi Email - Portal Diskominfo Bangkep')
                     ->html('
@@ -59,11 +59,11 @@ class AuthController extends Controller
                             <p style="color: #334155; font-size: 16px; line-height: 1.6;">Halo ' . htmlspecialchars($user->name) . ',</p>
                             <p style="color: #334155; font-size: 16px; line-height: 1.6;">Akun Anda telah berhasil dibuat. Silakan klik tombol di bawah ini untuk memverifikasi alamat email Anda dan mengaktifkan akun Anda:</p>
                             <div style="margin: 32px 0; text-align: center;">
-                                <a href="' . route('auth.verify', ['token' => $user->verification_token]) . '" style="background-color: #059669; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; letter-spacing: 0.5px; text-transform: uppercase;">Aktifkan Akun Saya</a>
+                                <a href="' . route('auth.verify', ['token' => $token]) . '" style="background-color: #059669; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; letter-spacing: 0.5px; text-transform: uppercase;">Aktifkan Akun Saya</a>
                             </div>
                             <p style="color: #64748b; font-size: 13px; line-height: 1.6; border-top: 1px solid #f1f5f9; padding-top: 16px; margin-top: 24px;">
                                 Jika tombol di atas tidak berfungsi, Anda juga dapat menyalin tautan berikut ke browser Anda:<br>
-                                <a href="' . route('auth.verify', ['token' => $user->verification_token]) . '" style="color: #3b82f6; word-break: break-all;">' . route('auth.verify', ['token' => $user->verification_token]) . '</a>
+                                <a href="' . route('auth.verify', ['token' => $token]) . '" style="color: #3b82f6; word-break: break-all;">' . route('auth.verify', ['token' => $token]) . '</a>
                             </p>
                             <p style="color: #94a3b8; font-size: 12px; text-align: center; margin-top: 32px;">&copy; ' . date('Y') . ' Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan</p>
                         </div>

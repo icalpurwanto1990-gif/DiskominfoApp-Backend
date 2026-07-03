@@ -36,6 +36,7 @@ class User extends Authenticatable implements FilamentUser
         'nip',
         'jabatan',
         'instansi',
+        'verification_token',
     ];
 
     /**
