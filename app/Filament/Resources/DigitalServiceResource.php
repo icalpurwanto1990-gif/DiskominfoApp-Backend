@@ -58,7 +58,13 @@ class DigitalServiceResource extends Resource
                     ->dehydrated(false)
                     ->afterStateHydrated(function ($state, $record, Set $set) {
                         if ($record && $record->icon) {
-                            $isPreset = in_array($record->icon, ['Globe', 'Shield', 'Video', 'Database', 'FileText']);
+                            $presetIcons = [
+                                'Globe', 'Shield', 'ShieldCheck', 'Video', 'Database',
+                                'FileText', 'File', 'Mail', 'Server', 'Network',
+                                'Wifi', 'Monitor', 'HardDrive', 'Layers', 'Users',
+                                'Phone', 'Wrench', 'Layout',
+                            ];
+                            $isPreset = in_array($record->icon, $presetIcons);
                             if ($isPreset) {
                                 $set('icon_type', 'preset');
                                 $set('preset_icon', $record->icon);
@@ -70,11 +76,24 @@ class DigitalServiceResource extends Resource
                     }),
                 Forms\Components\Select::make('preset_icon')
                     ->options([
-                        'Globe' => 'Globe (Umum / Jaringan)',
-                        'Shield' => 'Shield (Keamanan / TTE)',
-                        'Video' => 'Video (Zoom Meeting)',
-                        'Database' => 'Database (Hosting / Domain)',
-                        'FileText' => 'FileText (Persuratan)',
+                        'Globe'       => 'Globe (Umum / Jaringan)',
+                        'Shield'      => 'Shield (Keamanan / TTE)',
+                        'ShieldCheck' => 'ShieldCheck (Keamanan Terverifikasi)',
+                        'Video'       => 'Video (Zoom / Video Conference)',
+                        'Database'    => 'Database (Hosting / Cloud)',
+                        'FileText'    => 'FileText (Persuratan / Dokumen)',
+                        'File'        => 'File (Berkas Umum)',
+                        'Mail'        => 'Mail (Email / Surat)',
+                        'Server'      => 'Server (Server / Infrastruktur)',
+                        'Network'     => 'Network (Jaringan Komputer)',
+                        'Wifi'        => 'Wifi (Koneksi Nirkabel)',
+                        'Monitor'     => 'Monitor (Aplikasi / Sistem)',
+                        'HardDrive'   => 'HardDrive (Storage / Backup)',
+                        'Layers'      => 'Layers (Layanan Terpadu)',
+                        'Users'       => 'Users (SDM / Pengguna)',
+                        'Phone'       => 'Phone (Kontak / Telepon)',
+                        'Wrench'      => 'Wrench (Teknis / Perbaikan)',
+                        'Layout'      => 'Layout (Portal / Website)',
                     ])
                     ->label('Pilih Icon Preset')
                     ->visible(function (Get $get) {
@@ -175,15 +194,23 @@ class DigitalServiceResource extends Resource
                 Tables\Columns\TextColumn::make('icon')
                     ->label('Icon / Gambar')
                     ->formatStateUsing(function ($state) {
-                        return in_array($state, ['Globe', 'Shield', 'Video', 'Database', 'FileText'])
-                            ? "Preset: {$state}"
-                            : 'Kustom (Gambar)';
+                        $presets = [
+                            'Globe', 'Shield', 'ShieldCheck', 'Video', 'Database',
+                            'FileText', 'File', 'Mail', 'Server', 'Network',
+                            'Wifi', 'Monitor', 'HardDrive', 'Layers', 'Users',
+                            'Phone', 'Wrench', 'Layout',
+                        ];
+                        return in_array($state, $presets) ? "Preset: {$state}" : 'Kustom (Gambar)';
                     })
                     ->badge()
                     ->color(function ($state) {
-                        return in_array($state, ['Globe', 'Shield', 'Video', 'Database', 'FileText'])
-                            ? 'info'
-                            : 'success';
+                        $presets = [
+                            'Globe', 'Shield', 'ShieldCheck', 'Video', 'Database',
+                            'FileText', 'File', 'Mail', 'Server', 'Network',
+                            'Wifi', 'Monitor', 'HardDrive', 'Layers', 'Users',
+                            'Phone', 'Wrench', 'Layout',
+                        ];
+                        return in_array($state, $presets) ? 'info' : 'success';
                     }),
                 Tables\Columns\IconColumn::make('active')
                     ->boolean()

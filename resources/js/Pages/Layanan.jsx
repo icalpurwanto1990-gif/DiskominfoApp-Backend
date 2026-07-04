@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "@inertiajs/react";
-import { ShieldCheck, Database, Mail, Server, Video, Link as LinkIcon, Globe, Network, Send, CheckCircle2, Cpu } from "lucide-react";
+import { ShieldCheck, Shield, Database, Mail, Server, Video, Link as LinkIcon, Globe, Network, Send, CheckCircle2, Cpu, FileText, File, Lock, Wifi, Monitor, HardDrive, Layers, Users, Phone, Wrench, Layout } from "lucide-react";
 import MainLayout from "../Layouts/MainLayout";
 import PageHero from "../Components/PageHero";
 import ScrollReveal from "../Components/ScrollReveal";
@@ -70,15 +70,31 @@ export const Layanan = () => {
   };
 
   const iconMap = {
+    // Preset icons yang tersedia di Filament admin
+    Globe,
+    Shield,
     ShieldCheck,
-    Database,
-    Mail,
-    Server,
     Video,
+    Database,
+    FileText,
+    File,
+    // Alias tambahan untuk toleransi nama yang bervariasi
+    Mail,
+    Email: Mail,
+    Network,
+    Server,
+    Wifi,
+    HardDrive,
+    Monitor,
+    Layers,
+    Users,
+    Phone,
+    Wrench,
+    Layout,
+    // Link aliases
     Link: LinkIcon,
     LinkIcon: LinkIcon,
-    Globe,
-    Network,
+    ExternalLink: LinkIcon,
   };
 
   const getIcon = (iconName) => {
