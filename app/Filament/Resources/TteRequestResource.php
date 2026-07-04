@@ -6,6 +6,8 @@ use App\Filament\Resources\TteRequestResource\Pages;
 use App\Models\TteRequest;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -48,15 +50,6 @@ class TteRequestResource extends Resource
                             ->disabled()
                             ->label('Instansi / OPD'),
                     ])->columns(2),
-                Forms\Components\Section::make('Berkas Persyaratan')
-                    ->schema([
-                        Forms\Components\TextInput::make('dokumen_rekomendasi')
-                            ->disabled()
-                            ->label('Link/Path Surat Rekomendasi'),
-                        Forms\Components\TextInput::make('dokumen_ktp')
-                            ->disabled()
-                            ->label('Link/Path Scan KTP'),
-                    ])->columns(2),
                 Forms\Components\Section::make('Status & Catatan')
                     ->schema([
                         Forms\Components\TextInput::make('status')
@@ -67,6 +60,101 @@ class TteRequestResource extends Resource
                             ->label('Catatan Alasan Revisi')
                             ->rows(3),
                     ])->columns(1),
+            ]);
+    }
+
+    /**
+     * Infolist digunakan oleh ViewAction.
+     * Menampilkan berkas dokumen sebagai tombol link yang bisa dibuka di tab baru.
+     */
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\Section::make('Informasi ASN Pemohon')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('nama')
+                            ->label('Nama Lengkap')
+                            ->weight('bold'),
+                        Infolists\Components\TextEntry::make('nip')
+                            ->label('NIP'),
+                        Infolists\Components\TextEntry::make('nik')
+                            ->label('NIK'),
+                        Infolists\Components\TextEntry::make('jabatan')
+                            ->label('Jabatan'),
+                        Infolists\Components\TextEntry::make('instansi')
+                            ->label('Instansi / OPD'),
+                        Infolists\Components\TextEntry::make('status')
+                            ->label('Status')
+                            ->badge()
+                            ->color(fn (string $state): string => match ($state) {
+                                'PENDING'  => 'warning',
+                                'DIPROSES' => 'info',
+                                'SELESAI'  => 'success',
+                                'REVISI'   => 'danger',
+                                default    => 'gray',
+                            }),
+                    ])->columns(2),
+
+                Infolists\Components\Section::make('Berkas Persyaratan')
+                    ->description('Klik tombol di bawah untuk membuka atau mengunduh file dokumen.')
+                    ->schema([
+                        // Surat Rekomendasi
+                        Infolists\Components\TextEntry::make('dokumen_rekomendasi')
+                            ->label('Surat Rekomendasi')
+                            ->formatStateUsing(function (?string $state): string {
+                                if (! $state) return '—';
+                                $url  = str_starts_with($state, 'http') ? $state
+                                      : (str_starts_with($state, '/') ? $state : '/uploads/' . $state);
+                                $name = basename($state);
+                                return "<a href=\"{$url}\" target=\"_blank\" rel=\"noopener noreferrer\"
+                                    style=\"display:inline-flex;align-items:center;gap:6px;padding:8px 16px;
+                                            background:#059669;color:white;border-radius:8px;font-weight:600;
+                                            font-size:13px;text-decoration:none;\">
+                                    <svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'
+                                         fill='none' stroke='currentColor' stroke-width='2'
+                                         stroke-linecap='round' stroke-linejoin='round'>
+                                        <path d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/>
+                                        <polyline points='15 3 21 3 21 9'/>
+                                        <line x1='10' y1='14' x2='21' y2='3'/>
+                                    </svg>
+                                    Buka: {$name}
+                                </a>";
+                            })
+                            ->html(),
+
+                        // Scan KTP
+                        Infolists\Components\TextEntry::make('dokumen_ktp')
+                            ->label('Scan KTP')
+                            ->formatStateUsing(function (?string $state): string {
+                                if (! $state) return '—';
+                                $url  = str_starts_with($state, 'http') ? $state
+                                      : (str_starts_with($state, '/') ? $state : '/uploads/' . $state);
+                                $name = basename($state);
+                                return "<a href=\"{$url}\" target=\"_blank\" rel=\"noopener noreferrer\"
+                                    style=\"display:inline-flex;align-items:center;gap:6px;padding:8px 16px;
+                                            background:#059669;color:white;border-radius:8px;font-weight:600;
+                                            font-size:13px;text-decoration:none;\">
+                                    <svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'
+                                         fill='none' stroke='currentColor' stroke-width='2'
+                                         stroke-linecap='round' stroke-linejoin='round'>
+                                        <path d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/>
+                                        <polyline points='15 3 21 3 21 9'/>
+                                        <line x1='10' y1='14' x2='21' y2='3'/>
+                                    </svg>
+                                    Buka: {$name}
+                                </a>";
+                            })
+                            ->html(),
+                    ])->columns(2),
+
+                Infolists\Components\Section::make('Catatan Admin')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('catatan_admin')
+                            ->label('Alasan Revisi / Catatan')
+                            ->placeholder('Tidak ada catatan.')
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -90,17 +178,19 @@ class TteRequestResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->colors([
-                        'gray' => 'DRAFT',
+                        'gray'    => 'DRAFT',
                         'warning' => 'PENDING',
-                        'danger' => 'REVISI',
-                        'info' => 'DIPROSES',
+                        'danger'  => 'REVISI',
+                        'info'    => 'DIPROSES',
                         'success' => 'SELESAI',
                     ])
                     ->label('Status'),
             ])
             ->defaultSort('createdAt', 'desc')
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                // ViewAction kini menggunakan infolist() — berkas tampil sebagai tombol link berwarna
+                Tables\Actions\ViewAction::make()
+                    ->label('Lihat Detail'),
 
                 // 1. Approve Action (PENDING -> DIPROSES)
                 Action::make('approve')
@@ -110,7 +200,7 @@ class TteRequestResource extends Resource
                     ->visible(fn (TteRequest $record): bool => $record->status === 'PENDING')
                     ->requiresConfirmation()
                     ->action(function (TteRequest $record) {
-                        $payload = $record->triggerStatusTransition('DIPROSES', 'ADMIN');
+                        $record->triggerStatusTransition('DIPROSES', 'ADMIN');
 
                         Notification::make()
                             ->title('Permohonan Disetujui')
@@ -132,7 +222,7 @@ class TteRequestResource extends Resource
                             ->rows(3),
                     ])
                     ->action(function (TteRequest $record, array $data) {
-                        $payload = $record->triggerStatusTransition('REVISI', 'ADMIN', $data['catatan_revisi']);
+                        $record->triggerStatusTransition('REVISI', 'ADMIN', $data['catatan_revisi']);
 
                         Notification::make()
                             ->title('Berkas Dikembalikan')
@@ -149,7 +239,7 @@ class TteRequestResource extends Resource
                     ->visible(fn (TteRequest $record): bool => $record->status === 'DIPROSES')
                     ->requiresConfirmation()
                     ->action(function (TteRequest $record) {
-                        $payload = $record->triggerStatusTransition('SELESAI', 'ADMIN');
+                        $record->triggerStatusTransition('SELESAI', 'ADMIN');
 
                         Notification::make()
                             ->title('TTE Terbit & Selesai')
