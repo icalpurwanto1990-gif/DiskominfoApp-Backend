@@ -40,6 +40,12 @@ export const Dashboard = () => {
   const [completedServices, setCompletedServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Year selector untuk chart TTE
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [availableYears, setAvailableYears] = useState([currentYear]);
+  const [tteLoading, setTteLoading] = useState(false);
+
   const serviceTypeLabels = {
     TTE: "Sertifikat Elektronik (TTE)",
     DATA: "Permintaan Data Daerah",
@@ -88,6 +94,17 @@ export const Dashboard = () => {
             if (data.completedServices) setCompletedServices(data.completedServices);
           }
         }
+        // Ambil juga daftar tahun tersedia
+        const yRes = await fetch(`/api/dashboard/tte-stats?year=${currentYear}`);
+        if (yRes.ok) {
+          const yData = await yRes.json();
+          if (yData.success && Array.isArray(yData.availableYears) && yData.availableYears.length > 0) {
+            setAvailableYears(yData.availableYears);
+          }
+          if (yData.success && Array.isArray(yData.data) && yData.data.length > 0) {
+            setTteMonthlyData(yData.data);
+          }
+        }
       } catch (err) {
         console.error("Gagal memuat data dashboard:", err);
       } finally {
@@ -96,6 +113,31 @@ export const Dashboard = () => {
     };
     fetchStats();
   }, []);
+
+  // Fetch data TTE saat tahun berubah
+  useEffect(() => {
+    const fetchTteByYear = async () => {
+      setTteLoading(true);
+      try {
+        const res = await fetch(`/api/dashboard/tte-stats?year=${selectedYear}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.data)) {
+            setTteMonthlyData(data.data);
+            if (Array.isArray(data.availableYears) && data.availableYears.length > 0) {
+              setAvailableYears(data.availableYears);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Gagal memuat data TTE:", err);
+      } finally {
+        setTteLoading(false);
+      }
+    };
+    // Jangan jalankan saat pertama load (sudah dihandle di useEffect atas)
+    if (!loading) fetchTteByYear();
+  }, [selectedYear]);
 
   return (
     <MainLayout>
@@ -140,13 +182,32 @@ export const Dashboard = () => {
         {/* Analytics Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* Chart 1: TTE Issued (APTIKA Performance) */}
+          {/* Chart 1: TTE Issued (APTIKA Performance) — dengan filter tahun */}
           <div className="lg:col-span-8 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <h3 className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-wider">Statistik Penerbitan TTE Bulanan 2025</h3>
-              <p className="text-[10px] text-slate-400 font-bold uppercase">Volume pengajuan tanda tangan elektronik ASN disetujui</p>
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+              <div className="flex flex-col gap-1.5">
+                <h3 className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-wider">
+                  Statistik Penerbitan TTE Bulanan {selectedYear}
+                </h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase">Volume tanda tangan elektronik ASN yang disetujui per bulan</p>
+              </div>
+              {/* Dropdown Pilih Tahun */}
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <Calendar size={12} className="text-slate-400" />
+                <select
+                  id="tte-year-selector"
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(Number(e.target.value))}
+                  className="text-[11px] font-bold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg px-3 py-1.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                  aria-label="Pilih Tahun Statistik TTE"
+                >
+                  {availableYears.map((yr) => (
+                    <option key={yr} value={yr}>{yr}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-            {loading ? (
+            {loading || tteLoading ? (
               <div className="h-[220px] bg-slate-100 dark:bg-slate-800 animate-pulse rounded-2xl" />
             ) : (
               <BarChart data={tteMonthlyData} color="#499ed7" height={220} />

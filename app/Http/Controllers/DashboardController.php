@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\AppStatistic;
-use App\Models\Dataset;
 use App\Models\DigitalService;
 use App\Models\ServiceRequest;
+use App\Models\TteRequest;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -26,75 +27,27 @@ class DashboardController extends Controller
             }
 
             // Count actual data from DB
-            $actualSrvRequestCount = ServiceRequest::count();
-            $actualCompletedTteCount = ServiceRequest::where('serviceType', 'TTE')->where('status', 'SELESAI')->count();
-            $actualDigitalServiceCount = DigitalService::where('active', true)->count();
+            $actualSrvRequestCount      = ServiceRequest::count();
+            $actualCompletedTteCount    = ServiceRequest::where('serviceType', 'TTE')->where('status', 'SELESAI')->count();
+            $actualDigitalServiceCount  = DigitalService::where('active', true)->count();
 
             $stats = [
-                'TOTAL_VISITORS' => $statsMap['TOTAL_VISITORS'] ?? 14258,
-                'TOTAL_TTE_ISSUED' => ($statsMap['TOTAL_TTE_ISSUED'] ?? 377) + $actualCompletedTteCount,
-                'APP_OPD_COUNT' => $actualDigitalServiceCount > 0 ? $actualDigitalServiceCount : ($statsMap['APP_OPD_COUNT'] ?? 45),
-                'OPD_WEBSITE_COUNT' => $statsMap['OPD_WEBSITE_COUNT'] ?? 28,
+                'TOTAL_VISITORS'           => $statsMap['TOTAL_VISITORS'] ?? 14258,
+                'TOTAL_TTE_ISSUED'         => ($statsMap['TOTAL_TTE_ISSUED'] ?? 377) + $actualCompletedTteCount,
+                'APP_OPD_COUNT'            => $actualDigitalServiceCount > 0 ? $actualDigitalServiceCount : ($statsMap['APP_OPD_COUNT'] ?? 45),
+                'OPD_WEBSITE_COUNT'        => $statsMap['OPD_WEBSITE_COUNT'] ?? 28,
                 'TOTAL_SERVICES_REQUESTED' => ($statsMap['TOTAL_SERVICES_REQUESTED'] ?? 684) + $actualSrvRequestCount,
             ];
 
-            // 2. TTE Monthly Data
-            $monthMap = [
-                'Januari' => 'Jan',
-                'Februari' => 'Feb',
-                'Maret' => 'Mar',
-                'April' => 'Apr',
-                'Mei' => 'Mei',
-                'Juni' => 'Jun',
-                'Juli' => 'Jul',
-                'Agustus' => 'Ags',
-                'September' => 'Sep',
-                'Oktober' => 'Okt',
-                'November' => 'Nov',
-                'Desember' => 'Des',
-            ];
-
-            $tteMonthlyData = [
-                ['label' => 'Jan', 'value' => 24],
-                ['label' => 'Feb', 'value' => 30],
-                ['label' => 'Mar', 'value' => 45],
-                ['label' => 'Apr', 'value' => 18],
-                ['label' => 'Mei', 'value' => 50],
-                ['label' => 'Jun', 'value' => 29],
-                ['label' => 'Jul', 'value' => 40],
-                ['label' => 'Ags', 'value' => 35],
-                ['label' => 'Sep', 'value' => 58],
-                ['label' => 'Okt', 'value' => 15],
-                ['label' => 'Nov', 'value' => 22],
-                ['label' => 'Des', 'value' => 11],
-            ];
-
-            $tteDataset = Dataset::where('slug', 'jumlah-tte-asn-banggai-kep-2025')->first();
-            if ($tteDataset && is_array($tteDataset->jsonData)) {
-                $mapped = [];
-                foreach ($tteDataset->jsonData as $row) {
-                    $row = (array) $row;
-                    $bulan = $row['bulan'] ?? '';
-                    $label = $monthMap[$bulan] ?? substr($bulan, 0, 3);
-                    $value = (int) ($row['disetujui'] ?? $row['value'] ?? 0);
-                    $mapped[] = ['label' => $label, 'value' => $value];
-                }
-                if (count($mapped) > 0) {
-                    $tteMonthlyData = $mapped;
-                }
-            }
+            // 2. TTE Monthly Data (default: tahun berjalan)
+            $tteMonthlyData = $this->buildTteMonthlyData(now()->year);
 
             // 3. Service Ticket Breakdown (100% Real DB counts)
-            $countSelesai = ServiceRequest::where('status', 'SELESAI')->count();
-            $countDiproses = ServiceRequest::where('status', 'DIPROSES')->count();
-            $countPending = ServiceRequest::where('status', 'PENDING')->count();
-            $countDitolak = ServiceRequest::where('status', 'DITOLAK')->count();
-
             $ticketBreakdown = [
-                ['label' => 'Selesai', 'value' => $countSelesai, 'color' => '#10B981'],
-                ['label' => 'Diproses', 'value' => $countDiproses, 'color' => '#F59E0B'],
-                ['label' => 'Pending', 'value' => $countPending, 'color' => '#3B82F6'],
-                ['label' => 'Ditolak', 'value' => $countDitolak, 'color' => '#EF4444'],
+                ['label' => 'Selesai',  'value' => ServiceRequest::where('status', 'SELESAI')->count(),  'color' => '#10B981'],
+                ['label' => 'Diproses', 'value' => ServiceRequest::where('status', 'DIPROSES')->count(), 'color' => '#F59E0B'],
+                ['label' => 'Pending',  'value' => ServiceRequest::where('status', 'PENDING')->count(),  'color' => '#3B82F6'],
+                ['label' => 'Ditolak',  'value' => ServiceRequest::where('status', 'DITOLAK')->count(),  'color' => '#EF4444'],
             ];
 
             // 4. Completed Service Requests (Layanan yang sudah terlaksana)
@@ -104,17 +57,77 @@ class DashboardController extends Controller
                 ->get();
 
             return response()->json([
-                'success' => true,
-                'stats' => $stats,
-                'tteMonthlyData' => $tteMonthlyData,
-                'ticketBreakdown' => $ticketBreakdown,
+                'success'          => true,
+                'stats'            => $stats,
+                'tteMonthlyData'   => $tteMonthlyData,
+                'ticketBreakdown'  => $ticketBreakdown,
                 'completedServices' => $completedServices,
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'error' => $e->getMessage(),
-            ], 500);
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * API: Kembalikan data TTE bulanan berdasarkan tahun yang dipilih.
+     * GET /api/dashboard/tte-stats?year=2026
+     */
+    public function apiTteStats(Request $request)
+    {
+        try {
+            $year = (int) $request->get('year', now()->year);
+            // Batasi tahun antara 2020 s.d. tahun depan
+            $year = max(2020, min($year, now()->year + 1));
+
+            $data = $this->buildTteMonthlyData($year);
+
+            // Daftar tahun yang pernah ada di TteRequest (untuk opsi dropdown)
+            $availableYears = TteRequest::selectRaw('EXTRACT(YEAR FROM "createdAt")::int AS yr')
+                ->groupByRaw('EXTRACT(YEAR FROM "createdAt")')
+                ->orderByRaw('yr DESC')
+                ->pluck('yr')
+                ->toArray();
+
+            // Pastikan tahun berjalan selalu ada
+            if (! in_array(now()->year, $availableYears)) {
+                array_unshift($availableYears, now()->year);
+            }
+
+            return response()->json([
+                'success'        => true,
+                'year'           => $year,
+                'data'           => $data,
+                'availableYears' => $availableYears,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Helper: Bangun data TTE bulanan (Jan–Des) untuk tahun tertentu.
+     * Mengambil data riil dari tabel TteRequest, status SELESAI.
+     */
+    private function buildTteMonthlyData(int $year): array
+    {
+        $monthLabels = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+
+        $rows = TteRequest::selectRaw('EXTRACT(MONTH FROM "createdAt")::int AS bulan, COUNT(*) AS total')
+            ->whereRaw('EXTRACT(YEAR FROM "createdAt") = ?', [$year])
+            ->where('status', 'SELESAI')
+            ->groupByRaw('EXTRACT(MONTH FROM "createdAt")')
+            ->orderByRaw('bulan')
+            ->get()
+            ->keyBy('bulan');
+
+        $result = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $result[] = [
+                'label' => $monthLabels[$m - 1],
+                'value' => (int) ($rows->get($m)?->total ?? 0),
+            ];
+        }
+
+        return $result;
     }
 }

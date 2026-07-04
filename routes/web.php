@@ -87,6 +87,7 @@ Route::prefix('api')->group(function () {
     Route::get('/satu-data', [SatuDataController::class, 'apiIndex']);
     Route::get('/gis', [GisController::class, 'apiIndex']);
     Route::get('/dashboard/stats', [DashboardController::class, 'apiStats']);
+    Route::get('/dashboard/tte-stats', [DashboardController::class, 'apiTteStats']);
     Route::post('/upload', [UploadController::class, 'store']);
 
     // Admin API Endpoints
