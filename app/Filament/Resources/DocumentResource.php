@@ -32,7 +32,7 @@ class DocumentResource extends Resource
                     ->required()
                     ->maxLength(255)
                     ->label('Nama/Judul Dokumen'),
-                Forms\Components\Select::make('fileType')
+                Forms\Components\Select::make('category')
                     ->required()
                     ->options([
                         'DIP' => 'DIP (Daftar Informasi Publik)',
@@ -46,10 +46,6 @@ class DocumentResource extends Resource
                     ->directory('documents')
                     ->required()
                     ->label('Unggah File Dokumen (PDF)'),
-                Forms\Components\Textarea::make('description')
-                    ->maxLength(65535)
-                    ->columnSpanFull()
-                    ->label('Keterangan / Deskripsi Singkat'),
             ]);
     }
 
@@ -61,7 +57,7 @@ class DocumentResource extends Resource
                     ->searchable()
                     ->wrap()
                     ->label('Nama Dokumen'),
-                Tables\Columns\TextColumn::make('fileType')
+                Tables\Columns\TextColumn::make('category')
                     ->badge()
                     ->color('success')
                     ->label('Kategori'),
