@@ -111,7 +111,7 @@ export const Ppid = () => {
               type: doc.category,
               size: doc.fileSize || "1.5 MB",
               date: doc.createdAt ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(doc.createdAt)) : "Baru",
-              fileUrl: doc.fileUrl
+              fileUrl: doc.fileUrl ? (doc.fileUrl.startsWith('http') || doc.fileUrl.startsWith('/') ? doc.fileUrl : `/uploads/${doc.fileUrl}`) : '#'
             }));
             setPpidDocuments(mapped);
           }

@@ -217,8 +217,10 @@ export const Profil = ({ profileData, staff, documents }) => {
                         <span className="text-[10px] text-slate-400 mt-1 font-bold">Format: PDF • Ukuran: {doc.fileSize} • Unduhan: {doc.downloads} kali</span>
                       </div>
                       <a
-                        href={doc.fileUrl}
+                        href={doc.fileUrl ? (doc.fileUrl.startsWith('http') || doc.fileUrl.startsWith('/') ? doc.fileUrl : `/uploads/${doc.fileUrl}`) : '#'}
                         download
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition self-stretch sm:self-auto text-center justify-center"
                       >
                         <ArrowDownToLine size={14} />

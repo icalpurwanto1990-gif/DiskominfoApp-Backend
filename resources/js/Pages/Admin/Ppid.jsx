@@ -410,7 +410,7 @@ export default function Ppid({ requests: initialRequests, objections: initialObj
                         </td>
                         <td className="p-4 text-slate-400 max-w-xs truncate">{doc.description || "-"}</td>
                         <td className="p-4">
-                          <a href={doc.fileUrl} target="_blank" rel="noreferrer" className="text-emerald-600 hover:underline truncate inline-block max-w-[120px]">
+                          <a href={doc.fileUrl ? (doc.fileUrl.startsWith('http') || doc.fileUrl.startsWith('/') ? doc.fileUrl : `/uploads/${doc.fileUrl}`) : '#'} target="_blank" rel="noreferrer" className="text-emerald-600 hover:underline truncate inline-block max-w-[120px]">
                             {doc.fileUrl}
                           </a>
                         </td>
