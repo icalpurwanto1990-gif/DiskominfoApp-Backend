@@ -55,7 +55,6 @@ class DigitalServiceResource extends Resource
                     ->default('preset')
                     ->label('Tipe Icon')
                     ->live()
-                    ->dehydrated(false)
                     ->afterStateHydrated(function ($state, $record, Set $set) {
                         if ($record && $record->icon) {
                             $presetIcons = [
@@ -99,8 +98,7 @@ class DigitalServiceResource extends Resource
                     ->visible(function (Get $get) {
                         return $get('icon_type') === 'preset';
                     })
-                    ->live()
-                    ->dehydrated(false),
+                    ->live(),
                 Forms\Components\FileUpload::make('custom_icon_path')
                     ->image()
                     ->disk('uploads')
@@ -109,8 +107,7 @@ class DigitalServiceResource extends Resource
                     ->visible(function (Get $get) {
                         return $get('icon_type') === 'custom';
                     })
-                    ->live()
-                    ->dehydrated(false),
+                    ->live(),
                 Forms\Components\Select::make('color')
                     ->options([
                         'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' => 'Emerald (Hijau)',
