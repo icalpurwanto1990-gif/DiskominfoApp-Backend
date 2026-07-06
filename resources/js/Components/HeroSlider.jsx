@@ -3,7 +3,7 @@ import { Link } from "@inertiajs/react";
 import { ArrowRight, ChevronLeft, ChevronRight, Sparkles, Globe } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export const HeroSlider = ({ initialImages }) => {
+export const HeroSlider = ({ initialImages, heroStats }) => {
   const defaultSlides = [
     {
       url: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&auto=format&fit=crop&q=80",
@@ -124,11 +124,11 @@ export const HeroSlider = ({ initialImages }) => {
 
               {/* Quick Stats Strip */}
               <div className="flex flex-wrap items-center gap-6 mt-4 pt-4 border-t border-white/10">
-                {[
+                {(heroStats && heroStats.length > 0 ? heroStats : [
                   { label: "Layanan Digital", value: "12+" },
                   { label: "Website OPD", value: "28+" },
                   { label: "Aparatur TTE", value: "377" },
-                ].map((stat, i) => (
+                ]).map((stat, i) => (
                   <div key={i} className="flex flex-col">
                     <span className="text-xl font-black text-emerald-400">{stat.value}</span>
                     <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{stat.label}</span>

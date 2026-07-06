@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Map, Radio, Wifi } from "lucide-react";
 import GISMap from "../Components/GISMap";
 import MainLayout from "../Layouts/MainLayout";
@@ -6,6 +6,30 @@ import PageHero from "../Components/PageHero";
 import ScrollReveal from "../Components/ScrollReveal";
 
 export const Gis = () => {
+  const [gisStats, setGisStats] = useState({
+    btsCount: "...",
+    vsatCount: "...",
+  });
+
+  // Fetch real GIS stats from dedicated stats endpoint (efficient aggregation)
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/gis/stats");
+        if (res.ok) {
+          const data = await res.json();
+          setGisStats({
+            btsCount: data.BTS_TOWER !== undefined ? String(data.BTS_TOWER) : "0",
+            vsatCount: data.VSAT !== undefined ? String(data.VSAT) : "0",
+          });
+        }
+      } catch (err) {
+        console.error("Gagal memuat statistik GIS:", err);
+      }
+    };
+    fetchStats();
+  }, []);
+
   return (
     <MainLayout>
       {/* Premium Page Hero */}
@@ -19,8 +43,8 @@ export const Gis = () => {
         blobColor="bg-cyan-500"
         breadcrumbs={[{ label: "Peta GIS" }]}
         stats={[
-          { label: "Menara BTS", value: "40+", icon: Radio },
-          { label: "Akses VSAT", value: "28", icon: Wifi },
+          { label: "Menara BTS", value: gisStats.btsCount, icon: Radio },
+          { label: "Akses VSAT", value: gisStats.vsatCount, icon: Wifi },
         ]}
       />
 
