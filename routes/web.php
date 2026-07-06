@@ -35,6 +35,7 @@ Route::post('/api/kontak', [KontakController::class, 'store'])->name('api.kontak
 
 // Survey & AI Chat client actions
 Route::post('/api/survey', [SurveyController::class, 'store'])->name('api.survey');
+Route::get('/api/survey/categories', [SurveyController::class, 'apiCategories']);
 Route::post('/api/ai-chat', [AiChatController::class, 'reply'])->name('api.aichat');
 
 // Auth Routes (React Inertia Views)

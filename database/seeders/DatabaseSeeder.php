@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             SocialMediaSeeder::class,
             GisInfrastructureSeeder::class,
             ModulePermissionSeeder::class,
+            SurveyCategorySeeder::class,
         ]);
 
         User::updateOrCreate(

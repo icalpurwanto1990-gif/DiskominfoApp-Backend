@@ -28,4 +28,33 @@ class SurveyController extends Controller
             'survey' => $survey,
         ]);
     }
+
+    public function apiCategories()
+    {
+        try {
+            $categories = \App\Models\SurveyCategory::where('active', true)
+                ->orderBy('name', 'asc')
+                ->pluck('name');
+
+            if ($categories->isEmpty()) {
+                $categories = collect([
+                    'Layanan Informasi',
+                    'Layanan PPID',
+                    'Aksesibilitas Website',
+                    'Pengajuan TTE',
+                    'Aduan Jaringan',
+                ]);
+            }
+
+            return response()->json($categories);
+        } catch (\Exception $e) {
+            return response()->json([
+                'Layanan Informasi',
+                'Layanan PPID',
+                'Aksesibilitas Website',
+                'Pengajuan TTE',
+                'Aduan Jaringan',
+            ]);
+        }
+    }
 }

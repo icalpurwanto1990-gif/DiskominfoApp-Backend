@@ -4,18 +4,36 @@ import { Star, CheckCircle, Send, X } from "lucide-react";
 export const SurveyModal = ({ isOpen, onClose }) => {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
-  const [category, setCategory] = useState("Layanan Informasi");
+  const [category, setCategory] = useState("");
   const [comment, setComment] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const categories = [
+  const [categories, setCategories] = useState([
     "Layanan Informasi",
     "Layanan PPID",
     "Aksesibilitas Website",
     "Pengajuan TTE",
     "Aduan Jaringan",
-  ];
+  ]);
+
+  // Fetch categories from backend
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("/api/survey/categories");
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setCategories(data);
+            setCategory(data[0]);
+          }
+        }
+      } catch (error) {
+        console.error("Gagal mengambil kategori survey:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   // Auto-close on successful submit after a short delay
   useEffect(() => {
