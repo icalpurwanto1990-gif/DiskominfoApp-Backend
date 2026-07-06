@@ -248,6 +248,13 @@ class TteRequestResource extends Resource
                             ->success()
                             ->send();
                     }),
+
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 
