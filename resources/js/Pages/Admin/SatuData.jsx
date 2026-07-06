@@ -163,7 +163,7 @@ export default function SatuData({ datasets: initialDatasets }) {
       <div className="flex justify-between items-center gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-xl font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">
-            Pengelolaan Satu Data (Open Data)
+            Pengelolaan Data Sektoral (Open Data)
           </h1>
           <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">
             Kelola dataset statistik sektoral daerah dan masukkan data baris (JSON Grid) secara langsung

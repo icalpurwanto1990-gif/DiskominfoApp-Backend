@@ -14,7 +14,7 @@ export const MainLayout = ({ children }) => {
     if (pathname.startsWith("/berita")) return "Berita & Pengumuman";
     if (pathname.startsWith("/layanan")) return "Layanan Digital Publik";
     if (pathname.startsWith("/ppid")) return "Layanan PPID";
-    if (pathname.startsWith("/satu-data")) return "Portal Satu Data";
+    if (pathname.startsWith("/satu-data")) return "Data Sektoral";
     if (pathname.startsWith("/gis")) return "Peta Infrastruktur GIS";
     if (pathname.startsWith("/kontak")) return "Hubungi Kami";
     if (pathname.startsWith("/profil")) return "Profil Dinas";

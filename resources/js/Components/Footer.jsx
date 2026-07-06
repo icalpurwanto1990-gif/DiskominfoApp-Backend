@@ -123,7 +123,7 @@ export const Footer = () => {
                 { href: "/layanan/lacak", label: "Lacak Status Permohonan" },
                 { href: "/auth/login", label: "Portal Pemohon (Login)" },
                 { href: "/dashboard", label: "Smart Government Dashboard" },
-                { href: "/satu-data", label: "Satu Data Daerah" },
+                { href: "/satu-data", label: "Data Sektoral" },
               ].map((item) => (
                 <Link key={item.href} href={item.href} className="flex items-center gap-1.5 text-slate-500 hover:text-white transition group">
                   <ArrowUpRight size={10} className="opacity-0 group-hover:opacity-100 text-emerald-500 transition flex-shrink-0" />

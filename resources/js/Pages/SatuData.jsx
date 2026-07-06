@@ -85,14 +85,14 @@ export const SatuData = () => {
     <MainLayout>
       {/* Premium Page Hero */}
       <PageHero
-        label="SATU DATA DAERAH"
-        title="Portal Data Terbuka (Open Data)"
-        subtitle="Penyediaan data sektoral pemerintah daerah yang transparan, mudah diakses, dan dapat dibagipakaikan oleh publik dan OPD"
+        label="DATA SEKTORAL"
+        title="Portal Data Sektoral Daerah"
+        subtitle="Penyediaan data sektoral pemerintah daerah Kabupaten Banggai Kepulauan yang transparan, mudah diakses, dan dapat dibagipakaikan oleh publik dan OPD"
         icon={Database}
         gradient="from-purple-950 via-slate-900 to-slate-950"
         accentColor="text-purple-400"
         blobColor="bg-purple-500"
-        breadcrumbs={[{ label: "Satu Data" }]}
+        breadcrumbs={[{ label: "Data Sektoral" }]}
         stats={[
           { label: "Total Dataset", value: datasets.length || "...", icon: Table },
           { label: "Unduhan Tersedia", value: "CSV & JSON", icon: DownloadCloud },

@@ -17,7 +17,7 @@ export default function AdminLayout({ children }) {
     if (path.includes("/admin/berita")) return "Kelola Berita";
     if (path.includes("/admin/ppid")) return "Verifikasi PPID";
     if (path.includes("/admin/layanan")) return "Layanan Digital";
-    if (path.includes("/admin/satu-data")) return "Portal Satu Data";
+    if (path.includes("/admin/satu-data")) return "Data Sektoral";
     if (path.includes("/admin/gis")) return "Peta GIS";
     if (path.includes("/admin/media")) return "Galeri Media";
     if (path.includes("/admin/users")) return "Akun Pengguna";
@@ -79,7 +79,7 @@ export default function AdminLayout({ children }) {
     { href: "/admin/berita", label: "Berita & Kategori", icon: FileText },
     { href: "/admin/ppid", label: "Layanan PPID", icon: FileText },
     { href: "/admin/layanan", label: "Layanan Digital", icon: Shield },
-    { href: "/admin/satu-data", label: "Satu Data", icon: FileSpreadsheet },
+    { href: "/admin/satu-data", label: "Data Sektoral", icon: FileSpreadsheet },
     { href: "/admin/gis", label: "Peta GIS", icon: MapPin },
     { href: "/admin/media", label: "Galeri Media", icon: Images },
     { href: "/admin/users", label: "Akun Pengguna", icon: Users },
