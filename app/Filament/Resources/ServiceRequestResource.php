@@ -15,6 +15,7 @@ use Illuminate\Support\HtmlString;
 
 class ServiceRequestResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
     protected static ?string $model = ServiceRequest::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-ticket';

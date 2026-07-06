@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 
 class PpidObjectionResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
     protected static ?string $model = PpidObjection::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-exclamation-triangle';

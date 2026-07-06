@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 
 class PartnerLinkResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
     protected static ?string $model = PartnerLink::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-link';

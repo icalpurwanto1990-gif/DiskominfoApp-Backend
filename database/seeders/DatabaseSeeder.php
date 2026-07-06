@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             PartnerLinkSeeder::class,
             SocialMediaSeeder::class,
             GisInfrastructureSeeder::class,
+            ModulePermissionSeeder::class,
         ]);
 
         User::updateOrCreate(

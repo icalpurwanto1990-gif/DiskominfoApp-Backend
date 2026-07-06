@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 
 class StaffResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
     protected static ?string $model = Staff::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';

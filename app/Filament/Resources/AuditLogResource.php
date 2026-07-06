@@ -10,12 +10,9 @@ use Filament\Tables\Table;
 
 class AuditLogResource extends Resource
 {
-    protected static ?string $model = AuditLog::class;
+    use \App\Traits\HasDynamicPermission;
 
-    public static function canViewAny(): bool
-    {
-        return in_array(auth()->user()->role, ['SUPERADMIN', 'ADMIN']);
-    }
+    protected static ?string $model = AuditLog::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
 

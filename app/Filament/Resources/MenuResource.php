@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 
 class MenuResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
     protected static ?string $model = Menu::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-bars-3';

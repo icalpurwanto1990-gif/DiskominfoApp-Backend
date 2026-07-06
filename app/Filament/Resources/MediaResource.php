@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 
 class MediaResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
     protected static ?string $model = Media::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-film';

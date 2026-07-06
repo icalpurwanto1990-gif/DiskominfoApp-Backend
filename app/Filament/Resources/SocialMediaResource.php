@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 
 class SocialMediaResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
     protected static ?string $model = SocialMedia::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-share';

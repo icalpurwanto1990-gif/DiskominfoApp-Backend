@@ -16,6 +16,7 @@ use Filament\Tables\Table;
 
 class TteRequestResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
     protected static ?string $model = TteRequest::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-pencil-square';

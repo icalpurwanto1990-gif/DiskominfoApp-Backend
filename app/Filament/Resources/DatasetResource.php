@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 
 class DatasetResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
     protected static ?string $model = Dataset::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-table-cells';

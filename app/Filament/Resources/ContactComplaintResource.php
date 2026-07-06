@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 
 class ContactComplaintResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
     protected static ?string $model = ContactComplaint::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';

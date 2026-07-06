@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 
 class DocumentResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
     protected static ?string $model = Document::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-folder-open';

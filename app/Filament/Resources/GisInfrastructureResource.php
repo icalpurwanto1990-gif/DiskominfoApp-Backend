@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 
 class GisInfrastructureResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
     protected static ?string $model = GisInfrastructure::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-map';

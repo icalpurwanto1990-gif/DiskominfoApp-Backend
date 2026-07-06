@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 
 class PpidRequestResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
     protected static ?string $model = PpidRequest::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';

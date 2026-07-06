@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 
 class DigitalServiceResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
     protected static ?string $model = DigitalService::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-cpu-chip';

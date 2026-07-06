@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 
 class PostResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
     protected static ?string $model = Post::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';

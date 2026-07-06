@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 
 class BannerResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
     protected static ?string $model = Banner::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-presentation-chart-bar';
