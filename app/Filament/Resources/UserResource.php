@@ -52,6 +52,7 @@ class UserResource extends Resource
                     ->options([
                         'SUPERADMIN' => 'Super Administrator (SUPERADMIN)',
                         'ADMIN' => 'Administrator (ADMIN)',
+                        'PROTOKOL' => 'Protokol Pimpinan (PROTOKOL)',
                         'USER' => 'Pemohon (USER)',
                     ])
                     ->default('USER')
@@ -84,6 +85,7 @@ class UserResource extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'SUPERADMIN' => 'danger',
                         'ADMIN' => 'warning',
+                        'PROTOKOL' => 'success',
                         'USER' => 'info',
                         default => 'gray',
                     })

@@ -129,6 +129,11 @@ class ModulePermissionSeeder extends Seeder
                 'class' => 'App\Filament\Resources\SurveyCategoryResource',
                 'roles' => ['SUPERADMIN', 'ADMIN'],
             ],
+            [
+                'name' => 'Agenda Pimpinan',
+                'class' => 'App\Filament\Resources\LeaderAgendaResource',
+                'roles' => ['SUPERADMIN', 'ADMIN', 'PROTOKOL', 'USER'],
+            ],
         ];
 
         foreach ($modules as $mod) {
