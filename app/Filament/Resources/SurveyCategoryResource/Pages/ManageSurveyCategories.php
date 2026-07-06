@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\SurveyCategoryResource\Pages;
 
-use App\Filament\Resources\SurveyCategoryResource\Pages;
+use App\Filament\Resources\SurveyCategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
 
