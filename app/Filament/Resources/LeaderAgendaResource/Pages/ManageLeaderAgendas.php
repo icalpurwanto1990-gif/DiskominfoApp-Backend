@@ -16,8 +16,8 @@ class ManageLeaderAgendas extends ManageRecords
     {
         $user = auth()->user();
         
-        // Show create action to USER (OPD) and SUPERADMIN/ADMIN
-        $canCreate = $user && in_array($user->role, ['USER', 'SUPERADMIN', 'ADMIN']);
+        // Show create action to OPD and SUPERADMIN/ADMIN
+        $canCreate = $user && in_array($user->role, ['OPD', 'SUPERADMIN', 'ADMIN']);
 
         return $canCreate ? [
             Actions\CreateAction::make()

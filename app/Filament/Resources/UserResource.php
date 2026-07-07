@@ -53,6 +53,7 @@ class UserResource extends Resource
                         'SUPERADMIN' => 'Super Administrator (SUPERADMIN)',
                         'ADMIN' => 'Administrator (ADMIN)',
                         'PROTOKOL' => 'Protokol Pimpinan (PROTOKOL)',
+                        'OPD' => 'Akun Instansi / OPD (OPD)',
                         'USER' => 'Pemohon (USER)',
                     ])
                     ->default('USER')
@@ -86,6 +87,7 @@ class UserResource extends Resource
                         'SUPERADMIN' => 'danger',
                         'ADMIN' => 'warning',
                         'PROTOKOL' => 'success',
+                        'OPD' => 'primary',
                         'USER' => 'info',
                         default => 'gray',
                     })

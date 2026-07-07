@@ -132,7 +132,7 @@ class ModulePermissionSeeder extends Seeder
             [
                 'name' => 'Agenda Pimpinan',
                 'class' => 'App\Filament\Resources\LeaderAgendaResource',
-                'roles' => ['SUPERADMIN', 'ADMIN', 'PROTOKOL', 'USER'],
+                'roles' => ['SUPERADMIN', 'ADMIN', 'PROTOKOL', 'OPD'],
             ],
         ];
 

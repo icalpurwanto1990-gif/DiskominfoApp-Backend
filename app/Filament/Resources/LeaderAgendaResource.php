@@ -35,7 +35,7 @@ class LeaderAgendaResource extends Resource
         $user = auth()->user();
 
         // OPD users can only see their own requests
-        if ($user && $user->role === 'USER') {
+        if ($user && $user->role === 'OPD') {
             return $query->where('user_id', $user->id);
         }
 
@@ -45,7 +45,7 @@ class LeaderAgendaResource extends Resource
     public static function form(Form $form): Form
     {
         $user = auth()->user();
-        $isOPD = $user && $user->role === 'USER';
+        $isOPD = $user && $user->role === 'OPD';
 
         return $form
             ->schema([
