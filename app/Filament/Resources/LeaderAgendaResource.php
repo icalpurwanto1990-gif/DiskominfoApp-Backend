@@ -134,7 +134,7 @@ class LeaderAgendaResource extends Resource
                 Tables\Columns\TextColumn::make('letter_file')
                     ->label('Surat Permohonan')
                     ->formatStateUsing(fn () => 'Lihat Surat')
-                    ->url(fn (LeaderAgenda $record) => $record->letter_file ? '/uploads/' . $record->letter_file : null, shouldOpenInNewTab: true)
+                    ->url(fn ($record) => $record && $record->letter_file ? '/uploads/' . $record->letter_file : null, true)
                     ->color('primary')
                     ->underline()
                     ->default('-'),
