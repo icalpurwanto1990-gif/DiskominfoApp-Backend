@@ -136,7 +136,6 @@ class LeaderAgendaResource extends Resource
                     ->formatStateUsing(fn () => 'Lihat Surat')
                     ->url(fn ($record) => $record && $record->letter_file ? '/uploads/' . $record->letter_file : null, true)
                     ->color('primary')
-                    ->underline()
                     ->default('-'),
                 Tables\Columns\TextColumn::make('leader_name')
                     ->default('-')
