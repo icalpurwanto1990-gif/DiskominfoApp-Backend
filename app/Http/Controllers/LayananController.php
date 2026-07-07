@@ -123,7 +123,12 @@ class LayananController extends Controller
                         return response()->json(['success' => true, 'type' => 'PPID', 'data' => $ppidReq]);
                     }
 
-                    $tteReq = TteRequest::where('nip', $upperTicket)->orWhere('id', $upperTicket)->first();
+                    $tteQuery = TteRequest::where('nip', $upperTicket);
+                    if (\Illuminate\Support\Str::isUuid($upperTicket)) {
+                        $tteQuery->orWhere('id', $upperTicket);
+                    }
+                    $tteReq = $tteQuery->first();
+
                     if ($tteReq) {
                         return response()->json(['success' => true, 'type' => 'TTE', 'data' => $tteReq]);
                     }
