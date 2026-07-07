@@ -106,7 +106,7 @@ class LeaderAgendaResource extends Resource
                             ->placeholder('Contoh: Memberikan sambutan sekaligus membuka kegiatan')
                             ->label('Keterangan / Agenda Kegiatan'),
                     ])->columns(1)
-                    ->visible(fn (string $operation, ?LeaderAgenda $record) => !$isOPD || ($operation !== 'create' && $record && $record->leader_name !== null)),
+                    ->visible(fn ($record) => !$isOPD || ($record && $record->leader_name !== null)),
             ]);
     }
 
