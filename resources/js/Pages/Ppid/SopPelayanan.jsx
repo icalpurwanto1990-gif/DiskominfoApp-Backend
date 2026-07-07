@@ -50,15 +50,15 @@ export const SopPelayanan = ({ initialDocuments = [] }) => {
   return (
     <MainLayout>
       <PageHero
-        label="PPID UTAMA"
+        label="SOP LAYANAN"
         title="Standar Operasional Prosedur (SOP)"
-        subtitle="Alur pelayanan permohonan informasi, tata cara pengajuan keberatan, dan dokumen SOP resmi PPID"
+        subtitle="Alur pelayanan, tata cara pengajuan, dan dokumen SOP resmi Diskominfo, APTIKA, Persandian, Statistik, dan Informasi Komunikasi Publik"
         icon={ClipboardCheck}
         gradient="from-slate-900 via-slate-900 to-emerald-950"
         accentColor="text-emerald-400"
         blobColor="bg-emerald-500"
         breadcrumbs={[
-          { label: "PPID", href: "/ppid" },
+          { label: "Layanan", href: "/layanan" },
           { label: "SOP Pelayanan" }
         ]}
       />
@@ -70,7 +70,7 @@ export const SopPelayanan = ({ initialDocuments = [] }) => {
             <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Alur Pelayanan</span>
             <h2 className="text-2xl font-black text-slate-900 dark:text-white leading-tight">Prosedur Layanan Informasi Publik</h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-              Panduan interaktif tata cara permohonan informasi dan pengajuan keberatan pada PPID Utama Kabupaten Banggai Kepulauan
+              Panduan interaktif tata cara pelayanan dan pengajuan pada Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan
             </p>
           </div>
 
@@ -157,9 +157,9 @@ export const SopPelayanan = ({ initialDocuments = [] }) => {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800 text-[10px] font-black uppercase text-slate-500 tracking-wider">
+                  <tr className="bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200/80 dark:border-slate-800 text-[10px] font-black uppercase text-slate-500 tracking-wider">
                     <th className="py-4 px-4 w-[6%] text-center">No.</th>
-                    <th className="py-4 px-4 w-[60%]">Daftar Judul SOP Pelayanan PPID</th>
+                    <th className="py-4 px-4 w-[60%]">Daftar Judul SOP Pelayanan Diskominfo</th>
                     <th className="py-4 px-4 w-[14%]">Tanggal Publikasi</th>
                     <th className="py-4 px-4 w-[10%]">Ukuran</th>
                     <th className="py-4 px-4 w-[10%] text-center">Aksi</th>
