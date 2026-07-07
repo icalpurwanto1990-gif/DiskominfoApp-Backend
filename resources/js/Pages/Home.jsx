@@ -168,7 +168,7 @@ export const Home = ({ dbStats, sliderImages, dbServices, welcomeSpeech, latestN
     <MainLayout>
       <div className="w-full flex flex-col items-center">
         {/* 1. Hero Banner Slider */}
-        <HeroSlider initialImages={sliderImages} heroStats={heroStats} />
+        <HeroSlider initialImages={sliderImages} heroStats={heroStats} welcomeSpeech={welcomeSpeech} />
 
         {/* 2. Sambutan Kepala Dinas */}
         <section className="w-full max-w-7xl px-4 md:px-8 py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center border-b border-slate-200/70 dark:border-slate-800/70">
