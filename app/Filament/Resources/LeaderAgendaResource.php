@@ -155,14 +155,14 @@ class LeaderAgendaResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn (LeaderAgenda $record) => $user && ($user->role === 'SUPERADMIN' || $user->role === 'ADMIN' || ($user->role === 'PROTOKOL' && $record->status === 'PENDING') || ($user->role === 'USER' && $record->status === 'PENDING'))),
+                    ->visible(fn ($record) => $user && ($user->role === 'SUPERADMIN' || $user->role === 'ADMIN' || ($user->role === 'PROTOKOL' && $record->status === 'PENDING') || ($user->role === 'OPD' && $record->status === 'PENDING'))),
 
                 // Protokol approve action (PENDING -> PROTOKOL_APPROVED)
                 Action::make('approve_protocol')
                     ->label('Kirim ke Diskominfo')
                     ->icon('heroicon-m-check-circle')
                     ->color('success')
-                    ->visible(fn (LeaderAgenda $record): bool => $user && $user->role === 'PROTOKOL' && $record->status === 'PENDING')
+                    ->visible(fn ($record) => $user && $user->role === 'PROTOKOL' && $record && $record->status === 'PENDING')
                     ->requiresConfirmation()
                     ->form([
                         Forms\Components\Select::make('leader_name')
@@ -197,7 +197,7 @@ class LeaderAgendaResource extends Resource
                     ->label('Verifikasi & Publish')
                     ->icon('heroicon-m-globe-alt')
                     ->color('success')
-                    ->visible(fn (LeaderAgenda $record): bool => $user && ($user->role === 'SUPERADMIN' || $user->role === 'ADMIN') && $record->status === 'PROTOKOL_APPROVED')
+                    ->visible(fn ($record) => $user && ($user->role === 'SUPERADMIN' || $user->role === 'ADMIN') && $record && $record->status === 'PROTOKOL_APPROVED')
                     ->requiresConfirmation()
                     ->action(function (LeaderAgenda $record) {
                         $record->update(['status' => 'PUBLISHED']);
@@ -214,24 +214,26 @@ class LeaderAgendaResource extends Resource
                     ->label('Reschedule')
                     ->icon('heroicon-m-calendar-days')
                     ->color('warning')
-                    ->visible(fn (LeaderAgenda $record): bool => $user && ($user->role === 'PROTOKOL' || $user->role === 'SUPERADMIN' || $user->role === 'ADMIN') && in_array($record->status, ['PROTOKOL_APPROVED', 'PUBLISHED']))
+                    ->visible(fn ($record) => $user && ($user->role === 'PROTOKOL' || $user->role === 'SUPERADMIN' || $user->role === 'ADMIN') && $record && in_array($record->status, ['PROTOKOL_APPROVED', 'PUBLISHED']))
                     ->form([
                         Forms\Components\DatePicker::make('date')
                             ->required()
-                            ->default(fn (LeaderAgenda $record) => $record->date)
                             ->label('Tanggal Baru'),
                         Forms\Components\TextInput::make('time')
                             ->required()
-                            ->default(fn (LeaderAgenda $record) => $record->time)
                             ->label('Waktu / Jam Baru'),
                         Forms\Components\TextInput::make('location')
                             ->required()
-                            ->default(fn (LeaderAgenda $record) => $record->location)
                             ->label('Tempat / Lokasi Baru'),
                         Forms\Components\Textarea::make('notes')
-                            ->default(fn (LeaderAgenda $record) => $record->notes)
                             ->rows(3)
                             ->label('Keterangan / Alasan Reschedule (Opsional)'),
+                    ])
+                    ->fillForm(fn ($record): array => [
+                        'date' => $record->date,
+                        'time' => $record->time,
+                        'location' => $record->location,
+                        'notes' => $record->notes,
                     ])
                     ->action(function (LeaderAgenda $record, array $data) {
                         $record->update([
@@ -253,7 +255,7 @@ class LeaderAgendaResource extends Resource
                     ->label('Tolak')
                     ->icon('heroicon-m-x-circle')
                     ->color('danger')
-                    ->visible(fn (LeaderAgenda $record): bool => $user && ($user->role === 'SUPERADMIN' || $user->role === 'ADMIN' || $user->role === 'PROTOKOL') && in_array($record->status, ['PENDING', 'PROTOKOL_APPROVED']))
+                    ->visible(fn ($record) => $user && ($user->role === 'SUPERADMIN' || $user->role === 'ADMIN' || $user->role === 'PROTOKOL') && $record && in_array($record->status, ['PENDING', 'PROTOKOL_APPROVED']))
                     ->form([
                         Forms\Components\Textarea::make('rejection_reason')
                             ->label('Alasan Penolakan')
