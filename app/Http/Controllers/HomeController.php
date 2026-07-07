@@ -8,35 +8,9 @@ use App\Models\DigitalService;
 use App\Models\Post;
 use App\Models\ProfileContent;
 use Inertia\Inertia;
-use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    public function apiAgendas(Request $request)
-    {
-        try {
-            $month = $request->input('month', now()->month);
-            $year = $request->input('year', now()->year);
-
-            $agendas = \App\Models\LeaderAgenda::where('status', 'PUBLISHED')
-                ->whereMonth('date', $month)
-                ->whereYear('date', $year)
-                ->orderBy('date', 'asc')
-                ->orderBy('time', 'asc')
-                ->get();
-
-            return response()->json([
-                'success' => true,
-                'agendas' => $agendas,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
     public function index()
     {
         // 1. Fetch statistics
@@ -111,16 +85,6 @@ class HomeController extends Controller
             ->take(3)
             ->get();
 
-        // 7. Fetch published leader agendas for the current month
-        $currentMonth = now()->month;
-        $currentYear = now()->year;
-        $leaderAgendas = \App\Models\LeaderAgenda::where('status', 'PUBLISHED')
-            ->whereMonth('date', $currentMonth)
-            ->whereYear('date', $currentYear)
-            ->orderBy('date', 'asc')
-            ->orderBy('time', 'asc')
-            ->get();
-
         return Inertia::render('Home', [
             'dbStats' => $dbStats,
             'sliderImages' => $banners,
@@ -128,7 +92,6 @@ class HomeController extends Controller
             'welcomeSpeech' => $welcomeSpeech,
             'latestNewsItems' => $latestNewsItems,
             'latestAnnouncements' => $latestAnnouncements,
-            'initialAgendas' => $leaderAgendas,
         ]);
 
     }

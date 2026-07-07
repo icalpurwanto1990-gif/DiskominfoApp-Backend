@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminApiController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeritaController;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 
 // Client Frontend Views (Inertia Render)
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/agenda', [AgendaController::class, 'index'])->name('agenda.index');
 Route::get('/profil', [ProfilController::class, 'index'])->name('profil');
 Route::get('/media', [MediaController::class, 'index'])->name('media');
 Route::get('/berita', [BeritaController::class, 'index'])->name('berita.index');
@@ -36,7 +38,7 @@ Route::post('/api/kontak', [KontakController::class, 'store'])->name('api.kontak
 // Survey & AI Chat client actions
 Route::post('/api/survey', [SurveyController::class, 'store'])->name('api.survey');
 Route::get('/api/survey/categories', [SurveyController::class, 'apiCategories']);
-Route::get('/api/leader-agendas', [HomeController::class, 'apiAgendas']);
+Route::get('/api/leader-agendas', [AgendaController::class, 'apiAgendas']);
 Route::post('/api/ai-chat', [AiChatController::class, 'reply'])->name('api.aichat');
 
 // Auth Routes (React Inertia Views)

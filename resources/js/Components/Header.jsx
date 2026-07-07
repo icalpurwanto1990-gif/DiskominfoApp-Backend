@@ -160,7 +160,7 @@ export const Header = () => {
     { id: 5, label: "Layanan", url: "/layanan", target: "_self", children: [] },
     { id: 6, label: "Smart Gov", url: "/dashboard", target: "_self", children: [] },
     { id: 7, label: "Data Sektoral", url: "/satu-data", target: "_self", children: [] },
-    { id: 11, label: "Agenda Pimpinan", url: "/#agenda", target: "_self", children: [] },
+    { id: 11, label: "Agenda Pimpinan", url: "/agenda", target: "_self", children: [] },
     { id: 8, label: "Peta GIS", url: "/gis", target: "_self", children: [] },
     { id: 9, label: "Media", url: "/media", target: "_self", children: [] },
     { id: 10, label: "Kontak", url: "/kontak", target: "_self", children: [] },

@@ -111,7 +111,7 @@ class MenuSeeder extends Seeder
         // 7.5. Agenda Pimpinan
         Menu::create([
             'label' => 'Agenda Pimpinan',
-            'url' => '/#agenda',
+            'url' => '/agenda',
             'sort_order' => 8,
             'is_active' => true,
         ]);
