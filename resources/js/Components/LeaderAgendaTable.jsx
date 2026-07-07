@@ -121,9 +121,24 @@ export const LeaderAgendaTable = ({ initialAgendas = [] }) => {
               </div>
             </div>
             
-            {/* Visual Bupati/Wakil photo box placeholder matching the document image */}
+            {/* Visual Bupati/Wakil photo box matching the document image */}
             <div className="flex items-center gap-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg p-1.5 shadow-sm">
-              <div className="w-24 h-16 bg-slate-100 dark:bg-slate-900 rounded flex flex-col items-center justify-center text-[8px] font-bold text-slate-500 uppercase tracking-widest text-center px-1">
+              <img
+                src="/uploads/settings/bupati-wakil.png"
+                alt="Foto Bupati & Wakil Bupati"
+                className="w-24 h-16 object-cover rounded"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  const placeholder = e.target.nextSibling;
+                  if (placeholder) {
+                    placeholder.style.display = 'flex';
+                  }
+                }}
+              />
+              <div 
+                style={{ display: 'none' }}
+                className="w-24 h-16 bg-slate-100 dark:bg-slate-900 rounded flex flex-col items-center justify-center text-[8px] font-bold text-slate-500 uppercase tracking-widest text-center px-1"
+              >
                 <span>Foto Bupati</span>
                 <span>& Wakil Bupati</span>
               </div>
