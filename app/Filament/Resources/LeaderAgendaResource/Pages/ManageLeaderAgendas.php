@@ -23,13 +23,11 @@ class ManageLeaderAgendas extends ManageRecords
             Actions\CreateAction::make()
                 ->label('Ajukan Agenda Pimpinan')
                 ->modalHeading('Form Permohonan Agenda Pimpinan')
+                ->mutateFormDataUsing(function (array $data): array {
+                    $data['user_id'] = auth()->id();
+                    $data['status'] = 'PENDING';
+                    return $data;
+                })
         ] : [];
-    }
-
-    protected function mutateFormDataBeforeCreate(array $data): array
-    {
-        $data['user_id'] = auth()->id();
-        $data['status'] = 'PENDING';
-        return $data;
     }
 }
