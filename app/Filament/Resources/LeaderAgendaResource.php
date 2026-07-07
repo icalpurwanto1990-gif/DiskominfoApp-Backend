@@ -82,6 +82,8 @@ class LeaderAgendaResource extends Resource
                             ->directory('agenda-letters')
                             ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'])
                             ->required()
+                            ->openable()
+                            ->downloadable()
                             ->disabled($isOPD === false && $user?->role !== 'SUPERADMIN' && $user?->role !== 'ADMIN')
                             ->label('Surat Permohonan Resmi (PDF / Gambar)'),
                     ])->columns(2),
@@ -129,6 +131,13 @@ class LeaderAgendaResource extends Resource
                     ->label('Tempat'),
                 Tables\Columns\TextColumn::make('organizer')
                     ->label('Pelaksana'),
+                Tables\Columns\TextColumn::make('letter_file')
+                    ->label('Surat Permohonan')
+                    ->formatStateUsing(fn () => 'Lihat Surat')
+                    ->url(fn (LeaderAgenda $record) => $record->letter_file ? '/uploads/' . $record->letter_file : null, shouldOpenInNewTab: true)
+                    ->color('primary')
+                    ->underline()
+                    ->default('-'),
                 Tables\Columns\TextColumn::make('leader_name')
                     ->default('-')
                     ->label('Pimpinan'),
