@@ -147,11 +147,11 @@ export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
           )}
         </div>
 
-        {/* Right Side: Three Leaders Photos */}
-        <div className="lg:col-span-5 hidden lg:flex items-center justify-center relative min-h-[400px]">
-          <div className="flex gap-4 items-end relative z-10">
+        {/* Right Side: Three Leaders Photos (Enlarged UI/UX Layout) */}
+        <div className="lg:col-span-5 hidden lg:flex items-center justify-center relative min-h-[450px]">
+          <div className="flex gap-5 xl:gap-6 items-end relative z-10">
             {/* 1. Bupati Card */}
-            <div className="w-28 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-1.5 flex flex-col gap-2 transform hover:-translate-y-2 transition-transform duration-300 shadow-xl">
+            <div className="w-32 xl:w-36 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-2 flex flex-col gap-2 transform hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 shadow-2xl">
               <div className="w-full aspect-[3/4] bg-slate-800 rounded-xl overflow-hidden relative">
                 <img
                   src="/uploads/settings/bupati.png"
@@ -164,17 +164,17 @@ export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
                   }}
                 />
                 <div style={{ display: 'none' }} className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center bg-slate-800">
-                  <span className="text-[8px] font-black text-slate-400">FOTO BUPATI</span>
+                  <span className="text-[10px] font-black text-slate-400">FOTO BUPATI</span>
                 </div>
               </div>
               <div className="flex flex-col text-center pb-1">
-                <span className="text-[8px] font-black text-white uppercase tracking-wider leading-none">Bupati</span>
-                <span className="text-[6px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Pimpinan</span>
+                <span className="text-[10px] xl:text-xs font-black text-white uppercase tracking-wider leading-none">Bupati</span>
+                <span className="text-[8px] xl:text-[9px] font-semibold text-slate-400 uppercase tracking-widest mt-1">Pimpinan</span>
               </div>
             </div>
 
             {/* 2. Wakil Bupati Card (Staggered offset) */}
-            <div className="w-28 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-1.5 flex flex-col gap-2 transform hover:-translate-y-2 transition-transform duration-300 shadow-xl translate-y-3">
+            <div className="w-32 xl:w-36 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-2 flex flex-col gap-2 transform hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 shadow-2xl translate-y-4">
               <div className="w-full aspect-[3/4] bg-slate-800 rounded-xl overflow-hidden relative">
                 <img
                   src="/uploads/settings/wakil_bupati.png"
@@ -187,17 +187,17 @@ export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
                   }}
                 />
                 <div style={{ display: 'none' }} className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center bg-slate-800">
-                  <span className="text-[8px] font-black text-slate-400">FOTO WAKIL</span>
+                  <span className="text-[10px] font-black text-slate-400">FOTO WAKIL</span>
                 </div>
               </div>
               <div className="flex flex-col text-center pb-1">
-                <span className="text-[8px] font-black text-white uppercase tracking-wider leading-none">Wakil Bupati</span>
-                <span className="text-[6px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Wakil</span>
+                <span className="text-[10px] xl:text-xs font-black text-white uppercase tracking-wider leading-none">Wakil Bupati</span>
+                <span className="text-[8px] xl:text-[9px] font-semibold text-slate-400 uppercase tracking-widest mt-1">Wakil</span>
               </div>
             </div>
 
             {/* 3. Kadis Card */}
-            <div className="w-28 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-1.5 flex flex-col gap-2 transform hover:-translate-y-2 transition-transform duration-300 shadow-xl">
+            <div className="w-32 xl:w-36 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-2 flex flex-col gap-2 transform hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 shadow-2xl">
               <div className="w-full aspect-[3/4] bg-slate-800 rounded-xl overflow-hidden relative">
                 <img
                   src={welcomeSpeech?.foto || "/uploads/settings/kadis.png"}
@@ -210,19 +210,19 @@ export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
                   }}
                 />
                 <div style={{ display: 'none' }} className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center bg-slate-800">
-                  <span className="text-[8px] font-black text-slate-400">FOTO KADIS</span>
+                  <span className="text-[10px] font-black text-slate-400">FOTO KADIS</span>
                 </div>
               </div>
               <div className="flex flex-col text-center pb-1">
-                <span className="text-[8px] font-black text-white uppercase tracking-wider leading-none">Kadis Kominfo</span>
-                <span className="text-[6px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Sekretariat</span>
+                <span className="text-[10px] xl:text-xs font-black text-white uppercase tracking-wider leading-none">Kadis Kominfo</span>
+                <span className="text-[8px] xl:text-[9px] font-semibold text-slate-400 uppercase tracking-widest mt-1">Sekretariat</span>
               </div>
             </div>
           </div>
 
-          {/* Glowing slow-rotating tech background circles */}
-          <div className="absolute w-72 h-72 rounded-full border border-emerald-500/10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-[spin_60s_linear_infinite]" />
-          <div className="absolute w-80 h-80 rounded-full border border-dashed border-teal-500/5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-[spin_80s_linear_infinite]" />
+          {/* Glowing slow-rotating tech background circles (Scaled up) */}
+          <div className="absolute w-[360px] h-[360px] rounded-full border border-emerald-500/10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-[spin_60s_linear_infinite]" />
+          <div className="absolute w-[420px] h-[420px] rounded-full border border-dashed border-teal-500/5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-[spin_80s_linear_infinite]" />
         </div>
       </div>
 
