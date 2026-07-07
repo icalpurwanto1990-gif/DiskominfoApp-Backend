@@ -83,7 +83,7 @@ class UserResource extends Resource
                     ->label('Email'),
                 Tables\Columns\TextColumn::make('role')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn ($state) => match ($state) {
                         'SUPERADMIN' => 'danger',
                         'ADMIN' => 'warning',
                         'PROTOKOL' => 'success',
