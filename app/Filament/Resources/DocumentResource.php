@@ -36,7 +36,11 @@ class DocumentResource extends Resource
                 Forms\Components\Select::make('category')
                     ->required()
                     ->options([
-                        'DIP' => 'DIP (Daftar Informasi Publik)',
+                        'Berkala' => 'Informasi Secara Berkala',
+                        'Serta Merta' => 'Informasi Serta Merta',
+                        'Setiap Saat' => 'Informasi Tersedia Setiap Saat',
+                        'DIP' => 'Daftar Informasi Publik (DIP)',
+                        'SOP' => 'SOP Pelayanan PPID',
                         'Laporan Keuangan' => 'Laporan Keuangan',
                         'Renstra' => 'Renstra (Rencana Strategis)',
                         'Regulasi' => 'Regulasi Daerah / Perda',

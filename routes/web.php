@@ -28,6 +28,11 @@ Route::get('/media', [MediaController::class, 'index'])->name('media');
 Route::get('/berita', [BeritaController::class, 'index'])->name('berita.index');
 Route::get('/berita/{slug}', [BeritaController::class, 'show'])->name('berita.show');
 Route::get('/ppid', [PpidController::class, 'index'])->name('ppid.index');
+Route::get('/ppid/berkala', [PpidController::class, 'berkala'])->name('ppid.berkala');
+Route::get('/ppid/serta-merta', [PpidController::class, 'sertaMerta'])->name('ppid.serta-merta');
+Route::get('/ppid/setiap-saat', [PpidController::class, 'setiapSaat'])->name('ppid.setiap-saat');
+Route::get('/ppid/daftar-informasi-publik', [PpidController::class, 'daftarInformasiPublik'])->name('ppid.daftar-informasi-publik');
+Route::get('/ppid/sop-pelayanan', [PpidController::class, 'sopPelayanan'])->name('ppid.sop-pelayanan');
 Route::get('/layanan', [LayananController::class, 'index'])->name('layanan.index');
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index'); // Smart Gov
 Route::get('/satu-data', [SatuDataController::class, 'index'])->name('satudata.index');

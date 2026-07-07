@@ -154,8 +154,12 @@ export const Header = () => {
     ]},
     { id: 3, label: "Berita", url: "/berita", target: "_self", children: [] },
     { id: 4, label: "PPID", url: "/ppid", target: "_self", children: [
-      { id: 41, label: "Profil PPID", url: "/ppid#profil", target: "_self" },
-      { id: 42, label: "Permohonan Informasi", url: "/ppid#permohonan", target: "_self" }
+      { id: 41, label: "Profil & Layanan PPID", url: "/ppid", target: "_self" },
+      { id: 43, label: "Informasi Secara Berkala", url: "/ppid/berkala", target: "_self" },
+      { id: 44, label: "Informasi Serta Merta", url: "/ppid/serta-merta", target: "_self" },
+      { id: 45, label: "Informasi Tersedia Setiap Saat", url: "/ppid/setiap-saat", target: "_self" },
+      { id: 46, label: "Daftar Informasi Publik", url: "/ppid/daftar-informasi-publik", target: "_self" },
+      { id: 47, label: "SOP Pelayanan PPID", url: "/ppid/sop-pelayanan", target: "_self" }
     ]},
     { id: 5, label: "Layanan", url: "/layanan", target: "_self", children: [] },
     { id: 6, label: "Smart Gov", url: "/dashboard", target: "_self", children: [] },

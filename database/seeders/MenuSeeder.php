@@ -69,18 +69,50 @@ class MenuSeeder extends Seeder
         ]);
 
         Menu::create([
-            'label' => 'Profil PPID',
-            'url' => '/ppid#profil',
+            'label' => 'Profil & Layanan PPID',
+            'url' => '/ppid',
             'parent_id' => $ppid->id,
             'sort_order' => 1,
             'is_active' => true,
         ]);
 
         Menu::create([
-            'label' => 'Permohonan Informasi',
-            'url' => '/ppid#permohonan',
+            'label' => 'Informasi Secara Berkala',
+            'url' => '/ppid/berkala',
             'parent_id' => $ppid->id,
             'sort_order' => 2,
+            'is_active' => true,
+        ]);
+
+        Menu::create([
+            'label' => 'Informasi Serta Merta',
+            'url' => '/ppid/serta-merta',
+            'parent_id' => $ppid->id,
+            'sort_order' => 3,
+            'is_active' => true,
+        ]);
+
+        Menu::create([
+            'label' => 'Informasi Tersedia Setiap Saat',
+            'url' => '/ppid/setiap-saat',
+            'parent_id' => $ppid->id,
+            'sort_order' => 4,
+            'is_active' => true,
+        ]);
+
+        Menu::create([
+            'label' => 'Daftar Informasi Publik',
+            'url' => '/ppid/daftar-informasi-publik',
+            'parent_id' => $ppid->id,
+            'sort_order' => 5,
+            'is_active' => true,
+        ]);
+
+        Menu::create([
+            'label' => 'SOP Pelayanan PPID',
+            'url' => '/ppid/sop-pelayanan',
+            'parent_id' => $ppid->id,
+            'sort_order' => 6,
             'is_active' => true,
         ]);
 

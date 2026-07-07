@@ -110,4 +110,44 @@ class PpidController extends Controller
             ], 500);
         }
     }
+
+    public function berkala()
+    {
+        $documents = Document::where('category', 'Berkala')->orderBy('createdAt', 'desc')->get();
+        return Inertia::render('Ppid/Berkala', [
+            'initialDocuments' => $documents
+        ]);
+    }
+
+    public function sertaMerta()
+    {
+        $documents = Document::where('category', 'Serta Merta')->orderBy('createdAt', 'desc')->get();
+        return Inertia::render('Ppid/SertaMerta', [
+            'initialDocuments' => $documents
+        ]);
+    }
+
+    public function setiapSaat()
+    {
+        $documents = Document::where('category', 'Setiap Saat')->orderBy('createdAt', 'desc')->get();
+        return Inertia::render('Ppid/SetiapSaat', [
+            'initialDocuments' => $documents
+        ]);
+    }
+
+    public function daftarInformasiPublik()
+    {
+        $documents = Document::where('category', 'DIP')->orderBy('createdAt', 'desc')->get();
+        return Inertia::render('Ppid/DaftarInformasi', [
+            'initialDocuments' => $documents
+        ]);
+    }
+
+    public function sopPelayanan()
+    {
+        $documents = Document::where('category', 'SOP')->orderBy('createdAt', 'desc')->get();
+        return Inertia::render('Ppid/SopPelayanan', [
+            'initialDocuments' => $documents
+        ]);
+    }
 }
