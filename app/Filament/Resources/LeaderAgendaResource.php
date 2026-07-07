@@ -78,9 +78,10 @@ class LeaderAgendaResource extends Resource
                             ->disabled($isOPD === false && $user?->role !== 'SUPERADMIN' && $user?->role !== 'ADMIN')
                             ->label('Pelaksana / Instansi Pemohon'),
                         Forms\Components\FileUpload::make('letter_file')
+                            ->disk('uploads')
+                            ->directory('agenda-letters')
+                            ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'])
                             ->required()
-                            ->directory('uploads/agenda-letters')
-                            ->acceptedFileTypes(['application/pdf', 'image/*'])
                             ->disabled($isOPD === false && $user?->role !== 'SUPERADMIN' && $user?->role !== 'ADMIN')
                             ->label('Surat Permohonan Resmi (PDF / Gambar)'),
                     ])->columns(2),
