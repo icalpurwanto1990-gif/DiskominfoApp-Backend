@@ -666,7 +666,7 @@ export const Home = ({ dbStats, sliderImages, dbServices, welcomeSpeech, latestN
         </section>
 
         {/* 6.5. Agenda Pimpinan */}
-        <section className="w-full max-w-7xl px-4 md:px-8 py-20 border-b border-slate-200/70 dark:border-slate-800/70">
+        <section id="agenda" className="w-full max-w-7xl px-4 md:px-8 py-20 border-b border-slate-200/70 dark:border-slate-800/70">
           <ScrollReveal direction="up" className="w-full">
             <LeaderAgendaTable initialAgendas={initialAgendas} />
           </ScrollReveal>

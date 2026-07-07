@@ -108,11 +108,19 @@ class MenuSeeder extends Seeder
             'is_active' => true,
         ]);
 
+        // 7.5. Agenda Pimpinan
+        Menu::create([
+            'label' => 'Agenda Pimpinan',
+            'url' => '/#agenda',
+            'sort_order' => 8,
+            'is_active' => true,
+        ]);
+
         // 8. Peta GIS
         Menu::create([
             'label' => 'Peta GIS',
             'url' => '/gis',
-            'sort_order' => 8,
+            'sort_order' => 9,
             'is_active' => true,
         ]);
 
@@ -120,7 +128,7 @@ class MenuSeeder extends Seeder
         Menu::create([
             'label' => 'Media',
             'url' => '/media',
-            'sort_order' => 9,
+            'sort_order' => 10,
             'is_active' => true,
         ]);
 
@@ -128,7 +136,7 @@ class MenuSeeder extends Seeder
         Menu::create([
             'label' => 'Kontak',
             'url' => '/kontak',
-            'sort_order' => 10,
+            'sort_order' => 11,
             'is_active' => true,
         ]);
     }
