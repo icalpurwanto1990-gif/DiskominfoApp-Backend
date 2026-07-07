@@ -200,6 +200,45 @@ class LeaderAgendaResource extends Resource
                             ->send();
                     }),
 
+                // Reschedule action (PROTOKOL_APPROVED/PUBLISHED -> Updates details)
+                Action::make('reschedule')
+                    ->label('Reschedule')
+                    ->icon('heroicon-m-calendar-days')
+                    ->color('warning')
+                    ->visible(fn (LeaderAgenda $record): bool => $user && ($user->role === 'PROTOKOL' || $user->role === 'SUPERADMIN' || $user->role === 'ADMIN') && in_array($record->status, ['PROTOKOL_APPROVED', 'PUBLISHED']))
+                    ->form([
+                        Forms\Components\DatePicker::make('date')
+                            ->required()
+                            ->default(fn (LeaderAgenda $record) => $record->date)
+                            ->label('Tanggal Baru'),
+                        Forms\Components\TextInput::make('time')
+                            ->required()
+                            ->default(fn (LeaderAgenda $record) => $record->time)
+                            ->label('Waktu / Jam Baru'),
+                        Forms\Components\TextInput::make('location')
+                            ->required()
+                            ->default(fn (LeaderAgenda $record) => $record->location)
+                            ->label('Tempat / Lokasi Baru'),
+                        Forms\Components\Textarea::make('notes')
+                            ->default(fn (LeaderAgenda $record) => $record->notes)
+                            ->rows(3)
+                            ->label('Keterangan / Alasan Reschedule (Opsional)'),
+                    ])
+                    ->action(function (LeaderAgenda $record, array $data) {
+                        $record->update([
+                            'date' => $data['date'],
+                            'time' => $data['time'],
+                            'location' => $data['location'],
+                            'notes' => $data['notes'],
+                        ]);
+
+                        Notification::make()
+                            ->title('Jadwal Berhasil Diatur Ulang')
+                            ->body('Agenda pimpinan telah berhasil di-reschedule.')
+                            ->success()
+                            ->send();
+                    }),
+
                 // Reject action (PENDING/PROTOKOL_APPROVED -> REJECTED)
                 Action::make('reject')
                     ->label('Tolak')
