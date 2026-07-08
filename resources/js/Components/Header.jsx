@@ -3,6 +3,19 @@ import { Link, usePage } from "@inertiajs/react";
 import { Menu, X, Landmark, ChevronDown, LogOut, LayoutDashboard, Megaphone, ZoomIn, ZoomOut, LogIn, ExternalLink, User, Facebook, Instagram, Youtube, Twitter, Linkedin } from "lucide-react";
 import { useAccessibility } from "./AccessibilityContext";
 
+const LaporLogo = ({ className = "h-5 w-auto" }) => (
+  <svg viewBox="0 0 170 60" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Grey comment bubble */}
+    <path d="M8 8H40V28H18L10 36V8Z" stroke="#9ca3af" strokeWidth="3" strokeLinejoin="round" fill="none" />
+    {/* Red comment bubble */}
+    <path d="M22 18H54V38H33L25 46V18Z" stroke="#ea580c" strokeWidth="3" strokeLinejoin="round" fill="#ea580c" />
+    {/* Double border highlight */}
+    <path d="M22 18H54V38H33L25 46V18Z" stroke="white" strokeWidth="1" strokeLinejoin="round" fill="none" />
+    {/* LAPOR! text */}
+    <text x="64" y="38" fill="#ea580c" fontSize="22" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="0.5">LAPOR!</text>
+  </svg>
+);
+
 export const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -420,6 +433,21 @@ export const Header = () => {
 
         {/* Desktop / Large Screen: Mobile Hamburger Menu / Toggler */}
         <div className="flex items-center gap-2">
+          {/* SP4N Lapor Button */}
+          <a
+            href="https://www.lapor.go.id/instansi/pemerintah-kabupaten-banggai-kepulauan"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`flex items-center justify-center px-3 py-1.5 rounded-xl border transition-all duration-300 select-none shadow-sm active:scale-95 ${
+              scrolled
+                ? "bg-slate-100/80 hover:bg-slate-200/80 border-slate-200/60 dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 text-slate-850 dark:text-slate-100"
+                : "bg-white/10 hover:bg-white/20 border-white/15 text-white"
+            }`}
+            title="SP4N LAPOR! Kabupaten Banggai Kepulauan"
+          >
+            <LaporLogo className="h-4.5 w-auto" />
+          </a>
+
           {/* Mobile Login Widget (No Text 'LOGIN' - Just Icon for Professional Layout) */}
           <div className="xl:hidden">
             {isMounted && currentUser ? (
@@ -522,7 +550,7 @@ export const Header = () => {
                 href="/auth/login"
                 className="px-4.5 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 shadow-sm active:scale-95 bg-[#f5d042] hover:bg-[#ebd040] text-slate-900"
               >
-                Masuk Portal
+                Masuk
               </Link>
             ) : null}
           </div>
