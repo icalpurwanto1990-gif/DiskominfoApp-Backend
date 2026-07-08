@@ -4,16 +4,21 @@ import { Menu, X, Landmark, ChevronDown, LogOut, LayoutDashboard, Megaphone, Zoo
 import { useAccessibility } from "./AccessibilityContext";
 
 const LaporLogo = ({ className = "h-5 w-auto" }) => (
-  <svg viewBox="0 0 170 60" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Grey comment bubble */}
-    <path d="M8 8H40V28H18L10 36V8Z" stroke="#9ca3af" strokeWidth="3" strokeLinejoin="round" fill="none" />
-    {/* Red comment bubble */}
-    <path d="M22 18H54V38H33L25 46V18Z" stroke="#ea580c" strokeWidth="3" strokeLinejoin="round" fill="#ea580c" />
-    {/* Double border highlight */}
-    <path d="M22 18H54V38H33L25 46V18Z" stroke="white" strokeWidth="1" strokeLinejoin="round" fill="none" />
-    {/* LAPOR! text */}
-    <text x="64" y="38" fill="#ea580c" fontSize="22" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="0.5">LAPOR!</text>
-  </svg>
+  <span className="flex items-center">
+    <img
+      src="/images/lapor.png"
+      alt="SP4N LAPOR!"
+      className={className}
+      onError={(e) => {
+        e.target.style.display = 'none';
+        const fallback = e.target.nextSibling;
+        if (fallback) fallback.style.display = 'inline';
+      }}
+    />
+    <span style={{ display: 'none' }} className="font-black text-orange-600 tracking-wide text-xs">
+      LAPOR!
+    </span>
+  </span>
 );
 
 export const Header = () => {
