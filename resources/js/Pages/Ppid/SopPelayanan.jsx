@@ -6,7 +6,6 @@ import ScrollReveal from "../../Components/ScrollReveal";
 
 export const SopPelayanan = ({ initialDocuments = [] }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("permohonan");
 
   const filteredDocs = initialDocuments.filter((doc) =>
     doc.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -31,22 +30,6 @@ export const SopPelayanan = ({ initialDocuments = [] }) => {
     }
   };
 
-  const permohonanSteps = [
-    { num: "01", title: "Pengajuan Permohonan", desc: "Pemohon mengisi formulir permohonan informasi di portal PPID atau datang langsung dengan melampirkan salinan KTP/Identitas resmi." },
-    { num: "02", title: "Verifikasi Berkas", desc: "Petugas PPID memeriksa kelengkapan administrasi dan berkas pemohon dalam waktu maksimal 3 hari kerja." },
-    { num: "03", title: "Penyusunan Tanggapan", desc: "PPID Utama berkoordinasi dengan OPD pemilik data untuk menghimpun informasi yang diminta." },
-    { num: "04", title: "Keputusan Pemberian", desc: "PPID menerbitkan surat keputusan pemberitahuan tertulis tentang status pemberian informasi." },
-    { num: "05", title: "Pemberian Informasi", desc: "Informasi diberikan kepada pemohon melalui email, portal, atau diambil langsung dalam waktu 10 + 7 hari kerja." },
-  ];
-
-  const keberatanSteps = [
-    { num: "01", title: "Pengajuan Keberatan", desc: "Pemohon mengajukan keberatan melalui formulir jika merasa ditolak, informasi lambat, atau biaya tidak wajar." },
-    { num: "02", title: "Registrasi Keberatan", desc: "Petugas mencatat pengajuan keberatan dan memberikan tanda terima pendaftaran keberatan." },
-    { num: "03", title: "Review Atasan PPID", desc: "Atasan PPID melakukan evaluasi dan koordinasi internal atas keberatan pemohon." },
-    { num: "04", title: "Keputusan Atasan", desc: "Atasan PPID memberikan tanggapan tertulis atas keberatan yang diajukan pemohon." },
-    { num: "05", title: "Penyelesaian Keberatan", desc: "Tanggapan diberikan dalam waktu maksimal 30 hari kerja sejak permohonan keberatan diregistrasi." },
-  ];
-
   return (
     <MainLayout>
       <PageHero
@@ -64,63 +47,7 @@ export const SopPelayanan = ({ initialDocuments = [] }) => {
       />
 
       <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-16 flex flex-col gap-16">
-        {/* Section 1: Interactive Procedure Flowchart */}
-        <ScrollReveal direction="up" className="w-full flex flex-col gap-8">
-          <div className="text-center max-w-2xl mx-auto flex flex-col gap-2">
-            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Alur Pelayanan</span>
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white leading-tight">Prosedur Layanan Informasi Publik</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-              Panduan interaktif tata cara pelayanan dan pengajuan pada Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan
-            </p>
-          </div>
-
-          {/* Flow Tabs */}
-          <div className="flex justify-center gap-4 border-b border-slate-200/80 dark:border-slate-800/80 pb-px">
-            <button
-              onClick={() => setActiveTab("permohonan")}
-              className={`pb-4 text-xs font-black uppercase tracking-wider border-b-2 transition-all ${
-                activeTab === "permohonan"
-                  ? "border-emerald-500 text-slate-900 dark:text-white"
-                  : "border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400"
-              }`}
-            >
-              Alur Permohonan Informasi
-            </button>
-            <button
-              onClick={() => setActiveTab("keberatan")}
-              className={`pb-4 text-xs font-black uppercase tracking-wider border-b-2 transition-all ${
-                activeTab === "keberatan"
-                  ? "border-emerald-500 text-slate-900 dark:text-white"
-                  : "border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400"
-              }`}
-            >
-              Alur Pengajuan Keberatan
-            </button>
-          </div>
-
-          {/* Steps Timeline Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mt-4">
-            {(activeTab === "permohonan" ? permohonanSteps : keberatanSteps).map((step, idx) => (
-              <div
-                key={idx}
-                className="relative bg-slate-50 dark:bg-slate-900/40 p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow group overflow-hidden"
-              >
-                <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/5 dark:bg-emerald-500/2 rounded-bl-[40px] opacity-70 group-hover:opacity-100 transition-opacity" />
-                <span className="text-3xl font-black text-emerald-500/30 dark:text-emerald-500/20 leading-none">
-                  {step.num}
-                </span>
-                <div className="flex flex-col gap-1.5 z-10">
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-white">{step.title}</h4>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                    {step.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </ScrollReveal>
-
-        {/* Section 2: SOP Documents Download */}
+        {/* Section 1: SOP Documents Download */}
         <ScrollReveal direction="up" className="w-full flex flex-col gap-8">
           <div className="text-center max-w-2xl mx-auto flex flex-col gap-2">
             <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Unduh Berkas</span>
