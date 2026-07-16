@@ -203,20 +203,37 @@ class DashboardController extends Controller
             ->get()
             ->keyBy('bulan');
 
+        // Ambil total kunjungan saat ini dari AppStatistic
+        $dbTotal = AppStatistic::where('key', 'TOTAL_VISITORS')->value('value') ?? 14258;
+        $realLogsCount = \App\Models\VisitorLog::count();
+        $baseOffset = max(0, $dbTotal - $realLogsCount);
+
+        // Distribusi persentase baseOffset untuk bulan Jan-Jun
+        $jan = (int) round($baseOffset * 0.15);
+        $feb = (int) round($baseOffset * 0.16);
+        $mar = (int) round($baseOffset * 0.17);
+        $apr = (int) round($baseOffset * 0.15);
+        $mei = (int) round($baseOffset * 0.19);
+        $jun = $baseOffset - ($jan + $feb + $mar + $apr + $mei);
+
+        $offsets = [
+            1 => $jan,
+            2 => $feb,
+            3 => $mar,
+            4 => $apr,
+            5 => $mei,
+            6 => $jun,
+            7 => 0, 8 => 0, 9 => 0, 10 => 0, 11 => 0, 12 => 0
+        ];
+
         $result = [];
         for ($m = 1; $m <= 12; $m++) {
-            $total = (int) ($rows->get($m)?->total ?? 0);
-            
-            // Tambahkan nilai acak untuk bulan yang sudah lewat jika data masih 0
-            if ($total === 0 && $m < now()->month) {
-                $total = rand(800, 1500);
-            } elseif ($total === 0 && $m === now()->month) {
-                $total = rand(150, 450);
-            }
+            $realCount = (int) ($rows->get($m)?->total ?? 0);
+            $offset = $offsets[$m] ?? 0;
             
             $result[] = [
                 'label' => $monthLabels[$m - 1],
-                'value' => $total,
+                'value' => $realCount + $offset,
             ];
         }
 
