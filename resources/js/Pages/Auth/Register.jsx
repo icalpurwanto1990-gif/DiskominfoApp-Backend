@@ -13,6 +13,8 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successLink, setSuccessLink] = useState("");
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,7 +48,9 @@ export default function Register() {
 
       const data = await res.json();
       if (res.ok && data.success) {
-        setSuccessLink(data.verification_link);
+        setRegisteredEmail(email);
+        setSuccessLink(data.verification_link || "");
+        setIsRegistered(true);
       } else {
         const errMsg = data.errors 
           ? Object.values(data.errors).flat().join(" ") 
@@ -57,7 +61,7 @@ export default function Register() {
       console.error(err);
       setError("Terjadi kesalahan sistem. Silakan coba lagi.");
     } finally {
-      setLoading(false);
+      loading && setLoading(false);
     }
   };
 
@@ -76,28 +80,44 @@ export default function Register() {
         </Link>
 
         {/* Success View */}
-        {successLink ? (
-          <div className="flex flex-col items-center text-center gap-4 py-4">
-            <div className="p-4 bg-emerald-600/15 text-emerald-500 rounded-full border border-emerald-500/10">
+        {isRegistered ? (
+          <div className="flex flex-col items-center text-center gap-6 py-4">
+            <div className="p-4 bg-emerald-600/15 text-emerald-500 rounded-full border border-emerald-500/10 animate-bounce">
               <CheckCircle size={44} className="stroke-[2]" />
             </div>
-            <h2 className="text-xl font-extrabold uppercase tracking-wider text-white mt-2">
-              Registrasi Berhasil!
-            </h2>
-            <p className="text-xs text-slate-450 leading-relaxed max-w-sm">
-              Akun Anda telah berhasil dibuat namun statusnya saat ini <strong>belum aktif</strong>. Silakan klik tombol verifikasi di bawah ini untuk mengaktifkan akun Anda secara langsung:
-            </p>
+            <div className="flex flex-col gap-1">
+              <h2 className="text-xl font-extrabold uppercase tracking-wider text-white">
+                Registrasi Berhasil!
+              </h2>
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                Verifikasi Email Diperlukan
+              </span>
+            </div>
+            <div className="p-5 bg-slate-900/60 border border-slate-800 rounded-2xl text-xs text-slate-300 leading-relaxed max-w-sm">
+              <p className="font-extrabold text-slate-200 mb-2 uppercase tracking-wider text-[10px]">Pemberitahuan:</p>
+              Akun Anda telah berhasil dibuat. Silakan periksa kotak masuk email Anda **({registeredEmail})** (termasuk folder spam/promosi) untuk melakukan verifikasi dan mengaktifkan akun Anda.
+            </div>
             
-            <a
-              href={successLink}
-              className="mt-6 px-6 py-3.5 bg-emerald-650 hover:bg-emerald-600 text-white rounded-2xl font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-600/20 active:scale-[0.98] flex items-center gap-2"
-            >
-              <span>Aktifkan Akun Saya (Verifikasi Email)</span>
-            </a>
-            
-            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-4">
-              Development Environment Utility
-            </span>
+            {successLink ? (
+              <div className="flex flex-col items-center gap-3 w-full">
+                <a
+                  href={successLink}
+                  className="w-full px-6 py-3.5 bg-emerald-650 hover:bg-emerald-600 text-white rounded-2xl font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-600/20 active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                  <span>Aktifkan Akun (Bypass Verifikasi)</span>
+                </a>
+                <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">
+                  Development Environment Utility
+                </span>
+              </div>
+            ) : (
+              <Link
+                href="/auth/login"
+                className="w-full px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
+              >
+                <span>Kembali ke Halaman Login</span>
+              </Link>
+            )}
           </div>
         ) : (
           <>
