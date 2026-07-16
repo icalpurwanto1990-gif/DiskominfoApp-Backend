@@ -8,7 +8,8 @@ echo "========================================="
 
 # 1. Pull perubahan kode terbaru
 echo "📥 Menarik kode terbaru dari Git..."
-git pull origin main
+git fetch origin
+git reset --hard origin/main
 
 # 2. Rebuild dan jalankan kontainer Docker
 echo "🐳 Mem-build ulang dan menjalankan container..."
