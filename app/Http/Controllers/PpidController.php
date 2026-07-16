@@ -145,7 +145,7 @@ class PpidController extends Controller
 
     public function sopPelayanan()
     {
-        $documents = Document::where('category', 'SOP')->orderBy('createdAt', 'desc')->get();
+        $documents = Document::where('category', 'LIKE', 'SOP%')->orderBy('createdAt', 'desc')->get();
         return Inertia::render('Ppid/SopPelayanan', [
             'initialDocuments' => $documents
         ]);

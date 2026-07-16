@@ -5,11 +5,36 @@ import PageHero from "../../Components/PageHero";
 import ScrollReveal from "../../Components/ScrollReveal";
 
 export const SopPelayanan = ({ initialDocuments = [] }) => {
+  const [activeTab, setActiveTab] = useState("SOP APTIKA");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredDocs = initialDocuments.filter((doc) =>
-    doc.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const tabs = [
+    { id: "SOP APTIKA", label: "Aplikasi Informatika (APTIKA)" },
+    { id: "SOP IKP", label: "Informasi & Komunikasi Publik (IKP)" },
+    { id: "SOP PERSANDIAN", label: "Persandian" },
+    { id: "SOP Statistik", label: "Statistik Sektoral" },
+    { id: "SOP", label: "Umum / Lainnya" },
+  ];
+
+  const getTabCount = (tabId) => {
+    return initialDocuments.filter((doc) => {
+      const docCategory = doc.category || "SOP";
+      return tabId === "SOP"
+        ? (docCategory === "SOP" || !tabs.some(t => t.id !== "SOP" && t.id === docCategory))
+        : docCategory === tabId;
+    }).length;
+  };
+
+  const filteredDocs = initialDocuments.filter((doc) => {
+    const docCategory = doc.category || "SOP";
+    const matchesTab = activeTab === "SOP"
+      ? (docCategory === "SOP" || !tabs.some(t => t.id !== "SOP" && t.id === docCategory))
+      : docCategory === activeTab;
+
+    const matchesSearch = doc.title.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesTab && matchesSearch;
+  });
 
   const getFileUrl = (url) => {
     if (!url) return "#";
@@ -46,7 +71,7 @@ export const SopPelayanan = ({ initialDocuments = [] }) => {
         ]}
       />
 
-      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-16 flex flex-col gap-16">
+      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-16 flex flex-col gap-12">
         {/* Section 1: SOP Documents Download */}
         <ScrollReveal direction="up" className="w-full flex flex-col gap-8">
           <div className="text-center max-w-2xl mx-auto flex flex-col gap-2">
@@ -55,6 +80,38 @@ export const SopPelayanan = ({ initialDocuments = [] }) => {
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
               Berkas dokumen Standar Operasional Prosedur yang disahkan untuk menjamin kepastian pelayanan informasi
             </p>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="border-b border-slate-200 dark:border-slate-800 scrollbar-none overflow-x-auto">
+            <div className="flex gap-2 md:gap-6 -mb-px pb-1 min-w-max">
+              {tabs.map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveTab(tab.id);
+                      setSearchQuery("");
+                    }}
+                    className={`pb-4 px-1 text-xs font-bold transition-all border-b-2 outline-none whitespace-nowrap cursor-pointer flex items-center gap-2 ${
+                      isActive
+                        ? "border-emerald-500 text-emerald-600 dark:text-emerald-400 font-extrabold"
+                        : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <span>{tab.label}</span>
+                    <span className={`px-2 py-0.5 text-[9px] rounded-full font-bold transition-colors ${
+                      isActive
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                        : "bg-slate-100 dark:bg-slate-850 text-slate-500"
+                    }`}>
+                      {getTabCount(tab.id)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Search bar & statistics */}
@@ -67,7 +124,7 @@ export const SopPelayanan = ({ initialDocuments = [] }) => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari berkas SOP..."
+                placeholder="Cari berkas SOP di kategori ini..."
                 className="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-slate-800 dark:text-slate-200"
               />
             </div>
@@ -80,13 +137,13 @@ export const SopPelayanan = ({ initialDocuments = [] }) => {
           </div>
 
           {/* Table list */}
-          <div className="border border-slate-200/80 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-slate-900/20 mt-4">
+          <div className="border border-slate-200/80 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-slate-900/20">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200/80 dark:border-slate-800 text-[10px] font-black uppercase text-slate-500 tracking-wider">
                     <th className="py-4 px-4 w-[6%] text-center">No.</th>
-                    <th className="py-4 px-4 w-[60%]">Daftar Judul SOP Pelayanan Diskominfo</th>
+                    <th className="py-4 px-4 w-[60%]">Daftar Judul SOP Pelayanan</th>
                     <th className="py-4 px-4 w-[14%]">Tanggal Publikasi</th>
                     <th className="py-4 px-4 w-[10%]">Ukuran</th>
                     <th className="py-4 px-4 w-[10%] text-center">Aksi</th>
@@ -143,7 +200,7 @@ export const SopPelayanan = ({ initialDocuments = [] }) => {
                         <div className="flex flex-col items-center justify-center gap-2">
                           <AlertCircle size={24} className="text-slate-300" />
                           <span className="font-semibold text-sm">Dokumen SOP Tidak Ditemukan</span>
-                          <span className="text-[10px]">Belum ada dokumen SOP resmi yang diunggah saat ini.</span>
+                          <span className="text-[10px]">Belum ada dokumen SOP resmi di kategori ini.</span>
                         </div>
                       </td>
                     </tr>
