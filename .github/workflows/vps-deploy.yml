@@ -22,4 +22,5 @@ jobs:
           port: ${{ secrets.SSH_PORT || '22' }}
           script: |
             cd /var/www/diskominfo-app
+            chmod +x deploy.sh
             ./deploy.sh
