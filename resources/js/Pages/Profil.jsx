@@ -12,7 +12,6 @@ export const Profil = ({ profileData, staff, documents }) => {
     { id: "tupoksi", label: "Tugas & Fungsi", icon: Landmark },
     { id: "struktur", label: "Struktur Organisasi", icon: BookOpen },
     { id: "pegawai", label: "Daftar Pegawai", icon: Users },
-    { id: "dokumen", label: "Dokumen Renstra", icon: FolderOpen },
   ];
 
   const getProfileVal = (key, fallback) => {
@@ -51,10 +50,7 @@ export const Profil = ({ profileData, staff, documents }) => {
 
   // struktur organisasi now uses uploaded image
 
-  // Filter renstra documents (case insensitive)
-  const renstraDocuments = documents.filter((doc) =>
-    doc.category.toLowerCase().includes("renstra")
-  );
+
 
   return (
     <MainLayout>
@@ -200,38 +196,7 @@ export const Profil = ({ profileData, staff, documents }) => {
             </div>
           )}
 
-          {/* TAB 5: DOKUMEN RENSTRA */}
-          {activeTab === "dokumen" && (
-            <div className="p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl flex flex-col gap-6 animate-fadeIn">
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">Download Center Dokumen Perencanaan</h3>
-              {renstraDocuments.length === 0 ? (
-                <div className="p-8 text-center text-slate-400 font-bold uppercase text-xs">
-                  Tidak ada dokumen perencanaan (Renstra) yang tersedia saat ini.
-                </div>
-              ) : (
-                <div className="flex flex-col gap-4">
-                  {renstraDocuments.map((doc) => (
-                    <div key={doc.id} className="p-5 bg-slate-50 dark:bg-slate-950/40 rounded-2xl border border-slate-100 dark:border-slate-900/60 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                      <div className="flex flex-col gap-1">
-                        <span className="font-extrabold text-xs text-slate-900 dark:text-white">{doc.title}</span>
-                        <span className="text-[10px] text-slate-400 mt-1 font-bold">Format: PDF • Ukuran: {doc.fileSize} • Unduhan: {doc.downloads} kali</span>
-                      </div>
-                      <a
-                        href={doc.fileUrl ? (doc.fileUrl.startsWith('http') || doc.fileUrl.startsWith('/') ? doc.fileUrl : `/uploads/${doc.fileUrl}`) : '#'}
-                        download
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition self-stretch sm:self-auto text-center justify-center"
-                      >
-                        <ArrowDownToLine size={14} />
-                        <span>Download</span>
-                      </a>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+
         </div>
       </div>
     </MainLayout>
