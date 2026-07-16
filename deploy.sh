@@ -12,6 +12,7 @@ git pull origin main
 
 # 2. Rebuild dan jalankan kontainer Docker
 echo "🐳 Mem-build ulang dan menjalankan container..."
+docker compose down
 docker compose up -d --build
 
 # 3. Tunggu hingga database PostgreSQL siap menerima koneksi
