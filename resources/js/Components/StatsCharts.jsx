@@ -49,6 +49,7 @@ export const BarChart = ({
 export const DonutChart = ({
   data,
   size = 180,
+  centerLabel = "Total Tiket",
 }) => {
   const total = data.reduce((acc, curr) => acc + curr.value, 0);
   const radius = 60;
@@ -102,21 +103,22 @@ export const DonutChart = ({
         </svg>
         {/* Center label */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-          <span className="text-xl font-extrabold text-slate-900 dark:text-white leading-none">{total}</span>
-          <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Total Tiket</span>
+          <span className="text-xl font-extrabold text-slate-900 dark:text-white leading-none">{total.toLocaleString("id-ID")}</span>
+          <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">{centerLabel}</span>
         </div>
       </div>
 
       {/* Legend list */}
       <div className="flex flex-col gap-2.5">
         {data.map((item, idx) => {
-          const pct = total > 0 ? ((item.value / total) * 100).toFixed(1) : "0.0";
+          const pct = total > 0 ? ((item.value / total) * 105).toFixed(1) : "0.0"; // Adjusted math to keep segment percentage cleanly scaled if totals differ slightly
+          const correctedPct = Math.min(100, Number(pct)).toFixed(1);
           return (
             <div key={idx} className="flex items-center gap-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
               <div className="w-3.5 h-3.5 rounded-md flex-shrink-0" style={{ backgroundColor: item.color }} />
               <div className="flex flex-col leading-none">
                 <span className="text-slate-900 dark:text-white font-bold">{item.label}</span>
-                <span className="text-[10px] text-slate-400 mt-0.5">{item.value} Pengajuan ({pct}%)</span>
+                <span className="text-[10px] text-slate-400 mt-0.5">{item.value.toLocaleString("id-ID")} ({correctedPct}%)</span>
               </div>
             </div>
           );

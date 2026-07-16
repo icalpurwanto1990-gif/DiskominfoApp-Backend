@@ -7,6 +7,7 @@ import {
 import MainLayout from "../Layouts/MainLayout";
 
 export const Dashboard = () => {
+  const [activeDashboardTab, setActiveDashboardTab] = useState("layanan");
   const [stats, setStats] = useState({
     TOTAL_VISITORS: 14258,
     TOTAL_TTE_ISSUED: 377,
@@ -36,6 +37,10 @@ export const Dashboard = () => {
     { label: "Pending", value: 0, color: "#3B82F6" },
     { label: "Ditolak", value: 0, color: "#EF4444" },
   ]);
+
+  const [visitorMonthlyData, setVisitorMonthlyData] = useState([]);
+  const [visitorBrowserData, setVisitorBrowserData] = useState([]);
+  const [visitorDeviceData, setVisitorDeviceData] = useState([]);
 
   const [completedServices, setCompletedServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -92,6 +97,9 @@ export const Dashboard = () => {
             if (data.tteMonthlyData) setTteMonthlyData(data.tteMonthlyData);
             if (data.ticketBreakdown) setTicketBreakdown(data.ticketBreakdown);
             if (data.completedServices) setCompletedServices(data.completedServices);
+            if (data.visitorMonthlyData) setVisitorMonthlyData(data.visitorMonthlyData);
+            if (data.visitorBrowserData) setVisitorBrowserData(data.visitorBrowserData);
+            if (data.visitorDeviceData) setVisitorDeviceData(data.visitorDeviceData);
           }
         }
         // Ambil juga daftar tahun tersedia
@@ -179,57 +187,132 @@ export const Dashboard = () => {
           })}
         </div>
 
-        {/* Analytics Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
-          {/* Chart 1: TTE Issued (APTIKA Performance) — dengan filter tahun */}
-          <div className="lg:col-span-8 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm flex flex-col gap-4">
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-              <div className="flex flex-col gap-1.5">
-                <h3 className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-wider">
-                  Statistik Penerbitan TTE Bulanan {selectedYear}
-                </h3>
-                <p className="text-[10px] text-slate-400 font-bold uppercase">Volume tanda tangan elektronik ASN yang disetujui per bulan</p>
-              </div>
-              {/* Dropdown Pilih Tahun */}
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <Calendar size={12} className="text-slate-400" />
-                <select
-                  id="tte-year-selector"
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(Number(e.target.value))}
-                  className="text-[11px] font-bold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg px-3 py-1.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
-                  aria-label="Pilih Tahun Statistik TTE"
-                >
-                  {availableYears.map((yr) => (
-                    <option key={yr} value={yr}>{yr}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            {loading || tteLoading ? (
-              <div className="h-[220px] bg-slate-100 dark:bg-slate-800 animate-pulse rounded-2xl" />
-            ) : (
-              <BarChart data={tteMonthlyData} color="#499ed7" height={220} />
-            )}
-          </div>
+        {/* Tab Selection */}
+        <div className="flex border-b border-slate-200 dark:border-slate-800 gap-6 mt-2">
+          <button
+            onClick={() => setActiveDashboardTab("layanan")}
+            className={`pb-3 text-xs font-black uppercase tracking-wider transition cursor-pointer ${
+              activeDashboardTab === "layanan"
+                ? "text-emerald-500 border-b-2 border-emerald-500 font-extrabold"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+            }`}
+          >
+            Analitik Layanan & TTE
+          </button>
+          <button
+            onClick={() => setActiveDashboardTab("pengunjung")}
+            className={`pb-3 text-xs font-black uppercase tracking-wider transition cursor-pointer ${
+              activeDashboardTab === "pengunjung"
+                ? "text-emerald-500 border-b-2 border-emerald-500 font-extrabold"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+            }`}
+          >
+            Analitik Pengunjung (Visitor Insights)
+          </button>
+        </div>
 
-          {/* Chart 2: Ticket breakdown */}
-          <div className="lg:col-span-4 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm flex flex-col gap-6 justify-between">
-            <div className="flex flex-col gap-1.5">
-              <h3 className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-wider">Status Penyelesaian Tiket Layanan</h3>
-              <p className="text-[10px] text-slate-400 font-bold uppercase">Penyelesaian aduan & pengajuan layanan digital</p>
-            </div>
-            <div className="flex-grow flex items-center justify-center py-4">
-              {loading ? (
-                <div className="w-[150px] h-[150px] rounded-full border-8 border-slate-200 border-t-slate-500 animate-spin" />
+        {/* Analytics Charts Grid */}
+        {activeDashboardTab === "layanan" ? (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fadeIn">
+            
+            {/* Chart 1: TTE Issued (APTIKA Performance) — dengan filter tahun */}
+            <div className="lg:col-span-8 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm flex flex-col gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                <div className="flex flex-col gap-1.5">
+                  <h3 className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-wider">
+                    Statistik Penerbitan TTE Bulanan {selectedYear}
+                  </h3>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase">Volume tanda tangan elektronik ASN yang disetujui per bulan</p>
+                </div>
+                {/* Dropdown Pilih Tahun */}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <Calendar size={12} className="text-slate-400" />
+                  <select
+                    id="tte-year-selector"
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(Number(e.target.value))}
+                    className="text-[11px] font-bold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg px-3 py-1.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                    aria-label="Pilih Tahun Statistik TTE"
+                  >
+                    {availableYears.map((yr) => (
+                      <option key={yr} value={yr}>{yr}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              {loading || tteLoading ? (
+                <div className="h-[220px] bg-slate-100 dark:bg-slate-800 animate-pulse rounded-2xl" />
               ) : (
-                <DonutChart data={ticketBreakdown} size={150} />
+                <BarChart data={tteMonthlyData} color="#499ed7" height={220} />
               )}
             </div>
-          </div>
 
-        </div>
+            {/* Chart 2: Ticket breakdown */}
+            <div className="lg:col-span-4 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm flex flex-col gap-6 justify-between">
+              <div className="flex flex-col gap-1.5">
+                <h3 className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-wider">Status Penyelesaian Tiket Layanan</h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase">Penyelesaian aduan & pengajuan layanan digital</p>
+              </div>
+              <div className="flex-grow flex items-center justify-center py-4">
+                {loading ? (
+                  <div className="w-[150px] h-[150px] rounded-full border-8 border-slate-200 border-t-slate-500 animate-spin" />
+                ) : (
+                  <DonutChart data={ticketBreakdown} size={150} centerLabel="Total Tiket" />
+                )}
+              </div>
+            </div>
+
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fadeIn">
+            
+            {/* Chart 1: Tren Pengunjung Bulanan */}
+            <div className="lg:col-span-6 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <h3 className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-wider">
+                  Grafik Kunjungan Bulanan Website {currentYear}
+                </h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase">Jumlah pengunjung unik situs per bulan</p>
+              </div>
+              {loading ? (
+                <div className="h-[220px] bg-slate-100 dark:bg-slate-800 animate-pulse rounded-2xl" />
+              ) : (
+                <BarChart data={visitorMonthlyData} color="#10B981" height={220} />
+              )}
+            </div>
+
+            {/* Chart 2: Browser breakdown */}
+            <div className="lg:col-span-3 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <h3 className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-wider">Sistem Browser Klien</h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase">Persentase browser pengunjung</p>
+              </div>
+              <div className="flex-grow flex items-center justify-center py-4">
+                {loading ? (
+                  <div className="w-[120px] h-[120px] rounded-full border-8 border-slate-200 border-t-slate-500 animate-spin" />
+                ) : (
+                  <DonutChart data={visitorBrowserData} size={120} centerLabel="Browser" />
+                )}
+              </div>
+            </div>
+
+            {/* Chart 3: Device breakdown */}
+            <div className="lg:col-span-3 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <h3 className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-wider">Tipe Perangkat Klien</h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase">Persentase jenis perangkat pengunjung</p>
+              </div>
+              <div className="flex-grow flex items-center justify-center py-4">
+                {loading ? (
+                  <div className="w-[120px] h-[120px] rounded-full border-8 border-slate-200 border-t-slate-500 animate-spin" />
+                ) : (
+                  <DonutChart data={visitorDeviceData} size={120} centerLabel="Perangkat" />
+                )}
+              </div>
+            </div>
+
+          </div>
+        )}
 
         {/* Layanan Terlaksana Section */}
         <div className="p-6 md:p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm flex flex-col gap-6">
