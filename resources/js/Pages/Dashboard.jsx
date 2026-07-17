@@ -9,7 +9,10 @@ import MainLayout from "../Layouts/MainLayout";
 export const Dashboard = () => {
   const [activeDashboardTab, setActiveDashboardTab] = useState("layanan");
   const [stats, setStats] = useState({
-    TOTAL_VISITORS: 14258,
+    TOTAL_VISITORS: 0,
+    VISITORS_TODAY: 0,
+    VISITORS_YESTERDAY: 0,
+    VISITORS_WEEKLY: 0,
     TOTAL_TTE_ISSUED: 377,
     APP_OPD_COUNT: 45,
     OPD_WEBSITE_COUNT: 28,
@@ -163,22 +166,25 @@ export const Dashboard = () => {
         </div>
 
         {/* Stats Cards Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { label: "Kunjungan Portal", value: stats.TOTAL_VISITORS, desc: "Tahun berjalan", icon: Users, color: "text-blue-500 bg-blue-500/10" },
-            { label: "Sertifikat TTE", value: stats.TOTAL_TTE_ISSUED, desc: "ASN terdaftar TTE", icon: ShieldCheck, color: "text-teal-500 bg-teal-500/10" },
-            { label: "Sistem Aplikasi", value: stats.APP_OPD_COUNT, desc: "Layanan aplikasi OPD", icon: MonitorSmartphone, color: "text-indigo-500 bg-indigo-500/10" },
-            { label: "Website OPD", value: stats.OPD_WEBSITE_COUNT, desc: "Aktif di subdomain", icon: Landmark, color: "text-amber-500 bg-amber-500/10" },
-            { label: "Total Tiket Layanan", value: stats.TOTAL_SERVICES_REQUESTED, desc: "Pengajuan masuk", icon: ArrowUpRight, color: "text-emerald-500 bg-emerald-500/10" },
+            { label: "Kunjungan Hari Ini", value: stats.VISITORS_TODAY || 0, desc: "Hari ini", icon: Users, color: "text-emerald-500 bg-emerald-500/10" },
+            { label: "Kunjungan Kemarin", value: stats.VISITORS_YESTERDAY || 0, desc: "Kemarin", icon: Users, color: "text-slate-550 bg-slate-500/10" },
+            { label: "Kunjungan Minggu Ini", value: stats.VISITORS_WEEKLY || 0, desc: "7 hari terakhir", icon: Users, color: "text-purple-500 bg-purple-500/10" },
+            { label: "Total Kunjungan", value: stats.TOTAL_VISITORS || 0, desc: "Total terakumulasi", icon: Users, color: "text-blue-500 bg-blue-500/10" },
+            { label: "Sertifikat TTE", value: stats.TOTAL_TTE_ISSUED || 0, desc: "ASN terdaftar TTE", icon: ShieldCheck, color: "text-teal-500 bg-teal-500/10" },
+            { label: "Sistem Aplikasi", value: stats.APP_OPD_COUNT || 0, desc: "Layanan aplikasi OPD", icon: MonitorSmartphone, color: "text-indigo-500 bg-indigo-500/10" },
+            { label: "Website OPD", value: stats.OPD_WEBSITE_COUNT || 0, desc: "Aktif di subdomain", icon: Landmark, color: "text-amber-500 bg-amber-500/10" },
+            { label: "Total Tiket Layanan", value: stats.TOTAL_SERVICES_REQUESTED || 0, desc: "Pengajuan masuk", icon: ArrowUpRight, color: "text-emerald-500 bg-emerald-500/10" },
           ].map((item, idx) => {
             const Icon = item.icon;
             return (
-              <div key={idx} className="p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col gap-3 shadow-sm">
+              <div key={idx} className="p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col gap-3 shadow-sm hover:shadow-md transition">
                 <div className={`p-2.5 rounded-lg w-fit ${item.color}`}>
                   <Icon size={16} />
                 </div>
                 <div className="flex flex-col leading-none">
-                  <span className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">{item.value.toLocaleString("id-ID")}</span>
+                  <span className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">{(item.value ?? 0).toLocaleString("id-ID")}</span>
                   <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1.5">{item.label}</span>
                   <span className="text-[9px] text-slate-400 mt-1 font-semibold">{item.desc}</span>
                 </div>

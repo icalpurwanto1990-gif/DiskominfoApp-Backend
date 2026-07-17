@@ -36,6 +36,12 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'visitorStats' => fn () => [
+                'today' => \App\Models\VisitorLog::whereDate('visited_at', \Carbon\Carbon::today())->count(),
+                'yesterday' => \App\Models\VisitorLog::whereDate('visited_at', \Carbon\Carbon::yesterday())->count(),
+                'weekly' => \App\Models\VisitorLog::where('visited_at', '>=', \Carbon\Carbon::now()->subDays(7))->count(),
+                'total' => \App\Models\AppStatistic::where('key', 'TOTAL_VISITORS')->value('value') ?? 0,
+            ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),

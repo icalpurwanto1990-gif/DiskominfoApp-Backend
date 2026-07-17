@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Link, usePage } from "@inertiajs/react";
-import { Landmark, Mail, Phone, MapPin, MessageCircle, Globe, ArrowUpRight, Shield, Facebook, Instagram, Youtube, Twitter, Linkedin } from "lucide-react";
+import { Landmark, Mail, Phone, MapPin, MessageCircle, Globe, ArrowUpRight, Shield, Facebook, Instagram, Youtube, Twitter, Linkedin, Users } from "lucide-react";
 import PartnerLinksSlider from "./PartnerLinksSlider";
 
 export const Footer = () => {
   const { props } = usePage();
   const socialMedia = props.socialMedia || [];
+  const visitorStats = props.visitorStats || { today: 0, yesterday: 0, weekly: 0, total: 0 };
 
   // Fetch layanan dari API agar footer selalu sinkron dengan database
   const [footerServices, setFooterServices] = useState([]);
@@ -198,6 +199,33 @@ export const Footer = () => {
                 Sistem Pemerintahan Berbasis Elektronik sesuai Perpres No. 132 Tahun 2022.
               </p>
             </div>
+
+            {/* Statistik Pengunjung Widget */}
+            <div className="p-4 bg-white/5 rounded-xl border border-white/8 flex flex-col gap-2.5">
+              <span className="font-bold text-white text-[11px] flex items-center gap-1.5">
+                <Users size={14} className="text-emerald-450" />
+                Statistik Pengunjung
+              </span>
+              <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-500 font-bold">
+                <div className="flex flex-col">
+                  <span>Hari Ini</span>
+                  <span className="text-white font-extrabold mt-0.5">{(visitorStats.today ?? 0).toLocaleString("id-ID")}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span>Kemarin</span>
+                  <span className="text-white font-extrabold mt-0.5">{(visitorStats.yesterday ?? 0).toLocaleString("id-ID")}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span>Minggu Ini</span>
+                  <span className="text-white font-extrabold mt-0.5">{(visitorStats.weekly ?? 0).toLocaleString("id-ID")}</span>
+                </div>
+                <div className="flex flex-col col-span-2 border-t border-white/5 pt-1.5 mt-0.5">
+                  <span className="text-slate-400">Total Kunjungan</span>
+                  <span className="text-emerald-400 text-xs font-black mt-0.5">{(visitorStats.total ?? 0).toLocaleString("id-ID")}</span>
+                </div>
+              </div>
+            </div>
+
             <a
               href="https://wa.me/6282296421245"
               target="_blank"

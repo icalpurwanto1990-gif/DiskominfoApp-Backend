@@ -32,7 +32,10 @@ class DashboardController extends Controller
             $actualDigitalServiceCount  = DigitalService::where('active', true)->count();
 
             $stats = [
-                'TOTAL_VISITORS'           => $statsMap['TOTAL_VISITORS'] ?? 14258,
+                'TOTAL_VISITORS'           => $statsMap['TOTAL_VISITORS'] ?? 0,
+                'VISITORS_TODAY'           => \App\Models\VisitorLog::whereDate('visited_at', \Carbon\Carbon::today())->count(),
+                'VISITORS_YESTERDAY'       => \App\Models\VisitorLog::whereDate('visited_at', \Carbon\Carbon::yesterday())->count(),
+                'VISITORS_WEEKLY'          => \App\Models\VisitorLog::where('visited_at', '>=', \Carbon\Carbon::now()->subDays(7))->count(),
                 'TOTAL_TTE_ISSUED'         => ($statsMap['TOTAL_TTE_ISSUED'] ?? 377) + $actualCompletedTteCount,
                 'APP_OPD_COUNT'            => $actualDigitalServiceCount > 0 ? $actualDigitalServiceCount : ($statsMap['APP_OPD_COUNT'] ?? 45),
                 'OPD_WEBSITE_COUNT'        => $statsMap['OPD_WEBSITE_COUNT'] ?? 28,
