@@ -97,7 +97,7 @@ export const LeaderAgendaTable = ({ initialAgendas = [] }) => {
       </div>
 
       {/* Official Government layout style */}
-      <div className="w-full flex flex-col items-center gap-6 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 bg-slate-50/50 dark:bg-slate-900/50 overflow-x-auto">
+      <div className="w-full flex flex-col items-stretch gap-6 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 bg-slate-50/50 dark:bg-slate-900/50 overflow-x-auto">
         <div className="min-w-[800px] w-full flex flex-col items-center">
           
           {/* Government Document Masthead */}
