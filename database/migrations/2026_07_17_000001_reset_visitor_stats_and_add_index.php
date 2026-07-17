@@ -21,16 +21,10 @@ return new class extends Migration
             ['value' => 0, 'updatedAt' => now()]
         );
 
-        // 3. Tambahkan indeks pada kolom visited_at agar query harian/mingguan cepat
+        // 3. Tambahkan indeks pada kolom visited_at secara native
         if (Schema::hasTable('VisitorLog')) {
             Schema::table('VisitorLog', function (Blueprint $table) {
-                // Pastikan indeks belum ada sebelum ditambahkan
-                $conn = Schema::getConnection();
-                $dbSchemaManager = $conn->getDoctrineSchemaManager();
-                $indexes = $dbSchemaManager->listTableIndexes('VisitorLog');
-                if (!array_key_exists('visitorlog_visited_at_index', $indexes)) {
-                    $table->index('visited_at');
-                }
+                $table->index('visited_at');
             });
         }
     }
