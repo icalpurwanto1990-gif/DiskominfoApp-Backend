@@ -23,10 +23,10 @@ class AiChatController extends Controller
                 $profile = ProfileContent::all()->pluck('value', 'key')->toArray();
                 
                 $services = DigitalService::where('active', true)
-                    ->select('name', 'description')
+                    ->select('title', 'description')
                     ->get()
                     ->map(function($s) {
-                        return "- " . $s->name . ": " . $s->description;
+                        return "- " . $s->title . ": " . $s->description;
                     })
                     ->implode("\n");
 
