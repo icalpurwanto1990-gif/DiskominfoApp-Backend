@@ -57,7 +57,7 @@ PROFIL DINAS:
 - Kepala Dinas: " . $sambutanNama . "
 - Visi Kabupaten: " . $visi . "
 - Misi Diskominfo: " . $misi . "
-- Alamat Kantor: Kompleks Perkantoran Bukit Halimun, Salakan, Kecamatan Tinangkung, Sulawesi Tengah
+- Alamat Kantor: Kompleks Perkantoran Bukit Trikora, Salakan, Kecamatan Tinangkung, Sulawesi Tengah
 - Kontak: Email diskominfo@banggaikep.go.id atau WhatsApp Humas +62 822-9642-1245
 
 DAFTAR LAYANAN DIGITAL AKTIF:
@@ -100,13 +100,7 @@ ATURAN MENJAWAB (PENTING):
 
                 if ($response->successful()) {
                     $result = $response->json();
-                    $parts = $result['candidates'][0]['content']['parts'] ?? [];
-                    $reply = '';
-                    foreach ($parts as $part) {
-                        if (isset($part['text'])) {
-                            $reply .= $part['text'];
-                        }
-                    }
+                    $reply = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
                     if (!empty($reply)) {
                         return response()->json([
                             'reply' => trim($reply),

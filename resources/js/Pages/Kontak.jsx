@@ -84,7 +84,7 @@ export const Kontak = () => {
               <div className="flex flex-col gap-1">
                 <span className="text-slate-900 dark:text-white font-extrabold text-sm uppercase tracking-wider">Alamat Kantor</span>
                 <p className="text-slate-500 dark:text-slate-400 leading-relaxed mt-1 font-semibold">
-                  Kompleks Perkantoran Bukit Halimun, Salakan, Kecamatan Tinangkung, Kabupaten Banggai Kepulauan, Provinsi Sulawesi Tengah, Kode Pos 94885.
+                  Kompleks Perkantoran Bukit Trikora, Salakan, Kecamatan Tinangkung, Kabupaten Banggai Kepulauan, Provinsi Sulawesi Tengah, Kode Pos 94885.
                 </p>
               </div>
             </div>
