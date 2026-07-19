@@ -49,33 +49,28 @@ class LeaderAgendaResource extends Resource
 
         return $form
             ->schema([
-                Forms\Components\Section::make('Informasi Kegiatan (Diisi oleh OPD)')
+                Forms\Components\Section::make('Informasi Kegiatan (Diisi oleh OPD / Protokol)')
                     ->schema([
                         Forms\Components\TextInput::make('title')
                             ->required()
                             ->maxLength(255)
-                            ->disabled($isOPD === false && $user?->role !== 'SUPERADMIN' && $user?->role !== 'ADMIN') // Protokol reads, OPD edits
                             ->label('Uraian Kegiatan / Acara'),
                         Forms\Components\DatePicker::make('date')
                             ->required()
-                            ->disabled($isOPD === false && $user?->role !== 'SUPERADMIN' && $user?->role !== 'ADMIN')
                             ->label('Tanggal Pelaksanaan'),
                         Forms\Components\TextInput::make('time')
                             ->required()
                             ->placeholder('Contoh: 08.00 WITA')
                             ->maxLength(255)
-                            ->disabled($isOPD === false && $user?->role !== 'SUPERADMIN' && $user?->role !== 'ADMIN')
                             ->label('Waktu / Jam'),
                         Forms\Components\TextInput::make('location')
                             ->required()
                             ->maxLength(255)
-                            ->disabled($isOPD === false && $user?->role !== 'SUPERADMIN' && $user?->role !== 'ADMIN')
                             ->label('Tempat / Lokasi'),
                         Forms\Components\TextInput::make('organizer')
                             ->required()
                             ->maxLength(255)
                             ->default(fn () => auth()->user()?->instansi)
-                            ->disabled($isOPD === false && $user?->role !== 'SUPERADMIN' && $user?->role !== 'ADMIN')
                             ->label('Pelaksana / Instansi Pemohon'),
                         Forms\Components\FileUpload::make('letter_file')
                             ->disk('uploads')
@@ -84,7 +79,6 @@ class LeaderAgendaResource extends Resource
                             ->required()
                             ->openable()
                             ->downloadable()
-                            ->disabled($isOPD === false && $user?->role !== 'SUPERADMIN' && $user?->role !== 'ADMIN')
                             ->label('Surat Permohonan Resmi (PDF / Gambar)'),
                     ])->columns(2),
 
