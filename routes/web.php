@@ -46,6 +46,34 @@ Route::get('/api/survey/categories', [SurveyController::class, 'apiCategories'])
 Route::get('/api/leader-agendas', [AgendaController::class, 'apiAgendas']);
 Route::post('/api/ai-chat', [AiChatController::class, 'reply'])->name('api.aichat');
 
+Route::get('/test-gemini', function () {
+    $apiKey = config('services.gemini.key');
+    $envKey = env('GEMINI_API_KEY');
+    
+    $payload = [
+        'contents' => [
+            ['parts' => [['text' => 'Hello! Who are you?']]]
+        ]
+    ];
+    
+    $response = null;
+    $error = null;
+    try {
+        $response = \Illuminate\Support\Facades\Http::post("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . $apiKey, $payload);
+    } catch (\Exception $e) {
+        $error = $e->getMessage();
+    }
+    
+    return [
+        'gemini_api_key_from_config' => $apiKey ? substr($apiKey, 0, 5) . '...' . substr($apiKey, -5) : 'EMPTY',
+        'gemini_api_key_from_env' => $envKey ? substr($envKey, 0, 5) . '...' . substr($envKey, -5) : 'EMPTY',
+        'raw_env_is_set' => isset($_ENV['GEMINI_API_KEY']) ? 'YES' : 'NO',
+        'response_status' => $response ? $response->status() : 'N/A',
+        'response_body' => $response ? $response->json() : 'N/A',
+        'exception_error' => $error,
+    ];
+});
+
 // Auth Routes (React Inertia Views)
 Route::get('/auth/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/api/auth/login', [AuthController::class, 'login'])->name('api.login');
