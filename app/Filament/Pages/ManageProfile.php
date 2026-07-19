@@ -25,6 +25,12 @@ class ManageProfile extends Page implements Forms\Contracts\HasForms
 
     protected static string $view = 'filament.pages.manage-profile';
 
+    public static function canAccess(): bool
+    {
+        $user = auth()->user();
+        return $user && in_array($user->role, ['SUPERADMIN', 'ADMIN']);
+    }
+
     public ?array $data = [];
 
     public function mount(): void
