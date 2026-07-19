@@ -86,10 +86,10 @@ ATURAN MENJAWAB:
                     ]
                 ];
 
-                // Send request to Gemini API (gemini-1.5-flash)
+                // Send request to Gemini API (gemini-2.5-flash)
                 $response = Http::withHeaders([
                     'Content-Type' => 'application/json',
-                ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . $apiKey, $payload);
+                ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $apiKey, $payload);
 
                 if ($response->successful()) {
                     $result = $response->json();
