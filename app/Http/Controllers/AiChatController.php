@@ -87,7 +87,7 @@ ATURAN MENJAWAB (PENTING):
                         ]
                     ],
                     'generationConfig' => [
-                        'maxOutputTokens' => 500,
+                        'maxOutputTokens' => 1000,
                         'temperature' => 0.5,
                     ]
                 ];
@@ -100,7 +100,13 @@ ATURAN MENJAWAB (PENTING):
 
                 if ($response->successful()) {
                     $result = $response->json();
-                    $reply = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
+                    $parts = $result['candidates'][0]['content']['parts'] ?? [];
+                    $reply = '';
+                    foreach ($parts as $part) {
+                        if (isset($part['text'])) {
+                            $reply .= $part['text'];
+                        }
+                    }
                     if (!empty($reply)) {
                         return response()->json([
                             'reply' => trim($reply),
