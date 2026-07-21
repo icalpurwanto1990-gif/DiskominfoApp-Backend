@@ -24,6 +24,7 @@ class DigitalService extends Model
         'color',
         'active',
         'form_schema',
+        'sop_file',
     ];
 
     protected $casts = [

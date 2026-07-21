@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "@inertiajs/react";
-import { ShieldCheck, Shield, Database, Mail, Server, Video, Link as LinkIcon, Globe, Network, Send, CheckCircle2, Cpu, FileText, File, Lock, Wifi, Monitor, HardDrive, Layers, Users, Phone, Wrench, Layout } from "lucide-react";
+import { ShieldCheck, Shield, Database, Mail, Server, Video, Link as LinkIcon, Globe, Network, Send, CheckCircle2, Cpu, FileText, File, Lock, Wifi, Monitor, HardDrive, Layers, Users, Phone, Wrench, Layout, ExternalLink } from "lucide-react";
 import MainLayout from "../Layouts/MainLayout";
 import PageHero from "../Components/PageHero";
 import ScrollReveal from "../Components/ScrollReveal";
@@ -26,6 +26,14 @@ export const Layanan = () => {
 
   const currentService = services.find((s) => s.slug === selectedService);
   const formSchema = currentService?.form_schema || currentService?.formSchema || [];
+
+  const getSopUrl = (path) => {
+    if (!path) return "";
+    if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
+      return path;
+    }
+    return `/uploads/${path}`;
+  };
 
   useEffect(() => {
     setDetails({});
@@ -314,6 +322,12 @@ export const Layanan = () => {
                           )}
                         </div>
                         <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed font-semibold mt-1">{srv.description}</p>
+                        {srv.sop_file && (
+                          <span className="mt-2 inline-flex items-center gap-1 text-[9px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold w-fit">
+                            <FileText size={10} />
+                            <span>Ada SOP / Panduan</span>
+                          </span>
+                        )}
                       </div>
                     </button>
                   );
@@ -335,6 +349,33 @@ export const Layanan = () => {
                     Kembali
                   </button>
                 </div>
+
+                {currentService?.sop_file && (
+                  <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-emerald-500/10 text-emerald-600 rounded-xl flex-shrink-0">
+                        <FileText size={20} />
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-wider">
+                          Dokumen Petunjuk Pengisian / SOP
+                        </span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
+                          Pelajari SOP & panduan resmi sebelum melengkapi pengajuan ini
+                        </span>
+                      </div>
+                    </div>
+                    <a
+                      href={getSopUrl(currentService.sop_file)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-[11px] transition shadow-sm flex-shrink-0 self-stretch sm:self-auto justify-center"
+                    >
+                      <span>Buka Dokumen SOP</span>
+                      <ExternalLink size={12} />
+                    </a>
+                  </div>
+                )}
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-xs font-semibold">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -129,6 +129,15 @@ class DigitalServiceResource extends Resource
                     ->required()
                     ->columnSpanFull()
                     ->label('Deskripsi Layanan'),
+                Forms\Components\FileUpload::make('sop_file')
+                    ->disk('uploads')
+                    ->directory('services/sops')
+                    ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/jpg', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
+                    ->openable()
+                    ->downloadable()
+                    ->columnSpanFull()
+                    ->label('Dokumen Petunjuk Pengisian / SOP (PDF / Gambar / Doc)')
+                    ->helperText('Unggah berkas SOP atau Petunjuk Pengisian agar pemohon dapat membaca/mengunduh panduan layanan ini.'),
                 Forms\Components\Repeater::make('form_schema')
                     ->label('Formulir Layanan (Dynamic Fields)')
                     ->helperText('Definisikan field formulir tambahan yang akan diisi oleh pemohon untuk layanan ini.')
@@ -210,6 +219,13 @@ class DigitalServiceResource extends Resource
                         ];
                         return in_array($state, $presets) ? 'info' : 'success';
                     }),
+                Tables\Columns\TextColumn::make('sop_file')
+                    ->label('Petunjuk / SOP')
+                    ->formatStateUsing(fn ($state) => $state ? 'Ada SOP' : 'Tanpa SOP')
+                    ->badge()
+                    ->color(fn ($state) => $state ? 'success' : 'gray')
+                    ->url(fn ($record) => $record && $record->sop_file ? '/uploads/' . $record->sop_file : null, true)
+                    ->default('-'),
                 Tables\Columns\IconColumn::make('active')
                     ->boolean()
                     ->label('Aktif'),
