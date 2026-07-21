@@ -101,6 +101,21 @@ class LeaderAgendaResource extends Resource
                             ->label('Keterangan / Agenda Kegiatan'),
                     ])->columns(1)
                     ->visible(fn ($record) => !$isOPD || ($record && $record->leader_name !== null)),
+
+                Forms\Components\Section::make('Dokumentasi Hasil Kegiatan (Diisi oleh Protokol / Google Drive)')
+                    ->schema([
+                        Forms\Components\TextInput::make('photo_url')
+                            ->url()
+                            ->disabled($isOPD)
+                            ->placeholder('Contoh: https://drive.google.com/drive/folders/xxxx')
+                            ->label('Link Foto Kegiatan (Google Drive)'),
+                        Forms\Components\TextInput::make('speech_doc_url')
+                            ->url()
+                            ->disabled($isOPD)
+                            ->placeholder('Contoh: https://drive.google.com/file/d/xxxx/view')
+                            ->label('Link Dokumen Sambutan (Google Drive)'),
+                    ])->columns(2)
+                    ->visible(fn () => !$isOPD || auth()->user()?->role === 'SUPERADMIN' || auth()->user()?->role === 'ADMIN'),
             ]);
     }
 
@@ -134,6 +149,18 @@ class LeaderAgendaResource extends Resource
                 Tables\Columns\TextColumn::make('leader_name')
                     ->default('-')
                     ->label('Pimpinan'),
+                Tables\Columns\TextColumn::make('photo_url')
+                    ->label('Foto Kegiatan')
+                    ->formatStateUsing(fn () => 'Lihat Foto')
+                    ->url(fn ($record) => $record?->photo_url, true)
+                    ->color('primary')
+                    ->default('-'),
+                Tables\Columns\TextColumn::make('speech_doc_url')
+                    ->label('Dokumen Sambutan')
+                    ->formatStateUsing(fn () => 'Lihat Sambutan')
+                    ->url(fn ($record) => $record?->speech_doc_url, true)
+                    ->color('primary')
+                    ->default('-'),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->colors([
@@ -148,7 +175,40 @@ class LeaderAgendaResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn ($record) => $user && ($user->role === 'SUPERADMIN' || $user->role === 'ADMIN' || ($user->role === 'PROTOKOL' && $record->status === 'PENDING') || ($user->role === 'OPD' && $record->status === 'PENDING'))),
+                    ->visible(fn ($record) => $user && ($user->role === 'SUPERADMIN' || $user->role === 'ADMIN' || $user->role === 'PROTOKOL' || ($user->role === 'OPD' && $record->status === 'PENDING'))),
+
+                // Action khusus Protokol untuk mengisi link Foto Kegiatan & Dokumen Sambutan
+                Action::make('update_documentation')
+                    ->label('Input Dokumentasi')
+                    ->icon('heroicon-m-camera')
+                    ->color('info')
+                    ->visible(fn ($record) => $user && ($user->role === 'PROTOKOL' || $user->role === 'SUPERADMIN' || $user->role === 'ADMIN') && $record && in_array($record->status, ['PROTOKOL_APPROVED', 'PUBLISHED']))
+                    ->form([
+                        Forms\Components\TextInput::make('photo_url')
+                            ->url()
+                            ->placeholder('Contoh: https://drive.google.com/drive/folders/xxxx')
+                            ->label('Link Foto Kegiatan (Google Drive)'),
+                        Forms\Components\TextInput::make('speech_doc_url')
+                            ->url()
+                            ->placeholder('Contoh: https://drive.google.com/file/d/xxxx/view')
+                            ->label('Link Dokumen Sambutan (Google Drive)'),
+                    ])
+                    ->fillForm(fn ($record): array => [
+                        'photo_url' => $record->photo_url,
+                        'speech_doc_url' => $record->speech_doc_url,
+                    ])
+                    ->action(function (LeaderAgenda $record, array $data) {
+                        $record->update([
+                            'photo_url' => $data['photo_url'],
+                            'speech_doc_url' => $data['speech_doc_url'],
+                        ]);
+
+                        Notification::make()
+                            ->title('Dokumentasi Disimpan')
+                            ->body('Link foto kegiatan dan dokumen sambutan berhasil diperbarui.')
+                            ->success()
+                            ->send();
+                    }),
 
                 // Protokol approve action (PENDING -> PROTOKOL_APPROVED)
                 Action::make('approve_protocol')

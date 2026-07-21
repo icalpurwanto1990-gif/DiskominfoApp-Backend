@@ -29,6 +29,8 @@ class LeaderAgenda extends Model
         'leader_name',
         'status',
         'rejection_reason',
+        'photo_url',
+        'speech_doc_url',
     ];
 
     protected $casts = [

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, Clock, MapPin, Award, User, Download, FileText, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, Clock, MapPin, Award, User, Download, FileText, ChevronLeft, ChevronRight, Camera, ExternalLink } from "lucide-react";
 
 export const LeaderAgendaTable = ({ initialAgendas = [] }) => {
   const [agendas, setAgendas] = useState(initialAgendas);
@@ -98,7 +98,7 @@ export const LeaderAgendaTable = ({ initialAgendas = [] }) => {
 
       {/* Official Government layout style */}
       <div className="w-full flex flex-col items-stretch gap-6 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 bg-slate-50/50 dark:bg-slate-900/50 overflow-x-auto">
-        <div className="min-w-[800px] w-full flex flex-col items-center">
+        <div className="min-w-[1050px] w-full flex flex-col items-center">
           
           {/* Government Document Masthead */}
           <div className="w-full flex items-center justify-between border-b-2 border-slate-900 dark:border-slate-700 pb-4 mb-6">
@@ -149,13 +149,15 @@ export const LeaderAgendaTable = ({ initialAgendas = [] }) => {
           <table className="w-full border-collapse border-2 border-slate-950 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-200">
             <thead>
               <tr className="bg-slate-800 text-white border-b-2 border-slate-950 dark:border-slate-700 uppercase font-bold text-center">
-                <th className="border border-slate-950 dark:border-slate-700 py-3 px-2 w-[5%]">NO.</th>
-                <th className="border border-slate-950 dark:border-slate-700 py-3 px-3 w-[20%]">HARI / TANGGAL</th>
-                <th className="border border-slate-950 dark:border-slate-700 py-3 px-2 w-[12%]">JAM</th>
-                <th className="border border-slate-950 dark:border-slate-700 py-3 px-4 w-[20%]">TEMPAT</th>
-                <th className="border border-slate-950 dark:border-slate-700 py-3 px-4 w-[25%]">URAIAN KEGIATAN</th>
-                <th className="border border-slate-950 dark:border-slate-700 py-3 px-3 w-[13%]">PELAKSANA</th>
-                <th className="border border-slate-950 dark:border-slate-700 py-3 px-2 w-[15%]">KET</th>
+                <th className="border border-slate-950 dark:border-slate-700 py-3 px-2 w-[4%]">NO.</th>
+                <th className="border border-slate-950 dark:border-slate-700 py-3 px-3 w-[15%]">HARI / TANGGAL</th>
+                <th className="border border-slate-950 dark:border-slate-700 py-3 px-2 w-[10%]">JAM</th>
+                <th className="border border-slate-950 dark:border-slate-700 py-3 px-3 w-[16%]">TEMPAT</th>
+                <th className="border border-slate-950 dark:border-slate-700 py-3 px-3 w-[20%]">URAIAN KEGIATAN</th>
+                <th className="border border-slate-950 dark:border-slate-700 py-3 px-3 w-[11%]">PELAKSANA</th>
+                <th className="border border-slate-950 dark:border-slate-700 py-3 px-2 w-[10%]">KET</th>
+                <th className="border border-slate-950 dark:border-slate-700 py-3 px-2 w-[7%]">FOTO KEGIATAN</th>
+                <th className="border border-slate-950 dark:border-slate-700 py-3 px-2 w-[7%]">DOKUMEN SAMBUTAN</th>
               </tr>
               {/* Row index subheader matching the uploaded image document standard */}
               <tr className="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold text-center border-b-2 border-slate-950 dark:border-slate-700">
@@ -166,18 +168,20 @@ export const LeaderAgendaTable = ({ initialAgendas = [] }) => {
                 <td className="border border-slate-950 dark:border-slate-700 py-1">5</td>
                 <td className="border border-slate-950 dark:border-slate-700 py-1">6</td>
                 <td className="border border-slate-950 dark:border-slate-700 py-1">7</td>
+                <td className="border border-slate-950 dark:border-slate-700 py-1">8</td>
+                <td className="border border-slate-950 dark:border-slate-700 py-1">9</td>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="7" className="border border-slate-950 dark:border-slate-700 text-center py-10 font-bold text-slate-400">
+                  <td colSpan="9" className="border border-slate-950 dark:border-slate-700 text-center py-10 font-bold text-slate-400">
                     <span className="animate-pulse">Memuat Agenda Pimpinan...</span>
                   </td>
                 </tr>
               ) : agendas.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="border border-slate-950 dark:border-slate-700 text-center py-8 font-bold text-slate-400">
+                  <td colSpan="9" className="border border-slate-950 dark:border-slate-700 text-center py-8 font-bold text-slate-400">
                     Belum ada agenda pimpinan terjadwal untuk bulan {currentMonthLabel} {selectedYear}
                   </td>
                 </tr>
@@ -212,6 +216,40 @@ export const LeaderAgendaTable = ({ initialAgendas = [] }) => {
                         </span>
                         {item.notes || "-"}
                       </div>
+                    </td>
+                    <td className="border border-slate-950 dark:border-slate-700 text-center py-3 px-2 align-middle">
+                      {item.photo_url ? (
+                        <a
+                          href={item.photo_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[10px] transition shadow-sm"
+                          title="Buka Foto Kegiatan (Google Drive)"
+                        >
+                          <Camera size={12} />
+                          <span>Foto Drive</span>
+                          <ExternalLink size={10} className="opacity-80" />
+                        </a>
+                      ) : (
+                        <span className="text-slate-400 font-bold">-</span>
+                      )}
+                    </td>
+                    <td className="border border-slate-950 dark:border-slate-700 text-center py-3 px-2 align-middle">
+                      {item.speech_doc_url ? (
+                        <a
+                          href={item.speech_doc_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-[10px] transition shadow-sm"
+                          title="Buka Dokumen Sambutan (Google Drive)"
+                        >
+                          <FileText size={12} />
+                          <span>Sambutan</span>
+                          <ExternalLink size={10} className="opacity-80" />
+                        </a>
+                      ) : (
+                        <span className="text-slate-400 font-bold">-</span>
+                      )}
                     </td>
                   </tr>
                 ))
