@@ -42,6 +42,33 @@ class LeaderAgendaResource extends Resource
         return $query;
     }
 
+    public static function getLeaderOptions(): array
+    {
+        $defaultOptions = [
+            'Bupati Banggai Kepulauan' => 'Bupati Banggai Kepulauan',
+            'Wakil Bupati Banggai Kepulauan' => 'Wakil Bupati Banggai Kepulauan',
+            'Pj. Bupati Banggai Kepulauan' => 'Pj. Bupati Banggai Kepulauan',
+            'Sekretaris Daerah' => 'Sekretaris Daerah',
+            'Staf Ahli Pemerintah Hukum dan Politik' => 'Staf Ahli Pemerintah Hukum dan Politik',
+            'Staf Ahli Pembangunan Ekonomi dan Keuangan' => 'Staf Ahli Pembangunan Ekonomi dan Keuangan',
+            'Staf Ahli Kemasyarakatan dan SDM' => 'Staf Ahli Kemasyarakatan dan SDM',
+            'Asisten 1' => 'Asisten 1',
+            'Asisten 2' => 'Asisten 2',
+            'Asisten 3' => 'Asisten 3',
+            'Asisten 4' => 'Asisten 4',
+        ];
+
+        try {
+            $existingLeaders = LeaderAgenda::whereNotNull('leader_name')
+                ->pluck('leader_name', 'leader_name')
+                ->toArray();
+
+            return array_merge($defaultOptions, $existingLeaders);
+        } catch (\Exception $e) {
+            return $defaultOptions;
+        }
+    }
+
     public static function form(Form $form): Form
     {
         $user = auth()->user();
@@ -85,12 +112,17 @@ class LeaderAgendaResource extends Resource
                 Forms\Components\Section::make('Disusun oleh Protokol')
                     ->schema([
                         Forms\Components\Select::make('leader_name')
-                            ->options([
-                                'Bupati Banggai Kepulauan' => 'Bupati Banggai Kepulauan',
-                                'Wakil Bupati Banggai Kepulauan' => 'Wakil Bupati Banggai Kepulauan',
-                                'Pj. Bupati Banggai Kepulauan' => 'Pj. Bupati Banggai Kepulauan',
-                                'Sekretaris Daerah' => 'Sekretaris Daerah',
+                            ->options(static::getLeaderOptions())
+                            ->searchable()
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('custom_leader_name')
+                                    ->label('Nama / Jabatan Pimpinan Baru')
+                                    ->placeholder('Contoh: Staf Ahli ... / Asisten ...')
+                                    ->required(),
                             ])
+                            ->createOptionUsing(function (array $data): string {
+                                return $data['custom_leader_name'];
+                            })
                             ->required(fn () => auth()->user()?->role === 'PROTOKOL' || auth()->user()?->role === 'SUPERADMIN')
                             ->disabled($isOPD)
                             ->label('Pimpinan yang Dihadirkan'),
@@ -219,12 +251,17 @@ class LeaderAgendaResource extends Resource
                     ->requiresConfirmation()
                     ->form([
                         Forms\Components\Select::make('leader_name')
-                            ->options([
-                                'Bupati Banggai Kepulauan' => 'Bupati Banggai Kepulauan',
-                                'Wakil Bupati Banggai Kepulauan' => 'Wakil Bupati Banggai Kepulauan',
-                                'Pj. Bupati Banggai Kepulauan' => 'Pj. Bupati Banggai Kepulauan',
-                                'Sekretaris Daerah' => 'Sekretaris Daerah',
+                            ->options(static::getLeaderOptions())
+                            ->searchable()
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('custom_leader_name')
+                                    ->label('Nama / Jabatan Pimpinan Baru')
+                                    ->placeholder('Contoh: Staf Ahli ... / Asisten ...')
+                                    ->required(),
                             ])
+                            ->createOptionUsing(function (array $data): string {
+                                return $data['custom_leader_name'];
+                            })
                             ->required()
                             ->label('Pimpinan yang Hadir'),
                         Forms\Components\Textarea::make('notes')
