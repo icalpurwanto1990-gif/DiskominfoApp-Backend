@@ -118,6 +118,18 @@ class AuthController extends Controller
                 ], 422);
             }
 
+            // Check if 2FA is enabled
+            if ($user->two_factor_enabled) {
+                $request->session()->put('pending_2fa_user_id', $user->id);
+                $request->session()->put('pending_2fa_remember', $request->boolean('remember'));
+
+                return response()->json([
+                    'success' => true,
+                    'two_factor_required' => true,
+                    'message' => 'Otentikasi Dua Faktor diperlukan. Silakan masukkan kode 6-digit dari aplikasi Authenticator Anda.',
+                ]);
+            }
+
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
 
@@ -131,6 +143,7 @@ class AuthController extends Controller
                     'nip' => $user->nip,
                     'jabatan' => $user->jabatan,
                     'instansi' => $user->instansi,
+                    'two_factor_enabled' => $user->two_factor_enabled,
                 ],
             ]);
         }
@@ -139,6 +152,134 @@ class AuthController extends Controller
             'success' => false,
             'message' => 'Email atau password salah.',
         ], 422);
+    }
+
+    public function verify2FA(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string|size:6',
+        ]);
+
+        $userId = $request->session()->get('pending_2fa_user_id');
+        if (!$userId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sesi login telah kedaluwarsa atau tidak valid.',
+            ], 422);
+        }
+
+        $user = User::find($userId);
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pengguna tidak ditemukan.',
+            ], 422);
+        }
+
+        $service = new \App\Services\Google2FAService();
+        if ($service->verify($user->two_factor_secret, $request->code)) {
+            $remember = $request->session()->remove('pending_2fa_remember') ?? false;
+            $request->session()->forget('pending_2fa_user_id');
+
+            Auth::login($user, $remember);
+            $request->session()->regenerate();
+
+            // Auto-verify Filament 2FA for this session
+            $request->session()->put('filament_2fa_verified', true);
+
+            return response()->json([
+                'success' => true,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role ?? 'USER',
+                    'nip' => $user->nip,
+                    'jabatan' => $user->jabatan,
+                    'instansi' => $user->instansi,
+                    'two_factor_enabled' => $user->two_factor_enabled,
+                ],
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Kode Otentikasi Dua Faktor tidak valid.',
+        ], 422);
+    }
+
+    public function setup2FA(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        }
+
+        $service = new \App\Services\Google2FAService();
+        $secret = $user->two_factor_secret ?: $service->generateSecret();
+
+        if (!$user->two_factor_secret) {
+            $user->update(['two_factor_secret' => $secret]);
+        }
+
+        $qrUrl = $service->getQRUrl($user->email, $secret);
+
+        return response()->json([
+            'success' => true,
+            'secret' => $secret,
+            'qr_code_url' => $qrUrl,
+            'two_factor_enabled' => (bool)$user->two_factor_enabled,
+        ]);
+    }
+
+    public function enable2FA(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string|size:6',
+        ]);
+
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        }
+
+        $service = new \App\Services\Google2FAService();
+        if ($service->verify($user->two_factor_secret, $request->code)) {
+            $user->update(['two_factor_enabled' => true]);
+
+            // Set verified for the current session too
+            $request->session()->put('filament_2fa_verified', true);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Otentikasi Dua Faktor (2FA) berhasil diaktifkan.',
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Kode verifikasi salah. Gagal mengaktifkan 2FA.',
+        ], 422);
+    }
+
+    public function disable2FA(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        }
+
+        $user->update([
+            'two_factor_enabled' => false,
+            'two_factor_secret' => null,
+        ]);
+
+        $request->session()->forget('filament_2fa_verified');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Otentikasi Dua Faktor (2FA) berhasil dinonaktifkan.',
+        ]);
     }
 
     public function logout(Request $request)
@@ -243,5 +384,39 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'Kata sandi berhasil diperbarui. Silakan login kembali.',
         ]);
+    }
+
+    public function showAdmin2FA()
+    {
+        $user = auth()->user();
+        if (!$user || !$user->two_factor_enabled) {
+            return redirect('/admin');
+        }
+
+        if (session('filament_2fa_verified')) {
+            return redirect('/admin');
+        }
+
+        return view('admin.verify-2fa');
+    }
+
+    public function submitAdmin2FA(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string|size:6',
+        ]);
+
+        $user = auth()->user();
+        if (!$user || !$user->two_factor_enabled) {
+            return redirect('/admin');
+        }
+
+        $service = new \App\Services\Google2FAService();
+        if ($service->verify($user->two_factor_secret, $request->code)) {
+            session(['filament_2fa_verified' => true]);
+            return redirect('/admin');
+        }
+
+        return redirect()->route('admin.2fa.view')->withErrors(['code' => 'Kode Otentikasi Dua Faktor salah.']);
     }
 }

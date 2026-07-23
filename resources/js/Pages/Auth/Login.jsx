@@ -9,6 +9,9 @@ export default function Login() {
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
+  const [show2fa, setShow2fa] = useState(false);
+  const [code2fa, setCode2fa] = useState("");
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("verified") === "1") {
@@ -24,34 +27,41 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await fetch("/api/auth/login", {
+      const url = show2fa ? "/api/auth/verify-2fa" : "/api/auth/login";
+      const payload = show2fa ? { code: code2fa } : { email, password };
+
+      const res = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
           "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || ""
         },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify(payload)
       });
 
       const data = await res.json();
       if (res.ok && data.success) {
-        // Save session locally
-        if (data.user.role === "SUPERADMIN" || data.user.role === "ADMIN") {
-          localStorage.setItem("adminSession", JSON.stringify(data.user));
-          // also share with userSession so they are logged in on the client-side too
-          localStorage.setItem("userSession", JSON.stringify(data.user));
-          alert("Login Administrator berhasil!");
-          window.location.href = "/admin";
+        if (data.two_factor_required) {
+          setShow2fa(true);
+          setSuccessMsg(data.message);
         } else {
-          localStorage.setItem("userSession", JSON.stringify(data.user));
-          alert("Login berhasil!");
-          window.location.href = "/user/dashboard";
+          // Save session locally
+          if (data.user.role === "SUPERADMIN" || data.user.role === "ADMIN") {
+            localStorage.setItem("adminSession", JSON.stringify(data.user));
+            localStorage.setItem("userSession", JSON.stringify(data.user));
+            alert("Login Administrator berhasil!");
+            window.location.href = "/admin";
+          } else {
+            localStorage.setItem("userSession", JSON.stringify(data.user));
+            alert("Login berhasil!");
+            window.location.href = "/user/dashboard";
+          }
         }
       } else {
         const errMsg = data.errors 
           ? Object.values(data.errors).flat().join(" ") 
-          : (data.message || "Email atau password salah.");
+          : (data.message || "Email, password, atau kode 2FA salah.");
         setError(errMsg);
       }
     } catch (err) {
@@ -113,55 +123,105 @@ export default function Login() {
 
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-xs font-semibold text-slate-300">
-          <div className="flex flex-col gap-2">
-            <label htmlFor="email" className="text-slate-400 uppercase tracking-wider text-[10px] font-bold">Email Address</label>
-            <div className="relative">
-              <Mail size={16} className="absolute left-3.5 top-3.5 text-slate-500" />
-              <input
-                id="email"
-                type="email"
-                required
-                placeholder="nama@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-800 rounded-2xl pl-11 pr-4 py-3.5 text-xs text-white placeholder-slate-600 focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:outline-none"
-              />
-            </div>
-          </div>
+          {show2fa ? (
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <label htmlFor="code2fa" className="text-slate-400 uppercase tracking-wider text-[10px] font-bold text-center">Kode Otentikasi 2FA (6-Digit)</label>
+                <input
+                  id="code2fa"
+                  type="text"
+                  required
+                  maxLength="6"
+                  placeholder="000000"
+                  pattern="[0-9]{6}"
+                  inputMode="numeric"
+                  value={code2fa}
+                  onChange={(e) => setCode2fa(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-2xl px-4 py-3 text-center text-xl font-bold text-white tracking-[0.3em] placeholder-slate-750 focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:outline-none"
+                />
+              </div>
 
-          <div className="flex flex-col gap-2">
-            <div className="flex justify-between items-center">
-              <label htmlFor="pass" className="text-slate-400 uppercase tracking-wider text-[10px] font-bold">Password</label>
-              <Link href="/auth/forgot-password" style={{ textShadow: "0 0 20px rgba(16,185,129,0.2)" }} className="text-[10px] text-emerald-500 hover:text-emerald-400 hover:underline uppercase tracking-wider font-extrabold transition-colors">Lupa Password?</Link>
-            </div>
-            <div className="relative">
-              <Lock size={16} className="absolute left-3.5 top-3.5 text-slate-500" />
-              <input
-                id="pass"
-                type="password"
-                required
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-800 rounded-2xl pl-11 pr-4 py-3.5 text-xs text-white placeholder-slate-600 focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:outline-none"
-              />
-            </div>
-          </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-2 py-3.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-600/50 text-white rounded-2xl font-bold uppercase tracking-wider transition-all shadow-lg shadow-emerald-600/20 active:scale-[0.98] flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <LogIn size={14} />
+                    <span>Verifikasi & Masuk</span>
+                  </>
+                )}
+              </button>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full mt-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-600/50 text-white rounded-2xl font-bold uppercase tracking-wider transition-all shadow-lg shadow-emerald-600/20 active:scale-[0.98] flex items-center justify-center gap-2"
-          >
-            {loading ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              <>
-                <LogIn size={14} />
-                <span>Masuk Sekarang</span>
-              </>
-            )}
-          </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShow2fa(false);
+                  setCode2fa("");
+                  setSuccessMsg("");
+                  setError("");
+                }}
+                className="w-full py-2 text-center text-[10px] text-slate-500 hover:text-slate-400 uppercase tracking-widest font-extrabold transition-colors"
+              >
+                Batal
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="email" className="text-slate-400 uppercase tracking-wider text-[10px] font-bold">Email Address</label>
+                <div className="relative">
+                  <Mail size={16} className="absolute left-3.5 top-3.5 text-slate-500" />
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    placeholder="nama@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-800 rounded-2xl pl-11 pr-4 py-3.5 text-xs text-white placeholder-slate-600 focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <label htmlFor="pass" className="text-slate-400 uppercase tracking-wider text-[10px] font-bold">Password</label>
+                  <Link href="/auth/forgot-password" style={{ textShadow: "0 0 20px rgba(16,185,129,0.2)" }} className="text-[10px] text-emerald-500 hover:text-emerald-400 hover:underline uppercase tracking-wider font-extrabold transition-colors">Lupa Password?</Link>
+                </div>
+                <div className="relative">
+                  <Lock size={16} className="absolute left-3.5 top-3.5 text-slate-500" />
+                  <input
+                    id="pass"
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-800 rounded-2xl pl-11 pr-4 py-3.5 text-xs text-white placeholder-slate-600 focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-600/50 text-white rounded-2xl font-bold uppercase tracking-wider transition-all shadow-lg shadow-emerald-600/20 active:scale-[0.98] flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <LogIn size={14} />
+                    <span>Masuk Sekarang</span>
+                  </>
+                )}
+              </button>
+            </>
+          )}
         </form>
 
         {/* Footer Link */}

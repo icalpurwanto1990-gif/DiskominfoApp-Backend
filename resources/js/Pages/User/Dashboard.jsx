@@ -15,7 +15,12 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
   const [loading, setLoading] = useState(false);
 
   // Tab State
-  const [activeTab, setActiveTab] = useState("services"); // "services" | "ppid" | "tte" | "logs"
+  const [activeTab, setActiveTab] = useState("services"); // "services" | "ppid" | "tte" | "security" | "logs"
+
+  // 2FA States
+  const [twoFactorSetup, setTwoFactorSetup] = useState(null);
+  const [twoFactorCode, setTwoFactorCode] = useState("");
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
 
   // TTE Form Modal States
   const [tteModalOpen, setTteModalOpen] = useState(false);
@@ -43,6 +48,12 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
         setTteNip(parsed.nip || "");
         setTteJabatan(parsed.jabatan || "");
         setTteInstansi(parsed.instansi || "");
+
+        // Auto-switch tab if requested in query param
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("tab") === "security") {
+          handleTabChange("security");
+        }
       } catch (e) {
         console.error("Failed to parse user session:", e);
       }
@@ -90,6 +101,95 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
       console.error("Gagal logout:", err);
       localStorage.removeItem("userSession");
       window.location.href = "/";
+    }
+  };
+
+  const handleTabChange = async (tab) => {
+    setActiveTab(tab);
+    if (tab === "security") {
+      setLoading(true);
+      try {
+        const res = await fetch("/api/user/2fa/setup");
+        const data = await res.json();
+        if (data.success) {
+          setTwoFactorSetup(data);
+          setTwoFactorEnabled(data.two_factor_enabled);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleEnable2FA = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch("/api/user/2fa/enable", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || ""
+        },
+        body: JSON.stringify({ code: twoFactorCode })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setTwoFactorEnabled(true);
+        setTwoFactorCode("");
+        alert(data.message);
+        if (user) {
+          const updatedUser = { ...user, two_factor_enabled: true };
+          setUser(updatedUser);
+          localStorage.setItem("userSession", JSON.stringify(updatedUser));
+        }
+      } else {
+        alert(data.message || "Gagal mengaktifkan 2FA.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDisable2FA = async () => {
+    if (!confirm("Apakah Anda yakin ingin menonaktifkan Otentikasi Dua Faktor (2FA)? Ini akan menurunkan tingkat keamanan akun Anda.")) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/user/2fa/disable", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || ""
+        }
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setTwoFactorEnabled(false);
+        setTwoFactorSetup(null);
+        alert(data.message);
+        if (user) {
+          const updatedUser = { ...user, two_factor_enabled: false };
+          setUser(updatedUser);
+          localStorage.setItem("userSession", JSON.stringify(updatedUser));
+        }
+        const setupRes = await fetch("/api/user/2fa/setup");
+        const setupData = await setupRes.json();
+        if (setupData.success) {
+          setTwoFactorSetup(setupData);
+        }
+      } else {
+        alert(data.message || "Gagal menonaktifkan 2FA.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -377,7 +477,7 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
         {/* Tab Switcher */}
         <div className="flex border-b border-slate-200 dark:border-slate-800 gap-2 overflow-x-auto pb-px">
           <button
-            onClick={() => setActiveTab("services")}
+            onClick={() => handleTabChange("services")}
             className={`px-5 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 whitespace-nowrap focus:outline-none ${
               activeTab === "services"
                 ? "border-emerald-600 text-emerald-600 dark:text-emerald-400"
@@ -388,7 +488,7 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
             <span>Layanan Digital ({srvRequests.length})</span>
           </button>
           <button
-            onClick={() => setActiveTab("ppid")}
+            onClick={() => handleTabChange("ppid")}
             className={`px-5 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 whitespace-nowrap focus:outline-none ${
               activeTab === "ppid"
                 ? "border-emerald-600 text-emerald-600 dark:text-emerald-400"
@@ -399,22 +499,33 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
             <span>Informasi PPID ({ppidRequests.length})</span>
           </button>
           <button
-            onClick={() => setActiveTab("tte")}
+            onClick={() => handleTabChange("tte")}
             className={`px-5 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 whitespace-nowrap focus:outline-none ${
               activeTab === "tte"
                 ? "border-emerald-600 text-emerald-600 dark:text-emerald-400"
-                : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350"
+                : "border-transparent text-slate-500 hover:text-slate-705 dark:hover:text-slate-350"
             }`}
           >
             <Key size={14} />
             <span>Sertifikat TTE ASN ({tteRequests.length})</span>
           </button>
           <button
-            onClick={() => setActiveTab("logs")}
+            onClick={() => handleTabChange("security")}
+            className={`px-5 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 whitespace-nowrap focus:outline-none ${
+              activeTab === "security"
+                ? "border-emerald-600 text-emerald-600 dark:text-emerald-400"
+                : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350"
+            }`}
+          >
+            <Shield size={14} />
+            <span>Keamanan 2FA</span>
+          </button>
+          <button
+            onClick={() => handleTabChange("logs")}
             className={`px-5 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 whitespace-nowrap focus:outline-none ${
               activeTab === "logs"
                 ? "border-emerald-600 text-emerald-600 dark:text-emerald-400"
-                : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350"
+                : "border-transparent text-slate-500 hover:text-slate-750 dark:hover:text-slate-350"
             }`}
           >
             <Clock size={14} />
@@ -709,6 +820,102 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
                       </div>
                     );
                   })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 5: Keamanan 2FA */}
+          {activeTab === "security" && (
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-0.5 border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 className="font-extrabold text-sm uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
+                  <Shield size={16} className="text-emerald-600 dark:text-emerald-400" />
+                  Keamanan Otentikasi Dua Faktor (2FA)
+                </h3>
+                <span className="text-[10px] text-slate-400">Proteksi akun Anda dengan lapisan keamanan tambahan menggunakan Google Authenticator</span>
+              </div>
+
+              {twoFactorEnabled ? (
+                <div className="p-6 bg-emerald-50 dark:bg-emerald-950/10 border border-emerald-200 dark:border-emerald-800/40 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                  <div className="flex flex-col gap-1.5 max-w-lg">
+                    <span className="px-2 py-0.5 self-start text-[9px] font-black uppercase rounded bg-emerald-500/10 text-emerald-600">
+                      Status: Aktif
+                    </span>
+                    <h4 className="font-extrabold text-xs text-slate-900 dark:text-white">Otentikasi Dua Faktor (2FA) Sedang Aktif</h4>
+                    <p className="text-[11px] text-slate-500 font-semibold leading-relaxed">
+                      Setiap kali Anda masuk ke portal, setelah memasukkan email dan password, Anda akan diminta memasukkan kode 6-digit dari aplikasi Authenticator di ponsel Anda.
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleDisable2FA}
+                    disabled={loading}
+                    className="w-full md:w-auto px-5 py-3 bg-red-650 hover:bg-red-750 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition active:scale-[0.98] shadow-sm whitespace-nowrap"
+                  >
+                    Nonaktifkan 2FA
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col lg:flex-row gap-8 items-start">
+                  {twoFactorSetup && (
+                    <>
+                      {/* Left: Setup instructions */}
+                      <div className="flex-grow flex flex-col gap-4 max-w-lg text-slate-750 dark:text-slate-350 text-xs font-semibold">
+                        <h4 className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-wider">Langkah-langkah Aktivasi:</h4>
+                        
+                        <div className="flex gap-3.5 items-start">
+                          <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold flex items-center justify-center flex-shrink-0">1</div>
+                          <p className="leading-relaxed">Unduh aplikasi <strong>Google Authenticator</strong> atau <strong>Microsoft Authenticator</strong> di App Store / Play Store ponsel Anda.</p>
+                        </div>
+
+                        <div className="flex gap-3.5 items-start">
+                          <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold flex items-center justify-center flex-shrink-0">2</div>
+                          <p className="leading-relaxed">Buka aplikasi authenticator tersebut, pilih opsi untuk memindai/scan kode QR, lalu arahkan kamera ponsel Anda ke gambar QR Code di samping.</p>
+                        </div>
+
+                        <div className="flex gap-3.5 items-start">
+                          <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold flex items-center justify-center flex-shrink-0">3</div>
+                          <p className="leading-relaxed">Jika kamera ponsel tidak dapat memindai, Anda dapat memasukkan kode kunci manual berikut secara manual:<br />
+                            <code className="mt-1.5 block p-2 bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 rounded font-mono text-center text-sm font-bold text-slate-900 dark:text-white tracking-widest">{twoFactorSetup.secret}</code>
+                          </p>
+                        </div>
+
+                        <div className="flex gap-3.5 items-start">
+                          <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold flex items-center justify-center flex-shrink-0">4</div>
+                          <div className="flex flex-col gap-2 w-full">
+                            <p className="leading-relaxed">Masukkan 6-digit kode verifikasi yang muncul di aplikasi authenticator Anda ke kolom di bawah ini untuk mengaktifkan:</p>
+                            <form onSubmit={handleEnable2FA} className="flex gap-2 mt-1">
+                              <input
+                                type="text"
+                                required
+                                maxLength="6"
+                                placeholder="000000"
+                                value={twoFactorCode}
+                                onChange={(e) => setTwoFactorCode(e.target.value)}
+                                className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 w-32 text-center font-bold tracking-[0.2em] text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                              />
+                              <button
+                                type="submit"
+                                disabled={loading}
+                                className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl uppercase tracking-wider transition active:scale-[0.98] shadow-sm text-[10px]"
+                              >
+                                Aktifkan 2FA
+                              </button>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right: QR Code Visualizer */}
+                      <div className="flex flex-col items-center gap-3.5 p-6 bg-slate-50 dark:bg-slate-950/40 border border-slate-200/50 dark:border-slate-850 rounded-2xl flex-shrink-0 mx-auto">
+                        <span className="text-[10px] text-slate-450 font-bold uppercase tracking-wider">Pindai QR Code:</span>
+                        <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-inner">
+                          <img src={twoFactorSetup.qr_code_url} alt="QR Code 2FA" className="w-[180px] h-[180px]" />
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-semibold uppercase">Google Authenticator QR</span>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>

@@ -49,6 +49,7 @@ Route::post('/api/ai-chat', [AiChatController::class, 'reply'])->name('api.aicha
 // Auth Routes (React Inertia Views)
 Route::get('/auth/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/api/auth/login', [AuthController::class, 'login'])->name('api.login');
+Route::post('/api/auth/verify-2fa', [AuthController::class, 'verify2FA'])->name('api.verify-2fa');
 Route::post('/api/auth/logout', [AuthController::class, 'logout'])->name('api.logout');
 Route::get('/auth/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/api/auth/register', [AuthController::class, 'register'])->name('api.register');
@@ -82,6 +83,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user/requests', [UserController::class, 'getRequests'])->name('user.requests');
     Route::post('/api/user/tte', [UserController::class, 'storeTteRequest']);
     Route::post('/api/user/tte/update', [UserController::class, 'updateTteRequest']);
+    
+    // 2FA User & Admin routes
+    Route::get('/api/user/2fa/setup', [AuthController::class, 'setup2FA']);
+    Route::post('/api/user/2fa/enable', [AuthController::class, 'enable2FA']);
+    Route::post('/api/user/2fa/disable', [AuthController::class, 'disable2FA']);
+    Route::get('/admin/verify-2fa', [AuthController::class, 'showAdmin2FA'])->name('admin.2fa.view');
+    Route::post('/admin/verify-2fa', [AuthController::class, 'submitAdmin2FA'])->name('admin.2fa.submit');
 });
 
 // Client Web API JSON Endpoints

@@ -37,6 +37,8 @@ class User extends Authenticatable implements FilamentUser
         'jabatan',
         'instansi',
         'verification_token',
+        'two_factor_secret',
+        'two_factor_enabled',
     ];
 
     /**
