@@ -179,6 +179,13 @@ class ManageLeaderSettings extends Page implements Forms\Contracts\HasForms
         // Re-fill form from database so FileUpload components stay populated with the saved image paths
         $this->loadData();
 
+        // Clear Laravel application cache so changes take effect immediately on public site
+        try {
+            \Illuminate\Support\Facades\Cache::flush();
+        } catch (\Throwable $e) {
+            // Ignore if cache driver does not support flush
+        }
+
         Notification::make()
             ->title('Data Pimpinan Berhasil Diperbarui')
             ->body('Foto dan nama label Bupati/Wakil Bupati telah diperbarui di halaman publik.')

@@ -19,8 +19,8 @@ class LeaderSetting extends Model
     public static function getDefaults(): array
     {
         return [
-            'bupati_nama' => 'H. Ihsan Basir, SH., LL.M.',
-            'bupati_jabatan' => 'Pj. Bupati Banggai Kepulauan',
+            'bupati_nama' => 'H. Nama Bupati, SH., LL.M.',
+            'bupati_jabatan' => 'Bupati Banggai Kepulauan',
             'bupati_foto' => '/uploads/settings/bupati.png',
             'bupati_aktif' => '1',
             'wakil_bupati_nama' => 'Wakil Bupati',
