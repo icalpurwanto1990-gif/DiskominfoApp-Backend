@@ -83,6 +83,7 @@ class HandleInertiaRequests extends Middleware
                     'platform' => $sm->platform,
                     'url' => $sm->url,
                 ]),
+            'leaderSettings' => fn () => \App\Models\LeaderSetting::getAllFormatted(),
         ]);
     }
 }

@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { usePage } from "@inertiajs/react";
 import { Calendar, Clock, MapPin, Award, User, Download, FileText, ChevronLeft, ChevronRight, Camera, ExternalLink } from "lucide-react";
 
 export const LeaderAgendaTable = ({ initialAgendas = [] }) => {
+  const pageProps = usePage().props;
+  const jointFoto = pageProps?.leaderSettings?.jointFoto || "/uploads/settings/bupati-wakil.png";
+
   const [agendas, setAgendas] = useState(initialAgendas);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -124,7 +128,7 @@ export const LeaderAgendaTable = ({ initialAgendas = [] }) => {
             {/* Visual Bupati/Wakil photo box matching the document image */}
             <div className="flex items-center gap-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg p-1.5 shadow-sm">
               <img
-                src="/uploads/settings/bupati-wakil.png"
+                src={jointFoto}
                 alt="Foto Bupati & Wakil Bupati"
                 className="w-24 h-16 object-cover rounded"
                 onError={(e) => {

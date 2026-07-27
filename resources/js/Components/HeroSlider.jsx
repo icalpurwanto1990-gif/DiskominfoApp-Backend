@@ -1,9 +1,26 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { ArrowRight, ChevronLeft, ChevronRight, Sparkles, Globe } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
+  const pageProps = usePage().props;
+  const leaderSettings = pageProps?.leaderSettings;
+
+  const bupati = leaderSettings?.bupati || {
+    nama: 'H. Ihsan Basir, SH., LL.M.',
+    jabatan: 'Pj. Bupati Banggai Kepulauan',
+    foto: '/uploads/settings/bupati.png',
+    aktif: true,
+  };
+
+  const wakilBupati = leaderSettings?.wakilBupati || {
+    nama: 'Wakil Bupati',
+    jabatan: 'Wakil Bupati Banggai Kepulauan',
+    foto: '/uploads/settings/wakil_bupati.png',
+    aktif: true,
+  };
+
   const defaultSlides = [
     {
       url: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&auto=format&fit=crop&q=80",
@@ -147,54 +164,68 @@ export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
           )}
         </div>
 
-        {/* Right Side: Two Leaders Photos (Professional UI/UX — Bupati & Wakil Bupati) */}
+        {/* Right Side: Two Leaders Photos (Dynamic WebAdmin — Bupati & Wakil Bupati) */}
         <div className="lg:col-span-5 hidden lg:flex items-center justify-center relative min-h-[450px]">
-          <div className="flex gap-8 xl:gap-10 items-end relative z-10">
+          <div className="flex gap-6 xl:gap-8 items-end relative z-10">
             {/* 1. Bupati Card */}
-            <div className="w-40 xl:w-44 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-2 flex flex-col gap-2 transform hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 shadow-2xl">
-              <div className="w-full aspect-[3/4] bg-slate-800 rounded-xl overflow-hidden relative">
-                <img
-                  src="/uploads/settings/bupati.png"
-                  alt="Bupati"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    const fallback = e.target.nextSibling;
-                    if (fallback) fallback.style.display = 'flex';
-                  }}
-                />
-                <div style={{ display: 'none' }} className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center bg-slate-800">
-                  <span className="text-xs font-black text-slate-400">FOTO BUPATI</span>
+            {bupati.aktif && (
+              <div className="w-44 xl:w-48 bg-slate-900/75 backdrop-blur-md border border-emerald-500/20 rounded-2xl p-2.5 flex flex-col gap-2 transform hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 shadow-2xl">
+                <div className="w-full aspect-[3/4] bg-slate-800 rounded-xl overflow-hidden relative group">
+                  <img
+                    src={bupati.foto}
+                    alt={bupati.nama || "Bupati"}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      const fallback = e.target.nextSibling;
+                      if (fallback) fallback.style.display = 'flex';
+                    }}
+                  />
+                  <div style={{ display: 'none' }} className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center bg-slate-800">
+                    <span className="text-xs font-black text-slate-400">FOTO BUPATI</span>
+                  </div>
+                </div>
+                <div className="flex flex-col text-center pb-1 gap-0.5">
+                  <span className="text-xs xl:text-sm font-black text-white uppercase tracking-wider leading-none">{bupati.jabatan || 'Bupati'}</span>
+                  {bupati.nama && (
+                    <span className="text-[10px] xl:text-[11px] font-extrabold text-emerald-300 line-clamp-2 px-1.5 py-0.5 mt-1 bg-emerald-950/70 border border-emerald-500/30 rounded-md shadow-sm">
+                      {bupati.nama}
+                    </span>
+                  )}
+                  <span className="text-[9px] xl:text-[10px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Kab. Banggai Kepulauan</span>
                 </div>
               </div>
-              <div className="flex flex-col text-center pb-1.5">
-                <span className="text-xs xl:text-sm font-black text-white uppercase tracking-wider leading-none">Bupati</span>
-                <span className="text-[9px] xl:text-[10px] font-semibold text-emerald-400 uppercase tracking-widest mt-1">Kab. Banggai Kepulauan</span>
-              </div>
-            </div>
+            )}
 
             {/* 2. Wakil Bupati Card (Staggered offset) */}
-            <div className="w-40 xl:w-44 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-2 flex flex-col gap-2 transform hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 shadow-2xl translate-y-6">
-              <div className="w-full aspect-[3/4] bg-slate-800 rounded-xl overflow-hidden relative">
-                <img
-                  src="/uploads/settings/wakil_bupati.png"
-                  alt="Wakil Bupati"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    const fallback = e.target.nextSibling;
-                    if (fallback) fallback.style.display = 'flex';
-                  }}
-                />
-                <div style={{ display: 'none' }} className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center bg-slate-800">
-                  <span className="text-xs font-black text-slate-400">FOTO WAKIL BUPATI</span>
+            {wakilBupati.aktif && (
+              <div className="w-44 xl:w-48 bg-slate-900/75 backdrop-blur-md border border-emerald-500/20 rounded-2xl p-2.5 flex flex-col gap-2 transform hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 shadow-2xl translate-y-6">
+                <div className="w-full aspect-[3/4] bg-slate-800 rounded-xl overflow-hidden relative group">
+                  <img
+                    src={wakilBupati.foto}
+                    alt={wakilBupati.nama || "Wakil Bupati"}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      const fallback = e.target.nextSibling;
+                      if (fallback) fallback.style.display = 'flex';
+                    }}
+                  />
+                  <div style={{ display: 'none' }} className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center bg-slate-800">
+                    <span className="text-xs font-black text-slate-400">FOTO WAKIL BUPATI</span>
+                  </div>
+                </div>
+                <div className="flex flex-col text-center pb-1 gap-0.5">
+                  <span className="text-xs xl:text-sm font-black text-white uppercase tracking-wider leading-none">{wakilBupati.jabatan || 'Wakil Bupati'}</span>
+                  {wakilBupati.nama && (
+                    <span className="text-[10px] xl:text-[11px] font-extrabold text-emerald-300 line-clamp-2 px-1.5 py-0.5 mt-1 bg-emerald-950/70 border border-emerald-500/30 rounded-md shadow-sm">
+                      {wakilBupati.nama}
+                    </span>
+                  )}
+                  <span className="text-[9px] xl:text-[10px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Kab. Banggai Kepulauan</span>
                 </div>
               </div>
-              <div className="flex flex-col text-center pb-1.5">
-                <span className="text-xs xl:text-sm font-black text-white uppercase tracking-wider leading-none">Wakil Bupati</span>
-                <span className="text-[9px] xl:text-[10px] font-semibold text-emerald-400 uppercase tracking-widest mt-1">Kab. Banggai Kepulauan</span>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Glowing slow-rotating tech background circles */}
