@@ -35,6 +35,11 @@ class ManageLeaderSettings extends Page implements Forms\Contracts\HasForms
 
     public function mount(): void
     {
+        $this->loadData();
+    }
+
+    protected function loadData(): void
+    {
         $defaults = LeaderSetting::getDefaults();
         $dbSettings = LeaderSetting::all()->pluck('value', 'key')->toArray();
 
@@ -46,6 +51,8 @@ class ManageLeaderSettings extends Page implements Forms\Contracts\HasForms
                 $path = ltrim($merged[$photoKey], '/');
                 if (str_starts_with($path, 'uploads/')) {
                     $merged[$photoKey] = substr($path, 8);
+                } else {
+                    $merged[$photoKey] = $path;
                 }
             }
         }
@@ -168,6 +175,9 @@ class ManageLeaderSettings extends Page implements Forms\Contracts\HasForms
                 ['value' => (string) $value]
             );
         }
+
+        // Re-fill form from database so FileUpload components stay populated with the saved image paths
+        $this->loadData();
 
         Notification::make()
             ->title('Data Pimpinan Berhasil Diperbarui')
