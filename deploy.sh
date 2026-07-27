@@ -11,12 +11,19 @@ echo "📥 Menarik kode terbaru dari Git..."
 git fetch origin
 git reset --hard origin/main
 
-# 2. Rebuild dan jalankan kontainer Docker
+# 2. Pastikan folder uploads host ada dan permissions benar
+echo "📁 Memastikan folder uploads tersedia..."
+mkdir -p ./public/uploads/banners
+mkdir -p ./public/uploads/settings
+mkdir -p ./public/uploads/icons
+chmod -R 775 ./public/uploads
+
+# 3. Rebuild dan jalankan kontainer Docker
 echo "🐳 Mem-build ulang dan menjalankan container..."
 docker compose down
 docker compose up -d --build
 
-# 3. Tunggu hingga database PostgreSQL siap menerima koneksi
+# 4. Tunggu hingga database PostgreSQL siap menerima koneksi
 echo "⏳ Menunggu database PostgreSQL siap..."
 until docker compose exec db pg_isready -U diskominfo_admin -d diskominfo_db > /dev/null 2>&1; do
   echo "   [db] database belum siap, menunggu 2 detik..."
@@ -24,12 +31,18 @@ until docker compose exec db pg_isready -U diskominfo_admin -d diskominfo_db > /
 done
 echo "   [db] database siap!"
 
-# 4. Jalankan migrasi database
+# 5. Jalankan migrasi database
 echo "🗄️ Menjalankan migrasi database..."
 docker compose exec app php artisan migrate --force
 
-# 5. Optimasi cache Laravel untuk produksi
-echo "🧹 Mengoptimalkan konfigurasi dan cache Laravel..."
+# 6. Pastikan permissions upload di dalam container
+echo "🔒 Mengatur permission folder uploads dalam container..."
+docker compose exec app chmod -R 775 /var/www/html/public/uploads
+docker compose exec app chown -R www-data:www-data /var/www/html/public/uploads
+
+# 7. Bersihkan cache lama, lalu buat cache baru
+echo "🧹 Membersihkan cache lama dan mengoptimalkan..."
+docker compose exec app php artisan optimize:clear
 docker compose exec app php artisan config:cache
 docker compose exec app php artisan route:cache
 docker compose exec app php artisan view:cache
