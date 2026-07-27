@@ -49,17 +49,26 @@ class LeaderSetting extends Model
 
         // Format photo paths if they are saved via Filament upload disk
         $formatPhoto = function ($path, $default) {
-            if (!$path) return $default;
+            if (!$path || trim($path) === '') return $default;
             if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
                 return $path;
             }
-            if (str_starts_with($path, '/uploads/')) {
+            if (str_starts_with($path, '/uploads/') || str_starts_with($path, '/storage/')) {
                 return $path;
             }
             if (str_starts_with($path, '/')) {
                 return $path;
             }
-            return '/uploads/' . ltrim($path, '/');
+
+            $cleanPath = ltrim($path, '/');
+            if (file_exists(public_path('uploads/' . $cleanPath))) {
+                return '/uploads/' . $cleanPath;
+            }
+            if (file_exists(storage_path('app/public/' . $cleanPath))) {
+                return '/storage/' . $cleanPath;
+            }
+
+            return '/uploads/' . $cleanPath;
         };
 
         return [

@@ -176,9 +176,13 @@ export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
                     alt={bupati.nama || "Bupati"}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     onError={(e) => {
-                      e.target.style.display = 'none';
-                      const fallback = e.target.nextSibling;
-                      if (fallback) fallback.style.display = 'flex';
+                      if (!e.target.src.endsWith('/uploads/settings/bupati.png')) {
+                        e.target.src = '/uploads/settings/bupati.png';
+                      } else {
+                        e.target.style.display = 'none';
+                        const fallback = e.target.nextSibling;
+                        if (fallback) fallback.style.display = 'flex';
+                      }
                     }}
                   />
                   <div style={{ display: 'none' }} className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center bg-slate-800">
@@ -206,9 +210,13 @@ export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
                     alt={wakilBupati.nama || "Wakil Bupati"}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     onError={(e) => {
-                      e.target.style.display = 'none';
-                      const fallback = e.target.nextSibling;
-                      if (fallback) fallback.style.display = 'flex';
+                      if (!e.target.src.endsWith('/uploads/settings/wakil_bupati.png')) {
+                        e.target.src = '/uploads/settings/wakil_bupati.png';
+                      } else {
+                        e.target.style.display = 'none';
+                        const fallback = e.target.nextSibling;
+                        if (fallback) fallback.style.display = 'flex';
+                      }
                     }}
                   />
                   <div style={{ display: 'none' }} className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center bg-slate-800">
