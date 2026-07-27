@@ -147,6 +147,10 @@ class ManageLeaderSettings extends Page implements Forms\Contracts\HasForms
 
         foreach ($state as $key => $value) {
             if (is_array($value)) {
+                if (count($value) === 0) {
+                    // Do not wipe existing photo path if state is empty array
+                    continue;
+                }
                 $value = reset($value);
             }
 
@@ -155,9 +159,13 @@ class ManageLeaderSettings extends Page implements Forms\Contracts\HasForms
                 $value = $value ? '1' : '0';
             }
 
+            if ($value === null || $value === false) {
+                continue;
+            }
+
             LeaderSetting::updateOrCreate(
                 ['key' => $key],
-                ['value' => (string) ($value ?? '')]
+                ['value' => (string) $value]
             );
         }
 
