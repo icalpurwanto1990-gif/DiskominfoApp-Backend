@@ -192,7 +192,7 @@ export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
                       {bupati.nama}
                     </span>
                   )}
-                  <span className="text-[9px] xl:text-[10px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Kab. Banggai Kepulauan</span>
+
                 </div>
               </div>
             )}
@@ -222,7 +222,7 @@ export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
                       {wakilBupati.nama}
                     </span>
                   )}
-                  <span className="text-[9px] xl:text-[10px] font-semibold text-slate-400 uppercase tracking-widest mt-0.5">Kab. Banggai Kepulauan</span>
+
                 </div>
               </div>
             )}
