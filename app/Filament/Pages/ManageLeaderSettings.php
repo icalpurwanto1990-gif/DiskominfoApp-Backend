@@ -39,6 +39,17 @@ class ManageLeaderSettings extends Page implements Forms\Contracts\HasForms
         $dbSettings = LeaderSetting::all()->pluck('value', 'key')->toArray();
 
         $merged = array_merge($defaults, $dbSettings);
+
+        // Normalize photo paths for Filament FileUpload component on disk 'uploads'
+        foreach (['bupati_foto', 'wakil_bupati_foto', 'bupati_wakil_foto'] as $photoKey) {
+            if (!empty($merged[$photoKey])) {
+                $path = ltrim($merged[$photoKey], '/');
+                if (str_starts_with($path, 'uploads/')) {
+                    $merged[$photoKey] = substr($path, 8);
+                }
+            }
+        }
+
         $this->form->fill($merged);
     }
 
