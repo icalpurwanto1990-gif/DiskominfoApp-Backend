@@ -34,12 +34,28 @@ class Banner extends Model
 
     const UPDATED_AT = 'updatedAt';
 
-    public function getImageUrlAttribute($value)
+    /**
+     * Get the raw imageUrl stored in database (no path manipulation).
+     * Filament FileUpload stores relative path e.g. 'banners/abc.jpg'
+     */
+    public function getRawImagePath(): ?string
     {
-        if ($value && ! str_starts_with($value, 'http://') && ! str_starts_with($value, 'https://') && ! str_starts_with($value, '/')) {
-            return '/uploads/'.$value;
-        }
+        return $this->getRawOriginal('imageUrl');
+    }
 
-        return $value;
+    /**
+     * Get the full public URL for display, resolving the stored relative path.
+     */
+    public function getPublicImageUrl(): ?string
+    {
+        $value = $this->getRawOriginal('imageUrl');
+        if (! $value) return null;
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+            return $value;
+        }
+        if (str_starts_with($value, '/')) {
+            return $value;
+        }
+        return '/uploads/' . ltrim($value, '/');
     }
 }

@@ -22,7 +22,7 @@ class HomeController extends Controller
             ->get()
             ->map(function ($banner) {
                 return [
-                    'url' => $banner->imageUrl,
+                    'url' => $banner->getPublicImageUrl(),
                     'title' => $banner->title,
                     'description' => $banner->description ?? '',
                 ];

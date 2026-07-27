@@ -66,7 +66,8 @@ class BannerResource extends Resource
                 Tables\Columns\ImageColumn::make('imageUrl')
                     ->disk('uploads')
                     ->label('Gambar')
-                    ->square(),
+                    ->square()
+                    ->getStateUsing(fn ($record) => $record->getRawImagePath()),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
                     ->wrap()
@@ -101,5 +102,15 @@ class BannerResource extends Resource
         return [
             'index' => Pages\ManageBanners::route('/'),
         ];
+    }
+
+    public static function mutateFormDataBeforeFill(array $data): array
+    {
+        // Strip any /uploads/ prefix so Filament FileUpload disk('uploads')
+        // can locate the file at the correct path without double-prefixing.
+        if (isset($data['imageUrl']) && is_string($data['imageUrl'])) {
+            $data['imageUrl'] = ltrim(str_replace('/uploads/', '', $data['imageUrl']), '/');
+        }
+        return $data;
     }
 }
