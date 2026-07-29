@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "@inertiajs/react";
+import { Link, Head } from "@inertiajs/react";
 import { ShieldCheck, Shield, Database, Mail, Server, Video, Link as LinkIcon, Globe, Network, Send, CheckCircle2, Cpu, FileText, File, Lock, Wifi, Monitor, HardDrive, Layers, Users, Phone, Wrench, Layout, ExternalLink } from "lucide-react";
 import MainLayout from "../Layouts/MainLayout";
 import PageHero from "../Components/PageHero";
@@ -225,8 +225,20 @@ export const Layanan = () => {
     );
   }
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <MainLayout>
+      <Head>
+        <title>Portal Layanan Digital - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Pelayanan mandiri urusan persandian, infrastruktur TIK, & sistem informatika pemerintah daerah Kabupaten Banggai Kepulauan." />
+        <meta name="keywords" content="Layanan Digital Banggai Kepulauan, Pengajuan TTE, Domain Desa, Hosting Pemda" />
+        <link rel="canonical" href={pageUrl || "http://localhost:3001/layanan"} />
+        <meta property="og:title" content="Portal Layanan Digital - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan" />
+        <meta property="og:description" content="Pelayanan mandiri urusan persandian, infrastruktur TIK, & sistem informatika pemerintah daerah Kabupaten Banggai Kepulauan." />
+        <meta property="og:url" content={pageUrl || "http://localhost:3001/layanan"} />
+        <meta property="og:type" content="website" />
+      </Head>
       {/* Premium Page Hero */}
       <PageHero
         label="PORTAL PELAYANAN DIGITAL HUB"

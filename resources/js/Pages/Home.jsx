@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "@inertiajs/react";
+import { Link, Head } from "@inertiajs/react";
 import {
   ArrowRight, ShieldCheck, Database, Mail, Server, Video,
   Link as LinkIcon, Globe, Network, FileText, Map, Megaphone,
@@ -164,8 +164,35 @@ export const Home = ({ dbStats, sliderImages, dbServices, welcomeSpeech, latestN
     { label: "Aparatur TTE", value: getStatVal("TOTAL_TTE_ISSUED", "377") },
   ];
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const siteOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+
   return (
     <MainLayout>
+      <Head>
+        <title>Beranda - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Portal Resmi Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan — Layanan Digital, PPID, Satu Data, dan Smart Government SPBE." />
+        <meta name="keywords" content="Diskominfo, Banggai Kepulauan, SPBE, Layanan Digital, PPID, Satu Data, Portal Resmi" />
+        <link rel="canonical" href={pageUrl || "http://localhost:3001/"} />
+        <meta property="og:title" content="Beranda - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan" />
+        <meta property="og:description" content="Portal Resmi Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan — Layanan Digital, PPID, Satu Data, dan Smart Government SPBE." />
+        <meta property="og:url" content={pageUrl || "http://localhost:3001/"} />
+        <meta property="og:type" content="website" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "GovernmentOrganization",
+            "name": "Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan",
+            "url": siteOrigin || "http://localhost:3001",
+            "logo": `${siteOrigin || "http://localhost:3001"}/images/favicon.png`,
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "+62-811-XXXX-XXXX",
+              "contactType": "Customer Service"
+            }
+          })}
+        </script>
+      </Head>
       <div className="w-full flex flex-col items-center">
         {/* 1. Hero Banner Slider */}
         <HeroSlider initialImages={sliderImages} heroStats={heroStats} welcomeSpeech={welcomeSpeech} />

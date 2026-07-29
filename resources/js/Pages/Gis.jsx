@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Map, Radio, Wifi } from "lucide-react";
 import GISMap from "../Components/GISMap";
+import { Head } from "@inertiajs/react";
 import MainLayout from "../Layouts/MainLayout";
 import PageHero from "../Components/PageHero";
 import ScrollReveal from "../Components/ScrollReveal";
@@ -30,8 +31,20 @@ export const Gis = () => {
     fetchStats();
   }, []);
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <MainLayout>
+      <Head>
+        <title>Peta Infrastruktur GIS - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Penyediaan visualisasi sebaran menara BTS, VSAT Bakti, area blankspot, dan jalur kabel fiber optik Kabupaten Banggai Kepulauan secara real-time." />
+        <meta name="keywords" content="Peta GIS Banggai Kepulauan, Sebaran BTS, VSAT Bakti, Blankspot Pemda" />
+        <link rel="canonical" href={pageUrl || "http://localhost:3001/gis"} />
+        <meta property="og:title" content="Peta Infrastruktur GIS - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan" />
+        <meta property="og:description" content="Penyediaan visualisasi sebaran menara BTS, VSAT Bakti, area blankspot, dan jalur kabel fiber optik Kabupaten Banggai Kepulauan secara real-time." />
+        <meta property="og:url" content={pageUrl || "http://localhost:3001/gis"} />
+        <meta property="og:type" content="website" />
+      </Head>
       {/* Premium Page Hero */}
       <PageHero
         label="INFRASTRUKTUR TELEKOMUNIKASI GEOSPASIAL"

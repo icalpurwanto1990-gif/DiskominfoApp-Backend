@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Landmark, Award, BookOpen, Users, FolderOpen, ArrowDownToLine } from "lucide-react";
+import { Head } from "@inertiajs/react";
 import MainLayout from "../Layouts/MainLayout";
 import PageHero from "../Components/PageHero";
 import ScrollReveal from "../Components/ScrollReveal";
@@ -52,8 +53,20 @@ export const Profil = ({ profileData, staff, documents }) => {
 
 
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <MainLayout>
+      <Head>
+        <title>Profil Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Profil resmi Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan — Visi & Misi, Tugas & Fungsi, Struktur Organisasi, dan Daftar Pegawai." />
+        <meta name="keywords" content="Profil Diskominfo, Visi Misi Diskominfo, Struktur Organisasi Diskominfo Banggai Kepulauan, Pegawai Diskominfo" />
+        <link rel="canonical" href={pageUrl || "http://localhost:3001/profil"} />
+        <meta property="og:title" content="Profil Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan" />
+        <meta property="og:description" content="Profil resmi Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan — Visi & Misi, Tugas & Fungsi, Struktur Organisasi, dan Daftar Pegawai." />
+        <meta property="og:url" content={pageUrl || "http://localhost:3001/profil"} />
+        <meta property="og:type" content="website" />
+      </Head>
       {/* Premium Page Hero */}
       <PageHero
         label="PROFIL DINAS"

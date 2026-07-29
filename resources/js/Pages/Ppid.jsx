@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FileText, Send, CheckCircle2, FolderOpen, ArrowDownToLine, Scale, ShieldCheck } from "lucide-react";
+import { Head } from "@inertiajs/react";
 import MainLayout from "../Layouts/MainLayout";
 import PageHero from "../Components/PageHero";
 import ScrollReveal from "../Components/ScrollReveal";
@@ -208,8 +209,20 @@ export const Ppid = () => {
     }
   };
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <MainLayout>
+      <Head>
+        <title>PPID Online - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Layanan Pejabat Pengelola Informasi dan Dokumentasi (PPID) Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan." />
+        <meta name="keywords" content="PPID Banggai Kepulauan, Permohonan Informasi Publik, Keberatan Informasi, UU KIP" />
+        <link rel="canonical" href={pageUrl || "http://localhost:3001/ppid"} />
+        <meta property="og:title" content="PPID Online - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan" />
+        <meta property="og:description" content="Layanan Pejabat Pengelola Informasi dan Dokumentasi (PPID) Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan." />
+        <meta property="og:url" content={pageUrl || "http://localhost:3001/ppid"} />
+        <meta property="og:type" content="website" />
+      </Head>
       {/* Premium Page Hero */}
       <PageHero
         label="PPID ONLINE"

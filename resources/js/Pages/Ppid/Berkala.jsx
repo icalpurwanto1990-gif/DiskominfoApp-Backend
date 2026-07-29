@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FileText, ArrowDownToLine, Search, AlertCircle, Calendar, Eye, Shield } from "lucide-react";
+import { Head } from "@inertiajs/react";
 import MainLayout from "../../Layouts/MainLayout";
 import PageHero from "../../Components/PageHero";
 import ScrollReveal from "../../Components/ScrollReveal";
@@ -30,8 +31,20 @@ export const Berkala = ({ initialDocuments = [] }) => {
     }
   };
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <MainLayout>
+      <Head>
+        <title>Informasi Secara Berkala - PPID Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Daftar dokumen dan informasi publik Kabupaten Banggai Kepulauan yang wajib diumumkan secara berkala." />
+        <meta name="keywords" content="Informasi Berkala, PPID Berkala, Dokumen Berkala Banggai Kepulauan, Transparansi Pemda" />
+        <link rel="canonical" href={pageUrl || "http://localhost:3001/ppid/berkala"} />
+        <meta property="og:title" content="Informasi Secara Berkala - PPID Kab. Banggai Kepulauan" />
+        <meta property="og:description" content="Daftar dokumen dan informasi publik Kabupaten Banggai Kepulauan yang wajib diumumkan secara berkala." />
+        <meta property="og:url" content={pageUrl || "http://localhost:3001/ppid/berkala"} />
+        <meta property="og:type" content="website" />
+      </Head>
       <PageHero
         label="PPID UTAMA"
         title="Informasi Secara Berkala"

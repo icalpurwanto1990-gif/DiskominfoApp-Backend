@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Image, Video, FileImage, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Head } from "@inertiajs/react";
 import MainLayout from "../Layouts/MainLayout";
 import PageHero from "../Components/PageHero";
 import ScrollReveal from "../Components/ScrollReveal";
@@ -20,8 +21,20 @@ export const Media = ({ mediaList }) => {
   const videoItems = mediaList.filter(item => item.type === "VIDEO" || item.type === "video");
   const infografisItems = mediaList.filter(item => item.type === "INFOGRAFIS" || item.type === "infografis");
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <MainLayout>
+      <Head>
+        <title>Galeri & Media Center - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Dokumentasi kegiatan dinas, video edukasi pelayanan publik, dan infografis statistik daerah Kabupaten Banggai Kepulauan." />
+        <meta name="keywords" content="Galeri Foto Diskominfo, Video Dinas Banggai Kepulauan, Infografis Diskominfo" />
+        <link rel="canonical" href={pageUrl || "http://localhost:3001/media"} />
+        <meta property="og:title" content="Galeri & Media Center - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan" />
+        <meta property="og:description" content="Dokumentasi kegiatan dinas, video edukasi pelayanan publik, dan infografis statistik daerah Kabupaten Banggai Kepulauan." />
+        <meta property="og:url" content={pageUrl || "http://localhost:3001/media"} />
+        <meta property="og:type" content="website" />
+      </Head>
       {/* Premium Page Hero */}
       <PageHero
         label="MEDIA CENTER DISKOMINFO"

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "@inertiajs/react";
+import { Link, Head } from "@inertiajs/react";
 import { Search, Calendar, Eye, Tag, Clock, FileText, ArrowRight, Filter, Newspaper, ChevronRight } from "lucide-react";
 import MainLayout from "../Layouts/MainLayout";
 import ScrollReveal from "../Components/ScrollReveal";
@@ -134,8 +134,20 @@ export const Berita = ({ categories = [] }) => {
     setActiveLimit(8);
   };
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <MainLayout>
+      <Head>
+        <title>Berita & Siaran Pers - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Kumpulan berita pembangunan daerah, pengumuman resmi, siaran pers, dan informasi terbaru di Kabupaten Banggai Kepulauan." />
+        <meta name="keywords" content="Berita Banggai Kepulauan, Pengumuman Resmi Diskominfo, Siaran Pers Banggai Kepulauan" />
+        <link rel="canonical" href={pageUrl || "http://localhost:3001/berita"} />
+        <meta property="og:title" content="Berita & Siaran Pers - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan" />
+        <meta property="og:description" content="Kumpulan berita pembangunan daerah, pengumuman resmi, siaran pers, dan informasi terbaru di Kabupaten Banggai Kepulauan." />
+        <meta property="og:url" content={pageUrl || "http://localhost:3001/berita"} />
+        <meta property="og:type" content="website" />
+      </Head>
       {/* Premium Page Hero */}
       <PageHero
         label="PUBLIKASI KABUPATEN"

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FileText, ArrowDownToLine, Search, AlertCircle, Calendar, Eye, FileSpreadsheet } from "lucide-react";
+import { Head } from "@inertiajs/react";
 import MainLayout from "../../Layouts/MainLayout";
 import PageHero from "../../Components/PageHero";
 import ScrollReveal from "../../Components/ScrollReveal";
@@ -30,8 +31,20 @@ export const DaftarInformasi = ({ initialDocuments = [] }) => {
     }
   };
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <MainLayout>
+      <Head>
+        <title>Daftar Informasi Publik (DIP) - PPID Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Daftar resmi ringkasan informasi publik yang berada di bawah penguasaan dan pengelolaan PPID Kabupaten Banggai Kepulauan." />
+        <meta name="keywords" content="Daftar Informasi Publik, DIP PPID, Dokumen PPID Banggai Kepulauan, Transparansi" />
+        <link rel="canonical" href={pageUrl || "http://localhost:3001/ppid/daftar-informasi-publik"} />
+        <meta property="og:title" content="Daftar Informasi Publik (DIP) - PPID Kab. Banggai Kepulauan" />
+        <meta property="og:description" content="Daftar resmi ringkasan informasi publik yang berada di bawah penguasaan dan pengelolaan PPID Kabupaten Banggai Kepulauan." />
+        <meta property="og:url" content={pageUrl || "http://localhost:3001/ppid/daftar-informasi-publik"} />
+        <meta property="og:type" content="website" />
+      </Head>
       <PageHero
         label="PPID UTAMA"
         title="Daftar Informasi Publik (DIP)"

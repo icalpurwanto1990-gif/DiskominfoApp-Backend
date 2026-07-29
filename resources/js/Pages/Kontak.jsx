@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Mail, Phone, MapPin, Send, CheckCircle2, MessageCircle } from "lucide-react";
+import { Head } from "@inertiajs/react";
 import MainLayout from "../Layouts/MainLayout";
 import PageHero from "../Components/PageHero";
 import ScrollReveal from "../Components/ScrollReveal";
@@ -51,8 +52,20 @@ export const Kontak = () => {
     }
   };
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <MainLayout>
+      <Head>
+        <title>Kontak & Pengaduan - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Hubungi administrasi kantor Diskominfo Kabupaten Banggai Kepulauan atau kirimkan aduan resmi melalui formulir berikut." />
+        <meta name="keywords" content="Kontak Diskominfo, Pengaduan Banggai Kepulauan, Telepon Pemda, Email Diskominfo" />
+        <link rel="canonical" href={pageUrl || "http://localhost:3001/kontak"} />
+        <meta property="og:title" content="Kontak & Pengaduan - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan" />
+        <meta property="og:description" content="Hubungi administrasi kantor Diskominfo Kabupaten Banggai Kepulauan atau kirimkan aduan resmi melalui formulir berikut." />
+        <meta property="og:url" content={pageUrl || "http://localhost:3001/kontak"} />
+        <meta property="og:type" content="website" />
+      </Head>
       {/* Premium Page Hero */}
       <PageHero
         label="HUBUNGI KAMI"

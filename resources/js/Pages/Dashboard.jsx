@@ -4,6 +4,7 @@ import {
   ShieldCheck, Users, Landmark, MonitorSmartphone, ArrowUpRight,
   Mail, Database, Globe, Network, Server, Video, CheckCircle2, Calendar, FileText
 } from "lucide-react";
+import { Head } from "@inertiajs/react";
 import MainLayout from "../Layouts/MainLayout";
 
 export const Dashboard = () => {
@@ -150,8 +151,20 @@ export const Dashboard = () => {
     if (!loading) fetchTteByYear();
   }, [selectedYear]);
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <MainLayout>
+      <Head>
+        <title>Dashboard Kinerja SPBE - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Dashboard Kinerja SPBE dan analitik real-time sistem pemerintahan berbasis elektronik Kabupaten Banggai Kepulauan." />
+        <meta name="keywords" content="Dashboard SPBE, Analitik Pemda, Statistik Pengunjung Banggai Kepulauan, Kinerja TTE" />
+        <link rel="canonical" href={pageUrl || "http://localhost:3001/dashboard"} />
+        <meta property="og:title" content="Dashboard Kinerja SPBE - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan" />
+        <meta property="og:description" content="Dashboard Kinerja SPBE dan analitik real-time sistem pemerintahan berbasis elektronik Kabupaten Banggai Kepulauan." />
+        <meta property="og:url" content={pageUrl || "http://localhost:3001/dashboard"} />
+        <meta property="og:type" content="website" />
+      </Head>
       <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-12 flex flex-col gap-10">
         
         {/* Banner / Title */}

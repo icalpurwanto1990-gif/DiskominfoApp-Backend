@@ -1,5 +1,17 @@
 import React, { useState } from "react";
-import { Link } from "@inertiajs/react";
+import { Link, Head } from "@inertiajs/react";
+
+const stripHtml = (html) => {
+  if (!html) return "";
+  return html
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'");
+};
 import { ArrowLeft, Calendar, Eye, Tag, User, FileText, Search, ChevronRight } from "lucide-react";
 import MainLayout from "../Layouts/MainLayout";
 import ShareButtons from "../Components/ShareButtons";
@@ -41,8 +53,51 @@ export const BeritaDetail = ({ post, categories }) => {
     );
   }
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const siteOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+  const plainDesc = post ? stripHtml(post.content).substring(0, 160) + "..." : "";
+  const postImage = post && post.image ? (post.image.startsWith("http") ? post.image : `${siteOrigin}${post.image}`) : `${siteOrigin}/images/default-news.png`;
+
   return (
     <MainLayout>
+      <Head>
+        <title>{`${post.title} - Dinas Komunikasi dan Informatika`}</title>
+        <meta name="description" content={plainDesc} />
+        <meta name="keywords" content={`Berita, Banggai Kepulauan, ${post.category?.name || ""}, ${post.title}`} />
+        <link rel="canonical" href={pageUrl || `http://localhost:3001/berita/${post.slug}`} />
+        <meta property="og:title" content={`${post.title} - Dinas Komunikasi dan Informatika`} />
+        <meta property="og:description" content={plainDesc} />
+        <meta property="og:url" content={pageUrl || `http://localhost:3001/berita/${post.slug}`} />
+        <meta property="og:type" content="article" />
+        <meta property="og:image" content={postImage} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${post.title} - Dinas Komunikasi dan Informatika`} />
+        <meta name="twitter:description" content={plainDesc} />
+        <meta name="twitter:image" content={postImage} />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "NewsArticle",
+            "headline": post.title,
+            "image": [postImage],
+            "datePublished": post.createdAt || post.created_at,
+            "dateModified": post.updatedAt || post.updated_at || post.createdAt || post.created_at,
+            "author": {
+              "@type": "Person",
+              "name": post.author?.name || "Admin Diskominfo"
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan",
+              "logo": {
+                "@type": "ImageObject",
+                "url": `${siteOrigin}/images/favicon.png`
+              }
+            },
+            "description": plainDesc
+          })}
+        </script>
+      </Head>
       {/* Premium Page Hero — uses article info */}
       <PageHero
         label={post.category?.name || "BERITA DAERAH"}

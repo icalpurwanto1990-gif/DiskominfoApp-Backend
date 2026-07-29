@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FileText, ArrowDownToLine, Search, AlertCircle, Calendar, Eye, AlertTriangle } from "lucide-react";
+import { Head } from "@inertiajs/react";
 import MainLayout from "../../Layouts/MainLayout";
 import PageHero from "../../Components/PageHero";
 import ScrollReveal from "../../Components/ScrollReveal";
@@ -30,8 +31,20 @@ export const SertaMerta = ({ initialDocuments = [] }) => {
     }
   };
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <MainLayout>
+      <Head>
+        <title>Informasi Serta Merta - PPID Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Daftar dokumen, regulasi, dan maklumat informasi terkait ancaman keselamatan publik dan kedaruratan di Kabupaten Banggai Kepulauan." />
+        <meta name="keywords" content="Informasi Serta Merta, PPID Serta Merta, Darurat Banggai Kepulauan, Keselamatan Publik" />
+        <link rel="canonical" href={pageUrl || "http://localhost:3001/ppid/serta-merta"} />
+        <meta property="og:title" content="Informasi Serta Merta - PPID Kab. Banggai Kepulauan" />
+        <meta property="og:description" content="Daftar dokumen, regulasi, dan maklumat informasi terkait ancaman keselamatan publik dan kedaruratan di Kabupaten Banggai Kepulauan." />
+        <meta property="og:url" content={pageUrl || "http://localhost:3001/ppid/serta-merta"} />
+        <meta property="og:type" content="website" />
+      </Head>
       <PageHero
         label="PPID UTAMA"
         title="Informasi Serta Merta"

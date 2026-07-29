@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Search, Table, FileSpreadsheet, Braces, Database, DownloadCloud } from "lucide-react";
+import { Head } from "@inertiajs/react";
 import MainLayout from "../Layouts/MainLayout";
 import PageHero from "../Components/PageHero";
 import ScrollReveal from "../Components/ScrollReveal";
@@ -81,8 +82,20 @@ export const SatuData = () => {
     }
   };
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <MainLayout>
+      <Head>
+        <title>Portal Data Sektoral Daerah - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Penyediaan data sektoral pemerintah daerah Kabupaten Banggai Kepulauan yang transparan, mudah diakses, dan dapat dibagipakaikan oleh publik." />
+        <meta name="keywords" content="Satu Data Banggai Kepulauan, Data Sektoral, Dataset Pemda, Open Data" />
+        <link rel="canonical" href={pageUrl || "http://localhost:3001/satu-data"} />
+        <meta property="og:title" content="Portal Data Sektoral Daerah - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan" />
+        <meta property="og:description" content="Penyediaan data sektoral pemerintah daerah Kabupaten Banggai Kepulauan yang transparan, mudah diakses, dan dapat dibagipakaikan oleh publik." />
+        <meta property="og:url" content={pageUrl || "http://localhost:3001/satu-data"} />
+        <meta property="og:type" content="website" />
+      </Head>
       {/* Premium Page Hero */}
       <PageHero
         label="DATA SEKTORAL"

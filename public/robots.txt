@@ -1,2 +1,7 @@
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /user/dashboard
+Disallow: /auth/
+Disallow: /api/
+
+Sitemap: https://diskominfo.banggaikep.go.id/sitemap.xml

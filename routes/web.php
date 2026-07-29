@@ -15,6 +15,7 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PpidController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\SatuDataController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
@@ -39,6 +40,7 @@ Route::get('/satu-data', [SatuDataController::class, 'index'])->name('satudata.i
 Route::get('/gis', [GisController::class, 'index'])->name('gis.index');
 Route::get('/kontak', [KontakController::class, 'index'])->name('kontak.index');
 Route::post('/api/kontak', [KontakController::class, 'store'])->name('api.kontak');
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // Survey & AI Chat client actions
 Route::post('/api/survey', [SurveyController::class, 'store'])->name('api.survey');

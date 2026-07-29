@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FileText, ArrowDownToLine, Search, AlertCircle, Calendar, Eye, FolderOpen } from "lucide-react";
+import { Head } from "@inertiajs/react";
 import MainLayout from "../../Layouts/MainLayout";
 import PageHero from "../../Components/PageHero";
 import ScrollReveal from "../../Components/ScrollReveal";
@@ -30,8 +31,20 @@ export const SetiapSaat = ({ initialDocuments = [] }) => {
     }
   };
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <MainLayout>
+      <Head>
+        <title>Informasi Tersedia Setiap Saat - PPID Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Daftar dokumen dinas resmi, keputusan badan publik, daftar aset, SOP internal, dan rencana kerja yang dapat diakses publik setiap saat." />
+        <meta name="keywords" content="Informasi Setiap Saat, PPID Setiap Saat, Aset Pemda, Rencana Kerja Banggai Kepulauan" />
+        <link rel="canonical" href={pageUrl || "http://localhost:3001/ppid/setiap-saat"} />
+        <meta property="og:title" content="Informasi Tersedia Setiap Saat - PPID Kab. Banggai Kepulauan" />
+        <meta property="og:description" content="Daftar dokumen dinas resmi, keputusan badan publik, daftar aset, SOP internal, dan rencana kerja yang dapat diakses publik setiap saat." />
+        <meta property="og:url" content={pageUrl || "http://localhost:3001/ppid/setiap-saat"} />
+        <meta property="og:type" content="website" />
+      </Head>
       <PageHero
         label="PPID UTAMA"
         title="Informasi Tersedia Setiap Saat"

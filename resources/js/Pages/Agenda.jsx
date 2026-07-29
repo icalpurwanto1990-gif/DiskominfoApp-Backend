@@ -1,13 +1,26 @@
 import React from "react";
 import { Calendar } from "lucide-react";
+import { Head } from "@inertiajs/react";
 import MainLayout from "../Layouts/MainLayout";
 import PageHero from "../Components/PageHero";
 import LeaderAgendaTable from "../Components/LeaderAgendaTable";
 import ScrollReveal from "../Components/ScrollReveal";
 
 export const Agenda = ({ initialAgendas }) => {
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <MainLayout>
+      <Head>
+        <title>Agenda Pimpinan Daerah - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Informasi jadwal resmi, lokasi, dan pelaksana kegiatan Pimpinan Daerah Kabupaten Banggai Kepulauan." />
+        <meta name="keywords" content="Agenda Bupati Banggai Kepulauan, Kegiatan Pimpinan Daerah, Jadwal Diskominfo" />
+        <link rel="canonical" href={pageUrl || "http://localhost:3001/agenda"} />
+        <meta property="og:title" content="Agenda Pimpinan Daerah - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan" />
+        <meta property="og:description" content="Informasi jadwal resmi, lokasi, dan pelaksana kegiatan Pimpinan Daerah Kabupaten Banggai Kepulauan." />
+        <meta property="og:url" content={pageUrl || "http://localhost:3001/agenda"} />
+        <meta property="og:type" content="website" />
+      </Head>
       {/* Premium Page Hero */}
       <PageHero
         label="AGENDA KEGIATAN PIMPINAN"

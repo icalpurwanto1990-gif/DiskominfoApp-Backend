@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FileText, ArrowDownToLine, Search, AlertCircle, Calendar, Eye, HelpCircle, FileCheck, Layers, ClipboardCheck } from "lucide-react";
+import { Head } from "@inertiajs/react";
 import MainLayout from "../../Layouts/MainLayout";
 import PageHero from "../../Components/PageHero";
 import ScrollReveal from "../../Components/ScrollReveal";
@@ -55,8 +56,20 @@ export const SopPelayanan = ({ initialDocuments = [] }) => {
     }
   };
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <MainLayout>
+      <Head>
+        <title>SOP Pelayanan & Regulasi - PPID Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Alur pelayanan, tata cara pengajuan, dan dokumen Standar Operasional Prosedur (SOP) resmi Dinas Komunikasi dan Informatika." />
+        <meta name="keywords" content="SOP Pelayanan, SOP Diskominfo, Regulasi Banggai Kepulauan, SOP IKP, SOP APTIKA" />
+        <link rel="canonical" href={pageUrl || "http://localhost:3001/ppid/sop-pelayanan"} />
+        <meta property="og:title" content="SOP Pelayanan & Regulasi - PPID Kab. Banggai Kepulauan" />
+        <meta property="og:description" content="Alur pelayanan, tata cara pengajuan, dan dokumen Standar Operasional Prosedur (SOP) resmi Dinas Komunikasi dan Informatika." />
+        <meta property="og:url" content={pageUrl || "http://localhost:3001/ppid/sop-pelayanan"} />
+        <meta property="og:type" content="website" />
+      </Head>
       <PageHero
         label="SOP LAYANAN"
         title="Standar Operasional Prosedur (SOP)"
