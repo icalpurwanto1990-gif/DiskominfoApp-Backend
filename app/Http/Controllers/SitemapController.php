@@ -46,18 +46,15 @@ class SitemapController extends Controller
         try {
             $posts = Post::where('published', true)->get();
             foreach ($posts as $post) {
-                $lastmod = null;
-                if ($post->updatedAt) {
-                    $lastmod = Carbon::parse($post->updatedAt)->toAtomString();
-                } elseif ($post->createdAt) {
-                    $lastmod = Carbon::parse($post->createdAt)->toAtomString();
-                }
+                // updatedAt & createdAt are already Carbon objects (auto-cast by Eloquent
+                // via const UPDATED_AT / CREATED_AT). Use optional() for safe null handling.
+                $lastmod = optional($post->updatedAt ?? $post->createdAt)->toAtomString();
 
                 $urls[] = [
                     'loc' => $baseUrl . '/berita/' . $post->slug,
                     'priority' => '0.8',
                     'changefreq' => 'weekly',
-                    'lastmod' => $lastmod
+                    'lastmod' => $lastmod,
                 ];
             }
         } catch (\Exception $e) {
