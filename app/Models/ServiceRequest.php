@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Mail\ServiceStatusMail;
+use App\Services\WhatsAppNotificationService;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class ServiceRequest extends Model
@@ -108,6 +111,28 @@ class ServiceRequest extends Model
 
         // 4. Log payload for n8n/webhook simulation
         Log::info('SERVICE_AGENT_WEBHOOK_EVENT: '.json_encode($jsonPayload));
+
+        // 5. Kirim notifikasi Email ke pemohon (fail-safe)
+        if ($this->applicantEmail && in_array($newStatus, ['DIPROSES', 'SELESAI', 'DITOLAK'])) {
+            try {
+                Mail::to($this->applicantEmail)
+                    ->send(new ServiceStatusMail($this, $newStatus));
+                Log::info("Email notifikasi [{$newStatus}] berhasil dikirim ke {$this->applicantEmail} untuk tiket #{$this->ticketNumber}");
+            } catch (\Exception $e) {
+                Log::error("Gagal mengirim email notifikasi untuk tiket #{$this->ticketNumber}: " . $e->getMessage());
+            }
+        }
+
+        // 6. Kirim notifikasi WhatsApp ke pemohon (fail-safe)
+        if ($this->applicantPhone && in_array($newStatus, ['DIPROSES', 'SELESAI', 'DITOLAK'])) {
+            try {
+                /** @var WhatsAppNotificationService $waService */
+                $waService = app(WhatsAppNotificationService::class);
+                $waService->send($this->applicantPhone, $messageText);
+            } catch (\Exception $e) {
+                Log::error("Gagal mengirim WhatsApp notifikasi untuk tiket #{$this->ticketNumber}: " . $e->getMessage());
+            }
+        }
 
         return $jsonPayload;
     }

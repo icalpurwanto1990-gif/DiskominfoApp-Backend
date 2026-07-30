@@ -169,7 +169,7 @@ export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
           <div className="flex gap-6 xl:gap-8 items-end relative z-10">
             {/* 1. Bupati Card */}
             {bupati.aktif && (
-              <div className="w-44 xl:w-48 bg-slate-900/75 backdrop-blur-md border border-emerald-500/20 rounded-2xl p-2.5 flex flex-col gap-2 transform hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 shadow-2xl">
+              <div className="w-44 xl:w-48 bg-slate-900/25 backdrop-blur-md border border-emerald-500/20 rounded-2xl p-2.5 flex flex-col gap-2 transform hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 shadow-2xl">
                 <div className="w-full aspect-[3/4] bg-slate-800 rounded-xl overflow-hidden relative group">
                   <img
                     src={bupati.foto}
@@ -203,7 +203,7 @@ export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
 
             {/* 2. Wakil Bupati Card (Staggered offset) */}
             {wakilBupati.aktif && (
-              <div className="w-44 xl:w-48 bg-slate-900/75 backdrop-blur-md border border-emerald-500/20 rounded-2xl p-2.5 flex flex-col gap-2 transform hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 shadow-2xl translate-y-6">
+              <div className="w-44 xl:w-48 bg-slate-900/25 backdrop-blur-md border border-emerald-500/20 rounded-2xl p-2.5 flex flex-col gap-2 transform hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 shadow-2xl translate-y-6">
                 <div className="w-full aspect-[3/4] bg-slate-800 rounded-xl overflow-hidden relative group">
                   <img
                     src={wakilBupati.foto}

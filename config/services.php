@@ -39,4 +39,21 @@ return [
         'key' => env('GEMINI_API_KEY'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | WhatsApp Notification Gateway
+    |--------------------------------------------------------------------------
+    | Driver: 'fonnte' | 'webhook' | 'null'
+    | - fonnte  : Gunakan API Fonnte (fonnte.com) — provider WA Gateway Indonesia
+    | - webhook : Kirim ke HTTP endpoint custom (n8n, Make.com, dll)
+    | - null    : Nonaktifkan notifikasi WhatsApp
+    */
+    'whatsapp' => [
+        'driver'        => env('WHATSAPP_DRIVER', 'null'),
+        'fonnte_token'  => env('WHATSAPP_FONNTE_TOKEN'),
+        'webhook_url'   => env('WHATSAPP_WEBHOOK_URL'),
+        'webhook_token' => env('WHATSAPP_WEBHOOK_TOKEN'),
+    ],
+
 ];
+
