@@ -170,7 +170,7 @@ export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
             {/* 1. Bupati Card */}
             {bupati.aktif && (
               <div className="w-44 xl:w-48 bg-slate-900/25 backdrop-blur-md border border-emerald-500/20 rounded-2xl p-2.5 flex flex-col gap-2 transform hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 shadow-2xl">
-                <div className="w-full aspect-[3/4] bg-slate-800 rounded-xl overflow-hidden relative group">
+                <div className="w-full aspect-[3/4] bg-slate-800/25 rounded-xl overflow-hidden relative group">
                   <img
                     src={bupati.foto}
                     alt={bupati.nama || "Bupati"}
@@ -185,7 +185,7 @@ export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
                       }
                     }}
                   />
-                  <div style={{ display: 'none' }} className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center bg-slate-800">
+                  <div style={{ display: 'none' }} className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center bg-slate-800/25">
                     <span className="text-xs font-black text-slate-400">FOTO BUPATI</span>
                   </div>
                 </div>
@@ -204,7 +204,7 @@ export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
             {/* 2. Wakil Bupati Card (Staggered offset) */}
             {wakilBupati.aktif && (
               <div className="w-44 xl:w-48 bg-slate-900/25 backdrop-blur-md border border-emerald-500/20 rounded-2xl p-2.5 flex flex-col gap-2 transform hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 shadow-2xl translate-y-6">
-                <div className="w-full aspect-[3/4] bg-slate-800 rounded-xl overflow-hidden relative group">
+                <div className="w-full aspect-[3/4] bg-slate-800/25 rounded-xl overflow-hidden relative group">
                   <img
                     src={wakilBupati.foto}
                     alt={wakilBupati.nama || "Wakil Bupati"}
@@ -219,7 +219,7 @@ export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
                       }
                     }}
                   />
-                  <div style={{ display: 'none' }} className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center bg-slate-800">
+                  <div style={{ display: 'none' }} className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center bg-slate-800/25">
                     <span className="text-xs font-black text-slate-400">FOTO WAKIL BUPATI</span>
                   </div>
                 </div>
