@@ -84,7 +84,7 @@ export const Footer = () => {
             <div className="flex flex-col gap-2.5 text-xs">
               <a href="https://maps.app.goo.gl/V8u4bWv9vQT9pumz9" target="_blank" rel="noopener noreferrer" className="flex items-start gap-2.5 hover:text-white transition group">
                 <MapPin size={14} className="text-emerald-500 mt-0.5 flex-shrink-0 group-hover:text-emerald-400 transition" />
-                <span>Kompleks Perkantoran Jalan Trikora, Salakan, Sulawesi Tengah</span>
+                <span>Jalan Bukit Trikora Kompleks Perkantoran, Salakan, Sulawesi Tengah</span>
               </a>
               <a href="mailto:diskominfo@banggaikep.go.id" className="flex items-center gap-2.5 hover:text-white transition group">
                 <Mail size={14} className="text-emerald-500 flex-shrink-0 group-hover:text-emerald-400 transition" />
@@ -92,7 +92,7 @@ export const Footer = () => {
               </a>
               <div className="flex items-center gap-2.5">
                 <Phone size={14} className="text-emerald-500 flex-shrink-0" />
-                <span>(0462) 22110 / +62 822-9642-1245</span>
+                <span>(0462) **** / +62 822-7111-4668</span>
               </div>
               {activeSocialMedia.map((sm) => (
                 <a
@@ -119,12 +119,9 @@ export const Footer = () => {
               {[
                 { href: "/profil", label: "Profil Instansi" },
                 { href: "/berita", label: "Berita & Pengumuman" },
-                { href: "/ppid", label: "Layanan PPID Online" },
                 { href: "/layanan", label: "Portal Layanan Digital Hub" },
-                { href: "/layanan/lacak", label: "Lacak Status Permohonan" },
                 { href: "/auth/login", label: "Portal Pemohon (Login)" },
                 { href: "/dashboard", label: "Smart Government Dashboard" },
-                { href: "/satu-data", label: "Data Sektoral" },
               ].map((item) => (
                 <Link key={item.href} href={item.href} className="flex items-center gap-1.5 text-slate-500 hover:text-white transition group">
                   <ArrowUpRight size={10} className="opacity-0 group-hover:opacity-100 text-emerald-500 transition flex-shrink-0" />
@@ -138,7 +135,7 @@ export const Footer = () => {
           <div className="flex flex-col gap-5">
             <h4 className="text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2">
               <span className="w-4 h-0.5 bg-emerald-500 rounded-full" />
-              Layanan OPD &amp; ASN
+              Layanan Kami
             </h4>
             <ul className="flex flex-col gap-2 text-xs">
               {footerServices.length > 0 ? (
@@ -227,7 +224,7 @@ export const Footer = () => {
             </div>
 
             <a
-              href="https://wa.me/6282296421245"
+              href="https://wa.me/6282271114668"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition-all duration-300 font-bold text-xs shadow-lg shadow-emerald-600/20 hover:shadow-emerald-500/30 w-fit"
