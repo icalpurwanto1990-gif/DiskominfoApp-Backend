@@ -116,7 +116,33 @@ export const SurveyModal = ({ isOpen, onClose }) => {
               </p>
             </div>
 
+            {/* QR Code Section */}
+            <div className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl">
+              <img
+                src="/images/survey-qr.png"
+                alt="QR Code Survey Kepuasan Masyarakat Diskominfo Bangkep"
+                className="w-20 h-20 object-contain rounded-lg flex-shrink-0"
+                loading="lazy"
+              />
+              <div className="flex flex-col gap-1">
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  📱 Scan via Ponsel
+                </p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                  Scan QR Code di samping untuk mengisi survey kepuasan layanan secara langsung dari ponsel Anda.
+                </p>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-widest">atau isi di sini</span>
+              <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+            </div>
+
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-xs font-semibold">
+
               
               {/* Stars Selector */}
               <div className="flex flex-col gap-2">
