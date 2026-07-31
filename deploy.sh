@@ -11,12 +11,14 @@ echo "📥 Menarik kode terbaru dari Git..."
 git fetch origin
 git reset --hard origin/main
 
-# 2. Pastikan folder uploads host ada dan permissions benar
-echo "📁 Memastikan folder uploads tersedia..."
+# 2. Pastikan folder uploads dan images host ada dan permissions benar
+echo "📁 Memastikan folder uploads dan images tersedia..."
 mkdir -p ./public/uploads/banners
 mkdir -p ./public/uploads/settings
 mkdir -p ./public/uploads/icons
+mkdir -p ./public/images
 chmod -R 775 ./public/uploads
+chmod -R 755 ./public/images
 
 # 3. Rebuild dan jalankan kontainer Docker
 echo "🐳 Mem-build ulang dan menjalankan container..."
