@@ -83,7 +83,29 @@ export const SurveyWidget = () => {
         </p>
       </div>
 
+      {/* QR Code Section */}
+      <div className="flex flex-col items-center gap-2 mb-4 p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl">
+        <img
+          src="/images/survey-qr.png"
+          alt="QR Code Survey Kepuasan Masyarakat Diskominfo Bangkep"
+          className="w-28 h-28 object-contain rounded-lg"
+          loading="lazy"
+        />
+        <p className="text-[10px] text-slate-500 dark:text-slate-400 text-center font-medium leading-relaxed">
+          📱 Scan QR untuk mengisi survey<br />
+          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">via ponsel</span>
+        </p>
+      </div>
+
+      {/* Divider */}
+      <div className="flex items-center gap-2 mb-1">
+        <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-widest">atau isi di sini</span>
+        <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+      </div>
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-xs font-semibold">
+
         {/* Rating selection */}
         <div className="flex flex-col gap-2">
           <label className="text-slate-700 dark:text-slate-300">Bagaimana kualitas layanan kami?</label>
