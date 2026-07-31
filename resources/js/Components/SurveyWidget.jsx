@@ -86,7 +86,7 @@ export const SurveyWidget = () => {
       {/* QR Code Section */}
       <div className="flex flex-col items-center gap-2 mb-4 p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl">
         <img
-          src="/images/survey-qr.png"
+          src="/public/images/survey-qr.png"
           alt="QR Code Survey Kepuasan Masyarakat Diskominfo Bangkep"
           className="w-28 h-28 object-contain rounded-lg"
           loading="lazy"
@@ -122,11 +122,10 @@ export const SurveyWidget = () => {
               >
                 <Star
                   size={26}
-                  className={`transition-all duration-150 ${
-                    star <= (hoverRating || rating)
+                  className={`transition-all duration-150 ${star <= (hoverRating || rating)
                       ? "fill-amber-400 text-amber-400 scale-110"
                       : "text-slate-300 dark:text-slate-700"
-                  }`}
+                    }`}
                 />
               </button>
             ))}
