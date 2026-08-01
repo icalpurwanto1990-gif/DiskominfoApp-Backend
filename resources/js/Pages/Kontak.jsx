@@ -86,10 +86,10 @@ export const Kontak = () => {
       <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-12 flex flex-col gap-10">
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          
+
           {/* Left: Contact Detail Cards */}
           <div className="lg:col-span-5 flex flex-col gap-6 text-xs font-semibold text-slate-700 dark:text-slate-300">
-            
+
             <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl flex gap-4 shadow-sm">
               <div className="p-3 bg-emerald-500/10 text-emerald-600 rounded-2xl h-fit">
                 <MapPin size={18} />
@@ -97,7 +97,7 @@ export const Kontak = () => {
               <div className="flex flex-col gap-1">
                 <span className="text-slate-900 dark:text-white font-extrabold text-sm uppercase tracking-wider">Alamat Kantor</span>
                 <p className="text-slate-500 dark:text-slate-400 leading-relaxed mt-1 font-semibold">
-                  Kompleks Perkantoran Bukit Trikora, Salakan, Kecamatan Tinangkung, Kabupaten Banggai Kepulauan, Provinsi Sulawesi Tengah, Kode Pos 94885.
+                  Jl.Bukit Trikora Kompleks Perkantoran , Salakan, Kecamatan Tinangkung, Kabupaten Banggai Kepulauan, Provinsi Sulawesi Tengah, Kode Pos 94885.
                 </p>
               </div>
             </div>
@@ -120,15 +120,15 @@ export const Kontak = () => {
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-slate-900 dark:text-white font-extrabold text-sm uppercase tracking-wider">Telepon & WhatsApp</span>
-                <span className="text-slate-500 dark:text-slate-400 mt-1">(0462) 22110 (Telepon Kantor)</span>
+                <span className="text-slate-500 dark:text-slate-400 mt-1">(0462) 00000 (Telepon Kantor)</span>
                 <a
-                  href="https://wa.me/6282296421245"
+                  href="https://wa.me/6282271114668"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 hover:underline mt-2 font-bold"
                 >
                   <MessageCircle size={14} />
-                  <span>+62 822-9642-1245 (Hubungan Masyarakat)</span>
+                  <span>+62 822-7111-4668 (Hubungan Masyarakat)</span>
                 </a>
               </div>
             </div>
@@ -138,7 +138,7 @@ export const Kontak = () => {
           {/* Right: Dynamic Complaint Form */}
           <div className="lg:col-span-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-3xl shadow-sm">
             <h3 className="font-extrabold text-sm text-slate-900 dark:text-white uppercase tracking-wider mb-6">Formulir Kontak Pengaduan Masyarakat</h3>
-            
+
             {submitted ? (
               <div className="p-6 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900 rounded-2xl flex gap-3 text-emerald-950 dark:text-emerald-300">
                 <CheckCircle2 size={18} className="text-emerald-500 flex-shrink-0" />
