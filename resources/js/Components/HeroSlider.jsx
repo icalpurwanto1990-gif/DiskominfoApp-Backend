@@ -80,8 +80,8 @@ export const HeroSlider = ({ initialImages, heroStats, welcomeSpeech }) => {
           </AnimatePresence>
         )}
         {/* Multi-layer gradient overlay for dramatic effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/92 via-slate-950/70 to-slate-950/30 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/62 via-slate-950/70 to-slate-950/30 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/36 via-transparent to-transparent z-10" />
         {/* Subtle grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:3rem_3rem] z-10 pointer-events-none" />
       </div>
