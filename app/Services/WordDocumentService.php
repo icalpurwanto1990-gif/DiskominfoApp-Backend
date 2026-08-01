@@ -54,16 +54,7 @@ class WordDocumentService
      */
     private function generateFromTemplate(ServiceRequest $record, string $type, string $templatePath): string
     {
-        // Fix XML pecahan sebelum diproses — mengatasi masalah Word memecah
-        // placeholder seperti ${nama_pemohon} menjadi beberapa XML run
-        $fixedTemplatePath = $this->fixBrokenPlaceholders($templatePath, $record, $type);
-
-        $processor = new TemplateProcessor($fixedTemplatePath);
-
-        // Hapus file sementara fix jika beda dari original
-        if ($fixedTemplatePath !== $templatePath && file_exists($fixedTemplatePath)) {
-            register_shutdown_function(fn() => @unlink($fixedTemplatePath));
-        }
+        $processor = new TemplateProcessor($templatePath);
 
         // Isi semua nilai placeholder
         $placeholders = $this->buildPlaceholderMap($record);
@@ -82,123 +73,6 @@ class WordDocumentService
         $processor->saveAs($tmpPath);
 
         return $tmpPath;
-    }
-
-    /**
-     * Perbaiki placeholder yang terpecah oleh Word's XML formatting.
-     *
-     * Masalah: Word sering memecah teks seperti "${nama_pemohon}" menjadi
-     * beberapa <w:r><w:t> XML run yang terpisah, sehingga PhpWord tidak bisa
-     * menemukan pattern-nya.
-     *
-     * Solusi: Buka file ZIP .docx, baca word/document.xml, gabungkan semua
-     * run yang terpecah di dalam satu paragraf yang mengandung "${", lalu
-     * simpan kembali ke file sementara.
-     *
-     * @return string Path ke template yang sudah diperbaiki (atau original jika tidak berubah)
-     */
-    private function fixBrokenPlaceholders(string $templatePath, ServiceRequest $record, string $type): string
-    {
-        try {
-            $zip = new \ZipArchive();
-            if ($zip->open($templatePath) !== true) {
-                return $templatePath; // Gagal buka — gunakan original
-            }
-
-            $documentXml = $zip->getFromName('word/document.xml');
-            $zip->close();
-
-            if ($documentXml === false) {
-                return $templatePath;
-            }
-
-            // Gabungkan XML run yang terpecah dalam satu paragraf
-            // Pattern: cari <w:r>...<w:t>...</w:t></w:r> yang berdekatan
-            // dan gabungkan jika paragraf mengandung "${" dan "}"
-            $fixed = $this->mergeFragmentedRuns($documentXml);
-
-            // Jika tidak ada perubahan, gunakan template original
-            if ($fixed === $documentXml) {
-                return $templatePath;
-            }
-
-            // Simpan ke file sementara yang sudah diperbaiki
-            $fixedPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'fixed_' . basename($templatePath);
-            copy($templatePath, $fixedPath);
-
-            $zipWrite = new \ZipArchive();
-            if ($zipWrite->open($fixedPath) === true) {
-                $zipWrite->addFromString('word/document.xml', $fixed);
-                $zipWrite->close();
-            }
-
-            return $fixedPath;
-
-        } catch (\Exception $e) {
-            Log::warning("fixBrokenPlaceholders gagal: " . $e->getMessage() . ". Menggunakan template original.");
-            return $templatePath;
-        }
-    }
-
-    /**
-     * Gabungkan XML run yang terpecah dalam paragraf Word.
-     * Ini menggabungkan konten <w:t> yang berdekatan dalam satu <w:r>
-     * untuk paragraf yang mengandung placeholder ${...}.
-     */
-    private function mergeFragmentedRuns(string $xml): string
-    {
-        // Regex untuk menemukan paragraf <w:p>...</w:p> yang mengandung "${"
-        return preg_replace_callback(
-            '/<w:p[ >].*?<\/w:p>/s',
-            function (array $match) {
-                $paragraph = $match[0];
-
-                // Hanya proses paragraf yang berisi karakter placeholder
-                if (!str_contains($paragraph, '$') && !str_contains($paragraph, '{')) {
-                    return $paragraph;
-                }
-
-                // Ekstrak semua teks dari semua run dalam paragraf
-                preg_match_all('/<w:t[^>]*>(.*?)<\/w:t>/s', $paragraph, $texts);
-                $fullText = implode('', $texts[1] ?? []);
-
-                // Jika tidak ada placeholder setelah digabung, kembalikan asli
-                if (!preg_match('/\$\{[a-zA-Z0-9_]+\}/', $fullText)) {
-                    return $paragraph;
-                }
-
-                // Ada placeholder — gabungkan semua run menjadi satu run bersih
-                // Ambil format dari run pertama (font, size, dll)
-                preg_match('/<w:r[ >](.*?)<w:t/s', $paragraph, $firstRunProps);
-                $rPr = '';
-                if (!empty($firstRunProps[1])) {
-                    preg_match('/<w:rPr>(.*?)<\/w:rPr>/s', $firstRunProps[1], $rPrMatch);
-                    if (!empty($rPrMatch[0])) {
-                        $rPr = $rPrMatch[0];
-                    }
-                }
-
-                // Ganti semua run dengan satu run yang berisi teks gabungan
-                $mergedRun = '<w:r>' . $rPr . '<w:t xml:space="preserve">'
-                    . htmlspecialchars($fullText, ENT_XML1, 'UTF-8')
-                    . '</w:t></w:r>';
-
-                // Ganti semua run dalam paragraf dengan run gabungan
-                $paragraph = preg_replace(
-                    '/<w:r[ >].*?<\/w:r>/s',
-                    '',
-                    $paragraph,
-                    -1,
-                    $count
-                );
-
-                // Sisipkan run gabungan sebelum </w:p>
-                $paragraph = str_replace('</w:p>', $mergedRun . '</w:p>', $paragraph);
-
-                return $paragraph;
-            },
-            $xml
-        );
     }
 
     /**
@@ -391,11 +265,19 @@ class WordDocumentService
         ];
 
         // Tambahkan field dari details JSON sebagai placeholder dinamis
-        // Contoh: details['jenis_perangkat'] → placeholder 'detail_jenis_perangkat'
+        // Mendukung penulisan direct ${namadomain} maupun ${detail_namadomain}
         $details = $record->details ?? [];
         foreach ($details as $key => $value) {
-            $safeKey = 'detail_' . preg_replace('/[^a-z0-9_]/', '_', strtolower((string) $key));
-            $base[$safeKey] = is_array($value) ? implode(', ', $value) : (string) $value;
+            $val = is_array($value) ? implode(', ', $value) : (string) $value;
+            $cleanKey = preg_replace('/[^a-z0-9_]/', '_', strtolower((string) $key));
+
+            // Map langsung key asli (misal: namadomain / nama_domain)
+            $base[(string) $key] = $val;
+            $base[$cleanKey] = $val;
+
+            // Map key dengan prefix detail_ (misal: detail_namadomain)
+            $base['detail_' . $cleanKey] = $val;
+            $base['detail_' . $key] = $val;
         }
 
         return $base;
