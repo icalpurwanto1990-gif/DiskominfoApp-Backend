@@ -40,8 +40,12 @@ class AiChatController extends Controller
                     ->implode("\n");
 
                 $sambutanNama = $profile['sambutan_nama'] ?? 'Kepala Dinas';
-                $visi = $profile['visi_kabupaten'] ?? 'Menjadikan Kabupaten Banggai Kepulauan yang Maju, Mandiri, dan Sejahtera';
-                $misi = $profile['misi_diskominfo'] ?? 'Mewujudkan tata kelola pemerintahan yang bersih dan berbasis teknologi informasi.';
+                $visi         = $profile['visi_kabupaten'] ?? 'Menjadikan Kabupaten Banggai Kepulauan yang Maju, Mandiri, dan Sejahtera';
+                $misi         = $profile['misi_diskominfo'] ?? 'Mewujudkan tata kelola pemerintahan yang bersih dan berbasis teknologi informasi.';
+                $alamat       = $profile['kontak_alamat'] ?? 'Jl. Bukit Trikora Kompleks Perkantoran, Salakan, Kecamatan Tinangkung, Kabupaten Banggai Kepulauan, Provinsi Sulawesi Tengah, Kode Pos 94885';
+                $waHumas      = $profile['kontak_wa'] ?? '+62 822-7111-4668';
+                $telpKantor   = $profile['kontak_telepon'] ?? '(0462) 00000';
+                $emailResmi   = $profile['kontak_email'] ?? 'diskominfo@banggaikep.go.id';
 
                 // Build System Instruction
                 $systemInstruction = "Anda adalah Asisten AI resmi Dinas Komunikasi dan Informatika (Diskominfo) Kabupaten Banggai Kepulauan, Sulawesi Tengah.
@@ -52,13 +56,15 @@ ATURAN LOGIN & PENDAFTARAN AKUN:
 2. Untuk LAYANAN EKSTERNAL (layanan OPD luar/subdomain eksternal), pengguna bisa langsung mengakses tautan layanan tersebut tanpa perlu mendaftar/login di portal ini.
 3. Untuk membaca informasi umum, profil dinas, berita terbaru, agenda pimpinan, Satu Data (Katalog Dataset), dan dokumen PPID, publik BEBAS mengakses langsung tanpa perlu daftar atau login.
 
-PROFIL DINAS:
+PROFIL DINAS & CONTACT CENTER HUMAS:
 - Nama Instansi: Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan
 - Kepala Dinas: " . $sambutanNama . "
 - Visi Kabupaten: " . $visi . "
 - Misi Diskominfo: " . $misi . "
-- Alamat Kantor: Kompleks Perkantoran Bukit Trikora, Salakan, Kecamatan Tinangkung, Sulawesi Tengah
-- Kontak: Email diskominfo@banggaikep.go.id atau WhatsApp Humas +62 822-9642-1245
+- Alamat Kantor: " . $alamat . "
+- WhatsApp Humas (Utama): " . $waHumas . " (https://wa.me/6282271114668)
+- Telepon Kantor: " . $telpKantor . "
+- Email Resmi: " . $emailResmi . "
 
 DAFTAR LAYANAN DIGITAL AKTIF:
 " . ($services ?: '- Belum ada layanan digital terdaftar.') . "
@@ -70,7 +76,7 @@ ATURAN MENJAWAB (PENTING):
 1. JANGAN menampilkan analisis aturan, catatan evaluasi diri, proses berpikir, atau teks meta seperti 'Refining against constraints', 'Constraints met', atau sejenisnya. Anda harus LANGSUNG memberikan jawaban akhir.
 2. Jawablah secara singkat, jelas, padat, dan tidak bertele-tele.
 3. Selalu arahkan pengguna ke menu navigasi atas yang sesuai jika mereka menanyakan tentang pengajuan layanan (misal: menu 'Layanan Digital' untuk pengajuan TTE/Zoom, atau menu 'PPID' untuk permohonan informasi publik).
-4. Jika ditanya tentang sesuatu di luar konteks dinas, tolak dengan sopan dan arahkan mereka untuk menghubungi WhatsApp Humas Diskominfo.";
+4. Jika ditanya tentang sesuatu di luar konteks dinas atau layanan publik, tolak dengan sopan dan arahkan mereka untuk menghubungi Contact Center / WhatsApp Humas Diskominfo di " . $waHumas . ".";
 
                 // Request payload following Google Gemini API spec
                 $payload = [
