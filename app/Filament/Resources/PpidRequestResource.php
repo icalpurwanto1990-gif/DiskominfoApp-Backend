@@ -25,6 +25,17 @@ class PpidRequestResource extends Resource
 
     protected static ?string $navigationGroup = 'Pelayanan';
 
+    public static function getNavigationBadge(): ?string
+    {
+        $count = static::getModel()::where('status', 'PENDING')->count();
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'info';
+    }
+
     public static function form(Form $form): Form
     {
         return $form

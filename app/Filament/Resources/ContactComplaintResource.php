@@ -25,6 +25,22 @@ class ContactComplaintResource extends Resource
 
     protected static ?string $navigationGroup = 'Layanan Publik';
 
+    public static function getNavigationBadge(): ?string
+    {
+        $count = static::getModel()::where('status', 'PENDING')->count();
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'danger';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Jumlah pengaduan / pesan baru yang belum ditanggapi';
+    }
+
     public static function form(Form $form): Form
     {
         return $form

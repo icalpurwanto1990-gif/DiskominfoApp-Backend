@@ -7,6 +7,8 @@ use App\Models\DigitalService;
 use App\Models\PpidRequest;
 use App\Models\ServiceRequest;
 use App\Models\TteRequest;
+use App\Models\User;
+use Filament\Notifications\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -69,6 +71,22 @@ class LayananController extends Controller
                 }
             } catch (\Exception $e) {
                 // Skip if not exist or error
+            // Dispatch Filament Database Notification ke lonceng Admin
+            try {
+                $admins = User::all();
+                Notification::make()
+                    ->title('Tiket Layanan Baru!')
+                    ->body("Pemohon {$newRequest->applicantName} ({$newRequest->instansi}) mengajukan {$newRequest->serviceType} [#{$newRequest->ticketNumber}]")
+                    ->icon('heroicon-o-ticket')
+                    ->warning()
+                    ->actions([
+                        \Filament\Notifications\Actions\Action::make('view')
+                            ->label('Buka Tiket')
+                            ->url('/admin/service-requests'),
+                    ])
+                    ->sendToDatabase($admins);
+            } catch (\Exception $e) {
+                // Ignore if database notification table does not exist yet
             }
 
             return response()->json([
