@@ -71,6 +71,10 @@ class ServiceRequest extends Model
                 $messageText = "⚠️ Tiket pengajuan layanan Anda (#{$this->ticketNumber}) ditolak oleh Admin.\n\nAlasan: ".($catatan ?: $this->notes);
                 $target = 'user';
                 break;
+            case 'PERBAIKAN':
+                $messageText = "🔄 Tiket pengajuan layanan Anda (#{$this->ticketNumber}) dikembalikan oleh Admin untuk perbaikan.\n\nCatatan Perbaikan: ".($catatan ?: $this->notes);
+                $target = 'user';
+                break;
             case 'DIPROSES':
                 $messageText = "Tiket pengajuan layanan Anda (#{$this->ticketNumber}) telah disetujui dan sedang diproses oleh Tim IT Diskominfo.".($catatan ? "\n\nCatatan: {$catatan}" : '');
                 $target = 'user';
@@ -113,7 +117,7 @@ class ServiceRequest extends Model
         Log::info('SERVICE_AGENT_WEBHOOK_EVENT: '.json_encode($jsonPayload));
 
         // 5. Kirim notifikasi Email ke pemohon (fail-safe)
-        if ($this->applicantEmail && in_array($newStatus, ['DIPROSES', 'SELESAI', 'DITOLAK'])) {
+        if ($this->applicantEmail && in_array($newStatus, ['DIPROSES', 'SELESAI', 'DITOLAK', 'PERBAIKAN'])) {
             try {
                 Mail::to($this->applicantEmail)
                     ->send(new ServiceStatusMail($this, $newStatus));
@@ -124,7 +128,7 @@ class ServiceRequest extends Model
         }
 
         // 6. Kirim notifikasi WhatsApp ke pemohon (fail-safe)
-        if ($this->applicantPhone && in_array($newStatus, ['DIPROSES', 'SELESAI', 'DITOLAK'])) {
+        if ($this->applicantPhone && in_array($newStatus, ['DIPROSES', 'SELESAI', 'DITOLAK', 'PERBAIKAN'])) {
             try {
                 /** @var WhatsAppNotificationService $waService */
                 $waService = app(WhatsAppNotificationService::class);

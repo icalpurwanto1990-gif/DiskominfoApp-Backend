@@ -69,6 +69,15 @@ class ServiceStatusMail extends Mailable
                     . ($catatan ? "<br><br><strong>Alasan Penolakan:</strong><br>{$catatan}" : '<br><br>Silakan hubungi kami untuk informasi lebih lanjut.');
                 break;
 
+            case 'PERBAIKAN':
+                $this->statusLabel    = 'MEMERLUKAN PERBAIKAN';
+                $this->statusColor    = '#f59e0b'; // amber
+                $this->statusIcon     = '🔄';
+                $this->headlineMessage = 'Pengajuan Anda Dikembalikan untuk Perbaikan';
+                $this->bodyMessage    = "Pengajuan layanan Anda dengan nomor tiket <strong>#{$ticketNumber}</strong> dikembalikan oleh Verifikator Admin untuk perbaikan berkas/data.<br><br>Silakan perbaiki usulan Anda melalui portal layanan."
+                    . ($catatan ? "<br><br><strong>Instruksi Perbaikan dari Admin:</strong><br>{$catatan}" : '');
+                break;
+
             default:
                 $this->statusLabel    = $status;
                 $this->statusColor    = '#6b7280';
@@ -85,10 +94,11 @@ class ServiceStatusMail extends Mailable
     public function envelope(): Envelope
     {
         $subject = match ($this->newStatus) {
-            'DIPROSES' => "[Diskominfo Bangkep] Pengajuan #{$this->serviceRequest->ticketNumber} — Sedang Diproses ⚙️",
-            'SELESAI'  => "[Diskominfo Bangkep] Pengajuan #{$this->serviceRequest->ticketNumber} — Selesai ✅",
-            'DITOLAK'  => "[Diskominfo Bangkep] Pengajuan #{$this->serviceRequest->ticketNumber} — Tidak Dapat Diproses ⚠️",
-            default    => "[Diskominfo Bangkep] Update Status Tiket #{$this->serviceRequest->ticketNumber}",
+            'DIPROSES'  => "[Diskominfo Bangkep] Pengajuan #{$this->serviceRequest->ticketNumber} — Sedang Diproses ⚙️",
+            'SELESAI'   => "[Diskominfo Bangkep] Pengajuan #{$this->serviceRequest->ticketNumber} — Selesai ✅",
+            'DITOLAK'   => "[Diskominfo Bangkep] Pengajuan #{$this->serviceRequest->ticketNumber} — Tidak Dapat Diproses ⚠️",
+            'PERBAIKAN' => "[Diskominfo Bangkep] Pengajuan #{$this->serviceRequest->ticketNumber} — Memerlukan Perbaikan 🔄",
+            default     => "[Diskominfo Bangkep] Update Status Tiket #{$this->serviceRequest->ticketNumber}",
         };
 
         return new Envelope(subject: $subject);

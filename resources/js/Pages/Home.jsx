@@ -503,21 +503,25 @@ export const Home = ({ dbStats, sliderImages, dbServices, welcomeSpeech, latestN
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-colors shadow-sm ${
                         trackResult.data.status === 'SELESAI'
                           ? "bg-emerald-600 text-white"
-                          : ['REVISI', 'DITOLAK'].includes(trackResult.data.status)
-                            ? "bg-red-500 text-white"
-                            : "bg-slate-200 dark:bg-slate-800 text-slate-500"
+                          : trackResult.data.status === 'PERBAIKAN'
+                            ? "bg-amber-500 text-white animate-bounce"
+                            : ['REVISI', 'DITOLAK'].includes(trackResult.data.status)
+                              ? "bg-red-500 text-white"
+                              : "bg-slate-200 dark:bg-slate-800 text-slate-500"
                       }`}>
-                        {trackResult.data.status === 'SELESAI' ? "✓" : ['REVISI', 'DITOLAK'].includes(trackResult.data.status) ? "✕" : "3"}
+                        {trackResult.data.status === 'SELESAI' ? "✓" : trackResult.data.status === 'PERBAIKAN' ? "🔄" : ['REVISI', 'DITOLAK'].includes(trackResult.data.status) ? "✕" : "3"}
                       </div>
                       <div className="flex flex-col leading-none">
                         <span className={`font-extrabold text-xs ${
                           trackResult.data.status === 'SELESAI'
                             ? "text-emerald-600 dark:text-emerald-400"
-                            : ['REVISI', 'DITOLAK'].includes(trackResult.data.status)
-                              ? "text-red-500"
-                              : "text-slate-400"
+                            : trackResult.data.status === 'PERBAIKAN'
+                              ? "text-amber-500"
+                              : ['REVISI', 'DITOLAK'].includes(trackResult.data.status)
+                                ? "text-red-500"
+                                : "text-slate-400"
                         }`}>
-                          {trackResult.data.status === 'SELESAI' ? 'Selesai / Terbit' : ['REVISI', 'DITOLAK'].includes(trackResult.data.status) ? 'Ditolak / Revisi' : 'Keputusan Akhir'}
+                          {trackResult.data.status === 'SELESAI' ? 'Selesai / Terbit' : trackResult.data.status === 'PERBAIKAN' ? 'Dikembalikan (Perbaikan)' : ['REVISI', 'DITOLAK'].includes(trackResult.data.status) ? 'Ditolak' : 'Keputusan Akhir'}
                         </span>
                         <span className="text-[9px] text-slate-400 mt-1">Status final tiket</span>
                       </div>

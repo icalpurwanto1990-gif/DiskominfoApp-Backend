@@ -555,11 +555,12 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
                         <span className="font-extrabold text-slate-900 dark:text-white">{req.ticketNumber}</span>
                         <span className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded ${
                           req.status === "PENDING" ? "bg-amber-500/10 text-amber-600" :
+                          req.status === "PERBAIKAN" ? "bg-amber-500/20 text-amber-600 border border-amber-500/30" :
                           req.status === "DIPROSES" ? "bg-blue-500/10 text-blue-600" :
                           req.status === "SELESAI" ? "bg-emerald-500/10 text-emerald-600" :
                           "bg-red-500/10 text-red-600"
                         }`}>
-                          {req.status}
+                          {req.status === "PERBAIKAN" ? "🔄 PERBAIKAN" : req.status}
                         </span>
                       </div>
                       <div className="flex flex-col gap-1 p-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-xl font-bold">
@@ -572,10 +573,16 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
                         )) : null}
                       </div>
                       {req.notes && (
-                        <div className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl flex gap-2 text-emerald-700 dark:text-emerald-400">
+                        <div className={`p-3 border rounded-xl flex gap-2 ${
+                          req.status === "PERBAIKAN"
+                            ? "bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-400"
+                            : "bg-emerald-500/5 border-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                        }`}>
                           <CheckCircle2 size={13} className="flex-shrink-0 mt-0.5" />
                           <div className="flex flex-col">
-                            <span className="font-bold text-[9px] uppercase tracking-wider leading-none">Respon Admin</span>
+                            <span className="font-bold text-[9px] uppercase tracking-wider leading-none">
+                              {req.status === "PERBAIKAN" ? "Instruksi Perbaikan Admin" : "Respon Admin"}
+                            </span>
                             <p className="text-[10px] font-semibold mt-1">{req.notes}</p>
                           </div>
                         </div>

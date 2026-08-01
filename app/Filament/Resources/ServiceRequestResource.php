@@ -138,6 +138,7 @@ class ServiceRequestResource extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'PENDING' => 'warning',
                         'DIPROSES' => 'info',
+                        'PERBAIKAN' => 'warning',
                         'SELESAI' => 'success',
                         'DITOLAK' => 'danger',
                         default => 'gray',
@@ -193,6 +194,29 @@ class ServiceRequestResource extends Resource
                             ->title('Pengajuan Ditolak')
                             ->body('Pemberitahuan penolakan tiket #'.$record->ticketNumber.' telah dikirim.')
                             ->danger()
+                            ->send();
+                    }),
+
+                // 2b. Return for Revision Action (PENDING/DIPROSES -> PERBAIKAN)
+                Action::make('return_for_revision')
+                    ->label('Kembalikan Perbaikan')
+                    ->icon('heroicon-m-arrow-uturn-left')
+                    ->color('warning')
+                    ->visible(fn (ServiceRequest $record): bool => in_array($record->status, ['PENDING', 'DIPROSES']))
+                    ->form([
+                        Forms\Components\Textarea::make('catatan_perbaikan')
+                            ->label('Catatan / Hal yang Perlu Diperbaiki Pemohon')
+                            ->placeholder('Contoh: Berkas pendukung kurang jelas, silakan unggah ulang...')
+                            ->required()
+                            ->rows(3),
+                    ])
+                    ->action(function (ServiceRequest $record, array $data) {
+                        $record->triggerStatusTransition('PERBAIKAN', 'ADMIN', $data['catatan_perbaikan']);
+
+                        Notification::make()
+                            ->title('Pengajuan Dikembalikan')
+                            ->body('Pemberitahuan instruksi perbaikan tiket #'.$record->ticketNumber.' telah dikirim ke pemohon.')
+                            ->warning()
                             ->send();
                     }),
 

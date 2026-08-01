@@ -164,4 +164,50 @@ class LayananController extends Controller
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
+
+    public function updatePengajuan(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'ticketNumber' => 'required|string',
+                'applicantName' => 'required|string',
+                'applicantEmail' => 'required|email',
+                'applicantPhone' => 'required|string',
+                'instansi' => 'required|string',
+                'details' => 'nullable|array',
+            ]);
+
+            $serviceRequest = ServiceRequest::where('ticketNumber', $validated['ticketNumber'])->firstOrFail();
+
+            if (! in_array($serviceRequest->status, ['PERBAIKAN', 'PENDING', 'DRAFT'])) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Tiket ini sedang diproses atau sudah selesai dan tidak dapat diubah.',
+                ], 422);
+            }
+
+            $serviceRequest->update([
+                'applicantName' => $validated['applicantName'],
+                'applicantEmail' => $validated['applicantEmail'],
+                'applicantPhone' => $validated['applicantPhone'],
+                'instansi' => $validated['instansi'],
+                'details' => $validated['details'] ?? $serviceRequest->details,
+            ]);
+
+            // Transition status back to PENDING for admin re-verification
+            $serviceRequest->triggerStatusTransition('PENDING', 'USER', 'Perbaikan usulan telah dikirim ulang oleh pemohon.');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Perbaikan usulan Anda berhasil dikirim ulang ke Admin!',
+                'ticketNumber' => $serviceRequest->ticketNumber,
+                'serviceRequest' => $serviceRequest,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
