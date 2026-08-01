@@ -221,6 +221,29 @@ class ServiceRequestResource extends Resource
                             ->send();
                     }),
 
+                // 5. Download Surat Permohonan (tersedia untuk semua status)
+                Action::make('download_surat')
+                    ->label('Download Surat')
+                    ->icon('heroicon-m-document-arrow-down')
+                    ->color('gray')
+                    ->url(fn (ServiceRequest $record): string =>
+                        route('admin.service-request.download-surat', $record->id)
+                    )
+                    ->openUrlInNewTab()
+                    ->tooltip('Download Surat Permohonan (.docx)'),
+
+                // 6. Download Bukti Selesai (hanya tampil saat status SELESAI)
+                Action::make('download_bukti')
+                    ->label('Download Bukti')
+                    ->icon('heroicon-m-check-badge')
+                    ->color('success')
+                    ->visible(fn (ServiceRequest $record): bool => $record->status === 'SELESAI')
+                    ->url(fn (ServiceRequest $record): string =>
+                        route('admin.service-request.download-bukti', $record->id)
+                    )
+                    ->openUrlInNewTab()
+                    ->tooltip('Download Bukti Penyelesaian Layanan (.docx)'),
+
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

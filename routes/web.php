@@ -7,6 +7,7 @@ use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeritaController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocumentDownloadController;
 use App\Http\Controllers\GisController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KontakController;
@@ -92,6 +93,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/api/user/2fa/disable', [AuthController::class, 'disable2FA']);
     Route::get('/admin/verify-2fa', [AuthController::class, 'showAdmin2FA'])->name('admin.2fa.view');
     Route::post('/admin/verify-2fa', [AuthController::class, 'submitAdmin2FA'])->name('admin.2fa.submit');
+
+    // Document download routes (Admin only — dilindungi middleware auth)
+    Route::get('/admin/service-requests/{id}/download-surat',
+        [DocumentDownloadController::class, 'downloadSurat']
+    )->name('admin.service-request.download-surat');
+
+    Route::get('/admin/service-requests/{id}/download-bukti',
+        [DocumentDownloadController::class, 'downloadBukti']
+    )->name('admin.service-request.download-bukti');
 });
 
 // Client Web API JSON Endpoints
