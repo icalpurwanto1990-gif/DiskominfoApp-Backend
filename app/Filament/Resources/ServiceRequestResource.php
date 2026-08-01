@@ -30,8 +30,12 @@ class ServiceRequestResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = static::getModel()::where('status', 'PENDING')->count();
-        return $count > 0 ? (string) $count : null;
+        try {
+            $count = static::getModel()::where('status', 'PENDING')->count();
+            return $count > 0 ? (string) $count : null;
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     public static function getNavigationBadgeColor(): ?string
