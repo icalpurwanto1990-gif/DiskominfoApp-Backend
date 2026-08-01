@@ -71,6 +71,8 @@ class LayananController extends Controller
                 }
             } catch (\Exception $e) {
                 // Skip if not exist or error
+            }
+
             // Dispatch Filament Database Notification ke lonceng Admin
             try {
                 $admins = User::all();
