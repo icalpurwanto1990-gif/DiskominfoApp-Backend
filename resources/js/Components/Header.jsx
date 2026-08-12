@@ -335,7 +335,7 @@ export const Header = () => {
         </Link>
 
         {/* Desktop Navigation Links (Dynamic database-driven) */}
-        <nav className="hidden xl:flex items-center gap-0.5" aria-label="Menu Utama">
+        <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1" aria-label="Menu Utama">
           {activeMenus.map((menu) => {
             const hasChildren = menu.children && menu.children.length > 0;
             const isMenuLinkActive = isParentActive(menu);
@@ -344,7 +344,7 @@ export const Header = () => {
               return (
                 <div key={menu.id} className="relative group py-2">
                   <button
-                    className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] lg:text-[11.5px] font-semibold tracking-wide transition-all duration-300 ${
+                    className={`flex items-center gap-1 px-2 xl:px-2.5 py-1.5 rounded-lg text-[10.5px] lg:text-[11px] xl:text-[11.5px] font-semibold tracking-wide transition-all duration-300 ${
                       isMenuLinkActive
                         ? !isHomepage || scrolled
                           ? "text-[#0a549e] dark:text-sky-400 font-bold"
@@ -402,7 +402,7 @@ export const Header = () => {
                 href={menu.url}
                 target={menu.target || "_blank"}
                 rel="noopener noreferrer"
-                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] lg:text-[11.5px] font-semibold tracking-wide transition-all duration-300 ${
+                className={`flex items-center gap-1 px-2 xl:px-2.5 py-1.5 rounded-lg text-[10.5px] lg:text-[11px] xl:text-[11.5px] font-semibold tracking-wide transition-all duration-300 ${
                   !isHomepage || scrolled
                     ? "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70"
                     : "text-white hover:text-white hover:bg-white/10 [text-shadow:0_1px_2px_rgba(0,0,0,0.4)]"
@@ -415,7 +415,7 @@ export const Header = () => {
               <Link
                 key={menu.id}
                 href={menu.url || "#"}
-                className={`relative px-2.5 py-1.5 rounded-lg text-[11px] lg:text-[11.5px] font-semibold tracking-wide transition-all duration-300 group ${
+                className={`relative px-2 xl:px-2.5 py-1.5 rounded-lg text-[10.5px] lg:text-[11px] xl:text-[11.5px] font-semibold tracking-wide transition-all duration-300 group ${
                   isMenuLinkActive
                     ? !isHomepage || scrolled
                       ? "text-[#0a549e] dark:text-sky-400 font-bold"
@@ -454,7 +454,7 @@ export const Header = () => {
           </a>
 
           {/* Mobile Login Widget (No Text 'LOGIN' - Just Icon for Professional Layout) */}
-          <div className="xl:hidden">
+          <div className="lg:hidden">
             {isMounted && currentUser ? (
               <Link
                 href={admin ? "/admin" : "/user/dashboard"}
@@ -481,7 +481,7 @@ export const Header = () => {
           </div>
 
           {/* Desktop User Dropdown Menu */}
-          <div className="hidden xl:block">
+          <div className="hidden lg:block">
             {isMounted && currentUser ? (
               <div className="relative">
                 <button
@@ -562,7 +562,7 @@ export const Header = () => {
 
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className={`xl:hidden p-2 rounded-xl transition ${
+            className={`lg:hidden p-2 rounded-xl transition ${
               scrolled
                 ? "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                 : "text-white hover:bg-white/10"
@@ -577,7 +577,7 @@ export const Header = () => {
 
       {/* ── Mobile Drawer Menu — animated ───────────────────────────────── */}
       <div
-        className={`xl:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+        className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
           isOpen ? "max-h-[750px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
