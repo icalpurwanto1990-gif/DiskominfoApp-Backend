@@ -10,7 +10,6 @@ import MainLayout from "../Layouts/MainLayout";
 import HeroSlider from "../Components/HeroSlider";
 import SurveyWidget from "../Components/SurveyWidget";
 import SurveyModal from "../Components/SurveyModal";
-import AIChatWidget from "../Components/AIChatWidget";
 import ScrollReveal from "../Components/ScrollReveal";
 
 const stripHtml = (html) => {
@@ -725,9 +724,6 @@ export const Home = ({ dbStats, sliderImages, dbServices, welcomeSpeech, latestN
             <SurveyWidget />
           </ScrollReveal>
         </section>
-
-        {/* Floating AI Chat */}
-        <AIChatWidget />
 
         {/* Dynamic Satisfaction Survey Popup */}
         <SurveyModal isOpen={isSurveyOpen} onClose={() => setIsSurveyOpen(false)} />

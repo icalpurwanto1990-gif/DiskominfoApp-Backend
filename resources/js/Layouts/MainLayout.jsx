@@ -3,6 +3,7 @@ import { usePage, Head } from "@inertiajs/react";
 import { AccessibilityProvider } from "../Components/AccessibilityContext";
 import { AccessibilityWidget } from "../Components/AccessibilityWidget";
 import { RadioStreamingWidget } from "../Components/RadioStreamingWidget";
+import { AIChatWidget } from "../Components/AIChatWidget";
 import { Header } from "../Components/Header";
 import { Footer } from "../Components/Footer";
 
@@ -42,11 +43,14 @@ export const MainLayout = ({ children }) => {
         {/* Branding Footer */}
         <Footer />
 
-        {/* Floating Accessibility Panel */}
+        {/* Floating Accessibility Panel (Bottom-Left) */}
         <AccessibilityWidget />
 
-        {/* Floating Live Radio Streaming Side Widget */}
-        <RadioStreamingWidget />
+        {/* Floating Action Suite (Bottom-Right): MY MOE 101.1 FM + Tanya AI */}
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
+          <RadioStreamingWidget />
+          <AIChatWidget />
+        </div>
       </div>
     </AccessibilityProvider>
   );
