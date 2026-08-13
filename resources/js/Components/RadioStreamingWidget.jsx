@@ -1,109 +1,25 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import {
-  Radio, Play, Pause, Volume2, VolumeX, Volume1,
-  RefreshCw, X, Wifi, AlertTriangle, Disc, Sparkles
+  Play, Pause, Volume2, VolumeX, Volume1,
+  RefreshCw, X, Wifi, AlertTriangle, Disc
 } from "lucide-react";
+import { useRadioPlayer } from "./RadioPlayerContext";
 
 export const RadioStreamingWidget = () => {
-  const audioRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [volume, setVolume] = useState(0.85);
-  const [isMuted, setIsMuted] = useState(false);
-  const [prevVolume, setPrevVolume] = useState(0.85);
-  const [hasError, setHasError] = useState(false);
-  const [streamStatus, setStreamStatus] = useState("Standby");
-
-  // Stream URL specified in requirements
-  const STREAM_URL = "https://stream.mymoe.online/stream";
-
-  // Sync volume with audio element
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : volume;
-    }
-  }, [volume, isMuted]);
-
-  // Handle Play/Pause toggle
-  const togglePlay = async () => {
-    if (!audioRef.current) return;
-
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-      setIsLoading(false);
-      setStreamStatus("Dijeda");
-    } else {
-      setIsLoading(true);
-      setHasError(false);
-      setStreamStatus("Menghubungkan...");
-
-      if (audioRef.current.src !== STREAM_URL) {
-        audioRef.current.src = STREAM_URL;
-        audioRef.current.load();
-      }
-
-      try {
-        await audioRef.current.play();
-        setIsPlaying(true);
-        setIsLoading(false);
-        setStreamStatus("Mengudara (Live)");
-      } catch (err) {
-        console.warn("Stream playback failed:", err);
-        setIsLoading(false);
-        setIsPlaying(false);
-        setHasError(true);
-        setStreamStatus("Gagal Terhubung");
-      }
-    }
-  };
-
-  // Reconnect / Retry handler
-  const handleRetry = () => {
-    if (!audioRef.current) return;
-    setHasError(false);
-    setIsLoading(true);
-    setStreamStatus("Menghubungkan ulang...");
-    audioRef.current.src = `${STREAM_URL}?t=${Date.now()}`;
-    audioRef.current.load();
-    audioRef.current
-      .play()
-      .then(() => {
-        setIsPlaying(true);
-        setIsLoading(false);
-        setStreamStatus("Mengudara (Live)");
-      })
-      .catch((err) => {
-        console.error("Retry failed:", err);
-        setIsLoading(false);
-        setIsPlaying(false);
-        setHasError(true);
-        setStreamStatus("Koneksi Gagal");
-      });
-  };
-
-  // Handle Volume change
-  const handleVolumeChange = (e) => {
-    const val = parseFloat(e.target.value);
-    setVolume(val);
-    if (val === 0) {
-      setIsMuted(true);
-    } else if (isMuted) {
-      setIsMuted(false);
-    }
-  };
-
-  // Toggle Mute
-  const toggleMute = () => {
-    if (isMuted) {
-      setIsMuted(false);
-      setVolume(prevVolume > 0 ? prevVolume : 0.85);
-    } else {
-      setPrevVolume(volume);
-      setIsMuted(true);
-    }
-  };
+  const {
+    isPlaying,
+    isLoading,
+    isExpanded,
+    volume,
+    isMuted,
+    hasError,
+    streamStatus,
+    setIsExpanded,
+    togglePlay,
+    toggleMute,
+    handleVolumeChange,
+    handleRetry,
+  } = useRadioPlayer();
 
   const renderVolumeIcon = () => {
     if (isMuted || volume === 0) return <VolumeX size={16} />;
@@ -113,33 +29,6 @@ export const RadioStreamingWidget = () => {
 
   return (
     <div className="relative">
-      {/* Hidden Native Audio Element with preload="none" */}
-      <audio
-        ref={audioRef}
-        src={STREAM_URL}
-        preload="none"
-        onPlaying={() => {
-          setIsPlaying(true);
-          setIsLoading(false);
-          setHasError(false);
-          setStreamStatus("Mengudara (Live)");
-        }}
-        onWaiting={() => {
-          setIsLoading(true);
-          setStreamStatus("Buffering...");
-        }}
-        onError={() => {
-          setIsLoading(false);
-          setIsPlaying(false);
-          setHasError(true);
-          setStreamStatus("Koneksi Terputus");
-        }}
-        onPause={() => {
-          setIsPlaying(false);
-          setIsLoading(false);
-        }}
-      />
-
       {/* EXPANDED PLAYER CARD (Pop-up anchored above the trigger) */}
       {isExpanded && (
         <div className="absolute bottom-16 right-0 sm:right-0 w-[340px] max-w-[92vw] bg-slate-900/95 dark:bg-slate-950/95 text-white rounded-3xl p-5 shadow-2xl border border-amber-500/20 backdrop-blur-xl animate-in slide-in-from-bottom-4 duration-300 flex flex-col gap-4 font-sans ring-1 ring-black/60 z-50">
