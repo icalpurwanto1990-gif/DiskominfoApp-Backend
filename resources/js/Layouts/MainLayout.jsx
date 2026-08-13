@@ -2,6 +2,7 @@ import React from "react";
 import { usePage, Head } from "@inertiajs/react";
 import { AccessibilityProvider } from "../Components/AccessibilityContext";
 import { AccessibilityWidget } from "../Components/AccessibilityWidget";
+import { RadioStreamingWidget } from "../Components/RadioStreamingWidget";
 import { Header } from "../Components/Header";
 import { Footer } from "../Components/Footer";
 
@@ -43,6 +44,9 @@ export const MainLayout = ({ children }) => {
 
         {/* Floating Accessibility Panel */}
         <AccessibilityWidget />
+
+        {/* Floating Live Radio Streaming Side Widget */}
+        <RadioStreamingWidget />
       </div>
     </AccessibilityProvider>
   );
