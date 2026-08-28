@@ -10,13 +10,15 @@ class ManageAppStatistics extends ManageRecords
 {
     protected static string $resource = AppStatisticResource::class;
 
-    protected static ?string $title = 'Kelola Statistik Real-Time';
+    protected static ?string $title = 'Kelola Statistik & Indeks Realtime';
 
     protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()
-                ->label('Tambah Kunci Baru'),
+                ->label('Tambah Indeks Baru')
+                ->modalHeading('Tambah Indeks / Data Statistik Baru'),
         ];
     }
 }
+
