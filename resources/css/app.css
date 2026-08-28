@@ -11,3 +11,40 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* Post Content & Article Styling */
+.post-entry img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: block;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.post-entry figure {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.post-entry figure img {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.post-entry figcaption {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-align: center;
+    font-style: italic;
+}
+
+.post-entry iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+

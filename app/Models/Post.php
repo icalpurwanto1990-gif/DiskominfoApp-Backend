@@ -48,6 +48,22 @@ class Post extends Model
         return $value;
     }
 
+    public function getContentAttribute($value)
+    {
+        if (! $value) {
+            return $value;
+        }
+
+        // Normalize absolute localhost/domain URLs in img src tags to clean relative URLs: /uploads/... or /storage/...
+        $pattern = '/(src=["\'])(?:https?:\/\/[^\/"\']+(?::\d+)?)?(\/(?:uploads|storage)\/[^"\']+)(["\'])/i';
+        $normalized = preg_replace($pattern, '$1$2$3', $value);
+
+        // Fix any paths missing leading slash, e.g. src="uploads/..." -> src="/uploads/..."
+        $normalized = preg_replace('/(src=["\'])(uploads|storage)\/([^"\']+)(["\'])/i', '$1/$2/$3$4', $normalized);
+
+        return $normalized;
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'categoryId', 'id');

@@ -73,11 +73,17 @@ class PostResource extends Resource
                             ->disk('uploads')
                             ->directory('posts')
                             ->image()
+                            ->maxSize(10240)
                             ->label('Gambar Utama Berita'),
                         Forms\Components\RichEditor::make('content')
                             ->required()
+                            ->fileAttachmentsDisk('uploads')
+                            ->fileAttachmentsDirectory('posts/attachments')
+                            ->fileAttachmentsVisibility('public')
+                            ->maxSize(10240)
                             ->columnSpanFull()
-                            ->label('Isi Berita'),
+                            ->label('Isi Berita')
+                            ->helperText('Gunakan toolbar untuk format teks, menyisipkan gambar, tabel, atau tautan.'),
                         Forms\Components\Toggle::make('published')
                             ->required()
                             ->default(false)

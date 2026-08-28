@@ -16,6 +16,7 @@ echo "📁 Memastikan folder uploads dan images tersedia..."
 mkdir -p ./public/uploads/banners
 mkdir -p ./public/uploads/settings
 mkdir -p ./public/uploads/icons
+mkdir -p ./public/uploads/posts/attachments
 mkdir -p ./public/images
 chmod -R 775 ./public/uploads
 chmod -R 755 ./public/images
@@ -37,10 +38,12 @@ echo "   [db] database siap!"
 echo "🗄️ Menjalankan migrasi database..."
 docker compose exec app php artisan migrate --force
 
-# 6. Pastikan permissions upload di dalam container
+# 6. Pastikan permissions upload dan storage link di dalam container
 echo "🔒 Mengatur permission folder uploads dalam container..."
+docker compose exec app mkdir -p /var/www/html/public/uploads/posts/attachments
 docker compose exec app chmod -R 775 /var/www/html/public/uploads
 docker compose exec app chown -R www-data:www-data /var/www/html/public/uploads
+docker compose exec app php artisan storage:link || true
 
 # 7. Bersihkan cache lama, lalu buat cache baru
 echo "🧹 Membersihkan cache lama dan mengoptimalkan..."
