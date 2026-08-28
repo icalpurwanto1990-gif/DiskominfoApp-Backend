@@ -80,7 +80,6 @@ class PostResource extends Resource
                             ->fileAttachmentsDisk('uploads')
                             ->fileAttachmentsDirectory('posts/attachments')
                             ->fileAttachmentsVisibility('public')
-                            ->maxSize(10240)
                             ->columnSpanFull()
                             ->label('Isi Berita')
                             ->helperText('Gunakan toolbar untuk format teks, menyisipkan gambar, tabel, atau tautan.'),
@@ -161,4 +160,16 @@ class PostResource extends Resource
             'edit' => Pages\EditPost::route('/{record}/edit'),
         ];
     }
+
+    public static function mutateFormDataBeforeFill(array $data): array
+    {
+        // Strip any /uploads/ prefix so Filament FileUpload disk('uploads')
+        // can locate the file at the correct path without double-prefixing.
+        if (isset($data['image']) && is_string($data['image'])) {
+            $data['image'] = ltrim(str_replace('/uploads/', '', $data['image']), '/');
+        }
+
+        return $data;
+    }
 }
+
