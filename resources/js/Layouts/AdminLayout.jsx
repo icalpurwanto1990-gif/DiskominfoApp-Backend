@@ -3,7 +3,7 @@ import { Link, usePage, Head } from "@inertiajs/react";
 import { 
   LayoutDashboard, Image, UserCheck, FileText, FileSpreadsheet, 
   MapPin, Images, Users, LogOut, Globe, Shield, Menu, X, ChevronRight, ListCollapse,
-  BarChart3, ClipboardList
+  BarChart3, ClipboardList, Activity
 } from "lucide-react";
 
 export default function AdminLayout({ children }) {
@@ -22,6 +22,7 @@ export default function AdminLayout({ children }) {
     if (path.includes("/admin/media")) return "Galeri Media";
     if (path.includes("/admin/users")) return "Akun Pengguna";
     if (path.includes("/admin/survey")) return "Survey Kepuasan";
+    if (path.includes("/admin/statistics")) return "Statistik Realtime";
     if (path.includes("/admin/audit-log")) return "Log Audit";
     return "Dashboard Admin";
   };
@@ -84,6 +85,7 @@ export default function AdminLayout({ children }) {
     { href: "/admin/media", label: "Galeri Media", icon: Images },
     { href: "/admin/users", label: "Akun Pengguna", icon: Users },
     { href: "/admin/survey", label: "Survey Kepuasan", icon: BarChart3 },
+    { href: "/admin/statistics", label: "Statistik Realtime", icon: Activity },
     { href: "/admin/audit-log", label: "Log Audit", icon: ClipboardList },
   ];
 

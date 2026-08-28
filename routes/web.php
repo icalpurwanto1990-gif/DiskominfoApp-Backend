@@ -80,6 +80,11 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
 });
 */
 
+// Additional Admin View Routes (Active — used by Inertia SPA admin panel)
+Route::middleware(['admin'])->prefix('admin')->group(function () {
+    Route::get('/statistics', [AdminController::class, 'statistics'])->name('admin.statistics');
+});
+
 // User Dashboard Portal Routes (Applicants & OPDs)
 Route::middleware(['auth'])->group(function () {
     Route::get('/user/dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
@@ -172,5 +177,9 @@ Route::prefix('api')->group(function () {
         Route::get('/audit-logs', [AdminApiController::class, 'getAuditLogs']);
         Route::get('/survey-responses', [AdminApiController::class, 'getSurveyResponses']);
         Route::delete('/survey-responses/{id}', [AdminApiController::class, 'deleteSurveyResponse']);
+        // Statistics Realtime CRUD
+        Route::get('/statistics', [AdminApiController::class, 'getStatistics']);
+        Route::post('/statistics', [AdminApiController::class, 'saveStatistic']);
+        Route::delete('/statistics/{id}', [AdminApiController::class, 'deleteStatistic']);
     });
 });

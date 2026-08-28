@@ -19,10 +19,18 @@ class AppStatistic extends Model
         'id',
         'key',
         'value',
+        'label',
+        'suffix',
+        'desc',
+        'icon',
+        'color',
+        'is_published',
+        'order_index',
     ];
 
     protected $casts = [
-        'value' => 'integer',
+        'is_published' => 'boolean',
+        'order_index'  => 'integer',
     ];
 
     // Only updatedAt timestamp is present in this table
@@ -31,4 +39,16 @@ class AppStatistic extends Model
     const CREATED_AT = null;
 
     const UPDATED_AT = 'updatedAt';
+
+    // -------------------------------------------------------
+    // Scopes
+    // -------------------------------------------------------
+
+    /**
+     * Scope: only published statistics, ordered for public display.
+     */
+    public function scopePublished($query)
+    {
+        return $query->where('is_published', true)->orderBy('order_index', 'asc');
+    }
 }

@@ -101,4 +101,9 @@ class AdminController extends Controller
     {
         return Inertia::render('Admin/AuditLog');
     }
+
+    public function statistics()
+    {
+        return Inertia::render('Admin/Statistics');
+    }
 }

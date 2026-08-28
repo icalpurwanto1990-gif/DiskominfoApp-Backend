@@ -13,8 +13,8 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // 1. Fetch statistics
-        $dbStats = AppStatistic::all();
+        // 1. Fetch published statistics (ordered for public display, max 8)
+        $dbStats = AppStatistic::published()->take(8)->get();
 
         // 2. Fetch banners
         $banners = Banner::where('active', true)

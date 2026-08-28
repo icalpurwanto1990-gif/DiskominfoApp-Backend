@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AppStatistic;
 use App\Models\AuditLog;
 use App\Models\Banner;
 use App\Models\Category;
@@ -992,6 +993,85 @@ class AdminApiController extends Controller
                 $response->delete();
                 $this->logAudit(request(), 'DELETE', 'SURVEY', "Respons survey ID '{$id}' dihapus.");
             }
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    // ==========================================
+    // STATISTICS CRUD (Realtime Customizable)
+    // ==========================================
+
+    /**
+     * GET /api/admin/statistics
+     * Return all statistics for the admin panel (all, not just published).
+     */
+    public function getStatistics()
+    {
+        try {
+            $stats = AppStatistic::orderBy('order_index', 'asc')->get();
+            return response()->json(['success' => true, 'statistics' => $stats]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * POST /api/admin/statistics
+     * Create or update a statistic entry.
+     */
+    public function saveStatistic(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'id'          => 'nullable|string',
+                'key'         => 'required|string|max:100',
+                'value'       => 'required|string|max:50',
+                'label'       => 'required|string|max:100',
+                'suffix'      => 'nullable|string|max:20',
+                'desc'        => 'nullable|string|max:200',
+                'icon'        => 'nullable|string|max:50',
+                'color'       => 'nullable|string|max:30',
+                'is_published'=> 'required|boolean',
+                'order_index' => 'required|integer|min:0',
+            ]);
+
+            if (!empty($validated['id'])) {
+                // UPDATE
+                $stat = AppStatistic::findOrFail($validated['id']);
+                $stat->update($validated);
+                $action = 'UPDATE';
+            } else {
+                // CREATE
+                $validated['id'] = (string) Str::uuid();
+                $stat = AppStatistic::create($validated);
+                $action = 'CREATE';
+            }
+
+            $this->logAudit($request, $action, 'STATISTICS', "Statistik '{$validated['label']}' (key: {$validated['key']}) di-{$action}.");
+
+            return response()->json(['success' => true, 'statistic' => $stat]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['success' => false, 'error' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * DELETE /api/admin/statistics/{id}
+     * Delete a statistic entry.
+     */
+    public function deleteStatistic($id)
+    {
+        try {
+            $stat = AppStatistic::findOrFail($id);
+            $label = $stat->label;
+            $stat->delete();
+
+            $this->logAudit(request(), 'DELETE', 'STATISTICS', "Statistik '{$label}' (ID: {$id}) dihapus.");
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {

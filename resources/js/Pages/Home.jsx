@@ -27,7 +27,55 @@ const stripHtml = (html) => {
 const iconMap = {
   ShieldCheck, Database, Mail, Server, Video,
   Link: LinkIcon, LinkIcon, Globe, Network, FileText, Map,
+  TrendingUp, Users, Cpu, BarChart3,
 };
+
+// --- Color token → Tailwind class mapping ---
+const colorTokenMap = {
+  emerald: {
+    border: "border-emerald-200/60 dark:border-emerald-900/40",
+    bg: "bg-emerald-100 dark:bg-emerald-900/30",
+    icon: "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400",
+  },
+  blue: {
+    border: "border-blue-200/60 dark:border-blue-900/40",
+    bg: "bg-blue-100 dark:bg-blue-900/30",
+    icon: "bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400",
+  },
+  purple: {
+    border: "border-purple-200/60 dark:border-purple-900/40",
+    bg: "bg-purple-100 dark:bg-purple-900/30",
+    icon: "bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400",
+  },
+  amber: {
+    border: "border-amber-200/60 dark:border-amber-900/40",
+    bg: "bg-amber-100 dark:bg-amber-900/30",
+    icon: "bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400",
+  },
+  red: {
+    border: "border-red-200/60 dark:border-red-900/40",
+    bg: "bg-red-100 dark:bg-red-900/30",
+    icon: "bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400",
+  },
+  indigo: {
+    border: "border-indigo-200/60 dark:border-indigo-900/40",
+    bg: "bg-indigo-100 dark:bg-indigo-900/30",
+    icon: "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400",
+  },
+  teal: {
+    border: "border-teal-200/60 dark:border-teal-900/40",
+    bg: "bg-teal-100 dark:bg-teal-900/30",
+    icon: "bg-teal-100 dark:bg-teal-900/50 text-teal-600 dark:text-teal-400",
+  },
+  rose: {
+    border: "border-rose-200/60 dark:border-rose-900/40",
+    bg: "bg-rose-100 dark:bg-rose-900/30",
+    icon: "bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400",
+  },
+};
+
+const getColorToken = (colorKey) =>
+  colorTokenMap[colorKey] || colorTokenMap.emerald;
 
 const getIcon = (iconName) => iconMap[iconName] || Globe;
 
@@ -40,22 +88,24 @@ const getCustomIconUrl = (iconPath) => {
   return `/uploads/${iconPath}`;
 };
 
-// --- Count-Up Hook ---
-const useCountUp = (target, duration = 1800) => {
+// --- Count-Up Hook (numeric values only) ---
+const useCountUp = (rawValue, duration = 1800) => {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
   const started = useRef(false);
 
+  // Extract numeric part from free-form string, e.g. "85.2" or "45"
+  const numericTarget = parseFloat(String(rawValue).replace(/[^0-9.]/g, ""));
+  const isNumeric = !isNaN(numericTarget) && numericTarget >= 0;
+
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || !isNumeric) return;
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && !started.current) {
         started.current = true;
-        const numericTarget = parseFloat(String(target).replace(/[^0-9.]/g, ""));
-        if (isNaN(numericTarget)) { setCount(target); return; }
         let start = 0;
-        const step = Math.ceil(numericTarget / (duration / 16));
+        const step = Math.max(1, Math.ceil(numericTarget / (duration / 16)));
         const timer = setInterval(() => {
           start += step;
           if (start >= numericTarget) { setCount(numericTarget); clearInterval(timer); }
@@ -65,15 +115,25 @@ const useCountUp = (target, duration = 1800) => {
     }, { threshold: 0.5 });
     observer.observe(el);
     return () => observer.disconnect();
-  }, [target, duration]);
+  }, [numericTarget, duration, isNumeric]);
 
-  const suffix = String(target).replace(/[0-9.]/g, "");
-  return { ref, display: `${Math.round(count)}${suffix}` };
+  // Format with locale for large numbers
+  const formatted = isNumeric
+    ? (numericTarget % 1 !== 0
+        ? count.toFixed(1)                                       // decimal
+        : new Intl.NumberFormat("id-ID").format(Math.round(count))) // integer
+    : String(rawValue); // non-numeric: show as-is
+
+  return { ref, formatted, isNumeric };
 };
 
 // --- Stat Card ---
-const StatCard = ({ label, value, desc, icon: Icon, color }) => {
-  const { ref, display } = useCountUp(value);
+// Accepts server-driven data: { label, value, suffix, desc, icon (string), color (token string) }
+const StatCard = ({ label, value, suffix, desc, icon: iconName, color: colorKey }) => {
+  const Icon = iconMap[iconName] || BarChart3;
+  const color = getColorToken(colorKey);
+  const { ref, formatted, isNumeric } = useCountUp(value);
+
   return (
     <div ref={ref} className={`relative p-6 bg-white dark:bg-slate-900 border ${color.border} rounded-2xl flex flex-col gap-3 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group`}>
       <div className={`absolute top-0 right-0 w-24 h-24 ${color.bg} rounded-bl-[60px] opacity-30 transition-opacity group-hover:opacity-50`} />
@@ -81,7 +141,9 @@ const StatCard = ({ label, value, desc, icon: Icon, color }) => {
         <Icon size={18} className="stroke-[2]" />
       </div>
       <div className="flex flex-col gap-0.5 relative z-10">
-        <span className="text-3xl font-black text-slate-900 dark:text-white leading-none tracking-tight">{display}</span>
+        <span className="text-3xl font-black text-slate-900 dark:text-white leading-none tracking-tight">
+          {isNumeric ? formatted : value}{suffix || ""}
+        </span>
         <span className="font-bold text-xs text-slate-700 dark:text-slate-300 mt-1">{label}</span>
         <span className="text-[10px] text-slate-400 font-medium">{desc}</span>
       </div>
@@ -124,44 +186,14 @@ export const Home = ({ dbStats, sliderImages, dbServices, welcomeSpeech, latestN
     }
   };
 
-  const getStatVal = (key, fallback) => {
-    const found = dbStats?.find((s) => s.key === key);
-    if (found) {
-      if (key === "TOTAL_VISITORS") return new Intl.NumberFormat("id-ID").format(found.value) + "+";
-      return String(found.value);
-    }
-    return fallback;
-  };
+  // Build dynamic stats from server-driven dbStats (already filtered & ordered by admin)
+  const stats = Array.isArray(dbStats) ? dbStats : [];
 
-  const stats = [
-    {
-      label: "Pengunjung Website", value: getStatVal("TOTAL_VISITORS", "14258+"),
-      desc: "Kunjungan tahun ini", icon: TrendingUp,
-      color: { border: "border-emerald-200/60 dark:border-emerald-900/40", bg: "bg-emerald-100 dark:bg-emerald-900/30", icon: "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400" }
-    },
-    {
-      label: "Sertifikat TTE Terbit", value: getStatVal("TOTAL_TTE_ISSUED", "377"),
-      desc: "Aparatur Sipil Negara", icon: ShieldCheck,
-      color: { border: "border-blue-200/60 dark:border-blue-900/40", bg: "bg-blue-100 dark:bg-blue-900/30", icon: "bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400" }
-    },
-    {
-      label: "Website OPD Aktif", value: getStatVal("OPD_WEBSITE_COUNT", "28"),
-      desc: "Portal Dinas / Kecamatan", icon: Users,
-      color: { border: "border-purple-200/60 dark:border-purple-900/40", bg: "bg-purple-100 dark:bg-purple-900/30", icon: "bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400" }
-    },
-    {
-      label: "Aplikasi Daerah", value: getStatVal("APP_OPD_COUNT", "45"),
-      desc: "Sistem SPBE Terintegrasi", icon: Cpu,
-      color: { border: "border-amber-200/60 dark:border-amber-900/40", bg: "bg-amber-100 dark:bg-amber-900/30", icon: "bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400" }
-    },
-  ];
-
-  // Build hero stats from live DB data
-  const heroStats = [
-    { label: "Layanan Digital", value: getStatVal("APP_OPD_COUNT", "12") + "+" },
-    { label: "Website OPD", value: getStatVal("OPD_WEBSITE_COUNT", "28") + "+" },
-    { label: "Aparatur TTE", value: getStatVal("TOTAL_TTE_ISSUED", "377") },
-  ];
+  // Build hero stats from the first 3 published statistics
+  const heroStats = stats.slice(0, 3).map((s) => ({
+    label: s.label,
+    value: `${s.value}${s.suffix || ""}`,
+  }));
 
   const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
   const siteOrigin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -255,17 +287,34 @@ export const Home = ({ dbStats, sliderImages, dbServices, welcomeSpeech, latestN
           <ScrollReveal className="text-center flex flex-col gap-2">
             <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Capaian Kinerja</span>
             <h2 className="font-black text-2xl md:text-3xl text-slate-900 dark:text-white">
-              Statistik Real-Time <span className="text-emerald-600 dark:text-emerald-400">Kinerja SPBE</span>
+              Statistik <span className="text-emerald-600 dark:text-emerald-400">Real-Time Kinerja</span>
             </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Transparansi penyelenggaraan pemerintahan berbasis data</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Transparansi penyelenggaraan pemerintahan berbasis data aktual</p>
           </ScrollReveal>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat, idx) => (
-              <ScrollReveal key={idx} delay={idx * 80}>
-                <StatCard {...stat} />
-              </ScrollReveal>
-            ))}
-          </div>
+          {stats.length > 0 ? (
+            <div className={`grid grid-cols-1 sm:grid-cols-2 ${
+              stats.length <= 2 ? 'lg:grid-cols-2' :
+              stats.length === 3 ? 'lg:grid-cols-3' :
+              'lg:grid-cols-4'
+            } gap-6`}>
+              {stats.map((stat, idx) => (
+                <ScrollReveal key={stat.id || idx} delay={idx * 80}>
+                  <StatCard
+                    label={stat.label}
+                    value={stat.value}
+                    suffix={stat.suffix}
+                    desc={stat.desc}
+                    icon={stat.icon}
+                    color={stat.color}
+                  />
+                </ScrollReveal>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-10 text-sm text-slate-400 font-medium">
+              Belum ada data statistik yang dipublikasikan.
+            </div>
+          )}
         </section>
 
         {/* 4. Layanan Digital Gateway */}
