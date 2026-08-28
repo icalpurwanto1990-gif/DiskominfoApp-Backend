@@ -41,11 +41,60 @@ class Post extends Model
 
     public function getImageAttribute($value)
     {
-        if ($value && ! str_starts_with($value, 'http://') && ! str_starts_with($value, 'https://') && ! str_starts_with($value, '/')) {
-            return '/uploads/'.$value;
+        if (! $value) {
+            return null;
         }
 
-        return $value;
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+            return $value;
+        }
+
+        // If inside Filament Admin panel routes, return raw relative path e.g. 'posts/xyz.jpg'
+        // so Filament FileUpload and ImageColumn components do not fail with PathTraversalDetected
+        if (request()->is('admin*') || request()->routeIs('filament.*')) {
+            return ltrim(preg_replace('#^/?uploads/#', '', $value), '/');
+        }
+
+        // For frontend clients, ensure it starts with /uploads/
+        if (str_starts_with($value, '/uploads/')) {
+            return $value;
+        }
+
+        if (str_starts_with($value, '/')) {
+            return $value;
+        }
+
+        return '/uploads/' . $value;
+    }
+
+    public function setImageAttribute($value)
+    {
+        if ($value && ! str_starts_with($value, 'http://') && ! str_starts_with($value, 'https://')) {
+            $this->attributes['image'] = ltrim(preg_replace('#^/?uploads/#', '', $value), '/');
+        } else {
+            $this->attributes['image'] = $value;
+        }
+    }
+
+    public function getRawImagePath(): ?string
+    {
+        return $this->getRawOriginal('image');
+    }
+
+    public function getPublicImageUrl(): ?string
+    {
+        $value = $this->getRawOriginal('image');
+        if (! $value) {
+            return null;
+        }
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, '/uploads/')) {
+            return $value;
+        }
+        if (str_starts_with($value, '/')) {
+            return $value;
+        }
+
+        return '/uploads/' . ltrim($value, '/');
     }
 
     public function getContentAttribute($value)

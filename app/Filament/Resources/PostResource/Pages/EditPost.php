@@ -16,4 +16,13 @@ class EditPost extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        if (empty($this->record->authorId) && empty($data['authorId'])) {
+            $data['authorId'] = auth()->id() ?? \App\Models\User::first()?->id;
+        }
+
+        return $data;
+    }
 }
