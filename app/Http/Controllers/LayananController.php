@@ -57,17 +57,11 @@ class LayananController extends Controller
                 'status' => 'PENDING',
             ]);
 
-            // Increment service requests counter in app statistic
+            // Sync service requests counter in app statistic if it exists
             try {
                 $stat = AppStatistic::where('key', 'TOTAL_SERVICES_REQUESTED')->first();
                 if ($stat) {
-                    $stat->increment('value');
-                } else {
-                    AppStatistic::create([
-                        'id' => (string) Str::uuid(),
-                        'key' => 'TOTAL_SERVICES_REQUESTED',
-                        'value' => 1,
-                    ]);
+                    $stat->update(['value' => (string) ServiceRequest::count()]);
                 }
             } catch (\Exception $e) {
                 // Skip if not exist or error

@@ -39,7 +39,9 @@ class DashboardController extends Controller
                 'TOTAL_TTE_ISSUED'         => ($statsMap['TOTAL_TTE_ISSUED'] ?? 377) + $actualCompletedTteCount,
                 'APP_OPD_COUNT'            => $actualDigitalServiceCount > 0 ? $actualDigitalServiceCount : ($statsMap['APP_OPD_COUNT'] ?? 45),
                 'OPD_WEBSITE_COUNT'        => $statsMap['OPD_WEBSITE_COUNT'] ?? 28,
-                'TOTAL_SERVICES_REQUESTED' => ($statsMap['TOTAL_SERVICES_REQUESTED'] ?? 684) + $actualSrvRequestCount,
+                'TOTAL_SERVICES_REQUESTED' => isset($statsMap['TOTAL_SERVICES_REQUESTED']) && is_numeric($statsMap['TOTAL_SERVICES_REQUESTED'])
+                    ? (int) $statsMap['TOTAL_SERVICES_REQUESTED']
+                    : $actualSrvRequestCount,
             ];
 
             // 2. TTE Monthly Data (default: tahun berjalan)

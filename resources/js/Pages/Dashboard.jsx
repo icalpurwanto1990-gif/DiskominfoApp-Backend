@@ -17,7 +17,7 @@ export const Dashboard = () => {
     TOTAL_TTE_ISSUED: 377,
     APP_OPD_COUNT: 45,
     OPD_WEBSITE_COUNT: 28,
-    TOTAL_SERVICES_REQUESTED: 684,
+    TOTAL_SERVICES_REQUESTED: 0,
   });
 
   const [tteMonthlyData, setTteMonthlyData] = useState([
