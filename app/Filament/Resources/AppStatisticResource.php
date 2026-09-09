@@ -55,7 +55,9 @@ class AppStatisticResource extends Resource
                             ->maxLength(50)
                             ->label('Nilai Statistik (Value)')
                             ->placeholder('e.g., 85.20 atau 377 atau A')
-                            ->helperText('Nilai capaian (bisa berupa angka, desimal, huruf, atau kategori).')
+                            ->helperText(fn ($get) => $get('key') === 'TOTAL_VISITORS'
+                                ? '⚡ Otomatis terakumulasi oleh sistem dari lalu lintas pengunjung website. Anda dapat menyesuaikan angka dasar di sini jika diperlukan.'
+                                : 'Nilai capaian (bisa berupa angka, desimal, huruf, atau kategori).')
                             ->columnSpan(1),
 
                         Forms\Components\TextInput::make('suffix')
@@ -154,16 +156,21 @@ class AppStatisticResource extends Resource
 
                 Tables\Columns\TextColumn::make('key')
                     ->badge()
-                    ->color('gray')
+                    ->color(fn ($state): string => $state === 'TOTAL_VISITORS' ? 'success' : 'gray')
+                    ->icon(fn ($state): ?string => $state === 'TOTAL_VISITORS' ? 'heroicon-m-bolt' : null)
+                    ->description(fn (AppStatistic $record): ?string => $record->key === 'TOTAL_VISITORS' ? '⚡ Otomatis (Live)' : null)
                     ->searchable()
                     ->label('Kunci (Key)'),
 
                 Tables\Columns\TextColumn::make('value')
                     ->label('Nilai Publikasi')
-                    ->formatStateUsing(fn ($state, AppStatistic $record): string => "{$state}" . ($record->suffix ? " {$record->suffix}" : ''))
+                    ->formatStateUsing(function ($state, AppStatistic $record): string {
+                        $displayVal = is_numeric($state) ? number_format((float) $state, 0, ',', '.') : $state;
+                        return "{$displayVal}" . ($record->suffix ? " {$record->suffix}" : '');
+                    })
                     ->sortable()
                     ->weight('bold')
-                    ->color('primary'),
+                    ->color(fn (AppStatistic $record): string => $record->key === 'TOTAL_VISITORS' ? 'success' : 'primary'),
 
                 Tables\Columns\TextColumn::make('icon')
                     ->badge()

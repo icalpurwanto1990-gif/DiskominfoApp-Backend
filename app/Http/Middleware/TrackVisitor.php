@@ -47,10 +47,30 @@ class TrackVisitor
                     'visited_at' => now(),
                 ]);
 
-                // Dynamic increment TOTAL_VISITORS
-                $stat = AppStatistic::where('key', 'TOTAL_VISITORS')->first();
+                // Dynamic increment TOTAL_VISITORS safely (compatible with PostgreSQL, MySQL, SQLite)
+                $stat = AppStatistic::firstOrCreate(
+                    ['key' => 'TOTAL_VISITORS'],
+                    [
+                        'id'           => (string) Str::uuid(),
+                        'label'        => 'Pengunjung Website',
+                        'value'        => '1',
+                        'suffix'       => '+',
+                        'desc'         => 'Total kunjungan terakumulasi',
+                        'icon'         => 'TrendingUp',
+                        'color'        => 'emerald',
+                        'is_published' => true,
+                        'order_index'  => 1,
+                    ]
+                );
+
                 if ($stat) {
-                    $stat->increment('value');
+                    $current = is_numeric($stat->value) ? (int) $stat->value : 0;
+                    if ($current <= 0) {
+                        $current = VisitorLog::count();
+                    } else {
+                        $current += 1;
+                    }
+                    $stat->update(['value' => (string) $current]);
                 }
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::error('TrackVisitor failed: ' . $e->getMessage());
