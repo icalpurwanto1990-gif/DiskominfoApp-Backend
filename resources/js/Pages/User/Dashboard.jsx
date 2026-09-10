@@ -3,7 +3,8 @@ import { Link } from "@inertiajs/react";
 import { 
   Landmark, User, Shield, FileText, Clock, CheckCircle2, 
   AlertCircle, LogOut, PlusCircle, ArrowLeft, RefreshCw,
-  FolderOpen, Key, Upload, Trash2, Edit2, CheckSquare
+  FolderOpen, Key, Upload, Trash2, Edit2, CheckSquare,
+  ExternalLink
 } from "lucide-react";
 
 export default function UserDashboard({ serviceRequests: initialSrv, ppidRequests: initialPpid, tteRequests: initialTte, auditLogs: initialLogs }) {
@@ -46,6 +47,7 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
   const [serviceInstansi, setServiceInstansi] = useState("");
   const [serviceDetails, setServiceDetails] = useState({});
   const [submittingServiceEdit, setSubmittingServiceEdit] = useState(false);
+  const [uploadingServiceFiles, setUploadingServiceFiles] = useState({});
 
   useEffect(() => {
     const userSessionStr = localStorage.getItem("userSession");
@@ -319,7 +321,23 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
     setServiceApplicantEmail(req.applicantEmail || (user ? user.email : ""));
     setServiceInstansi(req.instansi || (user ? user.instansi || "" : ""));
     setServiceDetails(req.details ? { ...req.details } : {});
+    setUploadingServiceFiles({});
     setEditServiceModalOpen(true);
+  };
+
+  const isFileField = (key, value) => {
+    const lowerKey = (key || "").toLowerCase();
+    const strVal = String(value || "");
+    const fileKeywords = ["dokumen", "berkas", "file", "lampiran", "surat", "ktp", "sk", "proposal", "rekomendasi"];
+    const fileExtensions = [".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx", ".zip", ".rar"];
+
+    const keyMatches = fileKeywords.some(kw => lowerKey.includes(kw));
+    const valIsFile = strVal.startsWith("http://") || 
+                      strVal.startsWith("https://") || 
+                      strVal.startsWith("/uploads/") || 
+                      fileExtensions.some(ext => strVal.toLowerCase().endsWith(ext));
+
+    return keyMatches || valIsFile;
   };
 
   const handleServiceDetailChange = (key, value) => {
@@ -327,6 +345,40 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
       ...prev,
       [key]: value
     }));
+  };
+
+  const handleServiceFileUpload = async (fieldKey, file) => {
+    if (!file) return;
+
+    setUploadingServiceFiles(prev => ({ ...prev, [fieldKey]: true }));
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        headers: {
+          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || ""
+        },
+        body: formData
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setServiceDetails(prev => ({
+          ...prev,
+          [fieldKey]: data.url
+        }));
+        alert(`Berkas untuk '${fieldKey.replace(/_/g, ' ')}' berhasil diunggah!`);
+      } else {
+        alert(data.error || "Gagal mengunggah berkas.");
+      }
+    } catch (err) {
+      console.error("Gagal upload berkas:", err);
+      alert("Terjadi kesalahan jaringan saat mengunggah berkas.");
+    } finally {
+      setUploadingServiceFiles(prev => ({ ...prev, [fieldKey]: false }));
+    }
   };
 
   const handleServiceEditSubmit = async (e) => {
@@ -638,12 +690,33 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
                       </div>
                       <div className="flex flex-col gap-1 p-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-xl font-bold">
                         <span className="text-[9px] text-slate-400 font-bold uppercase mb-1">Tipe Layanan: {req.serviceType}</span>
-                        {req.details ? Object.entries(req.details).map(([k, v]) => (
-                          <div key={k} className="flex justify-between text-[10px] gap-2 border-b border-slate-50 dark:border-slate-850 last:border-b-0 pb-1">
-                            <span className="text-slate-400">{k}</span>
-                            <span className="truncate max-w-[200px]">{String(v)}</span>
-                          </div>
-                        )) : null}
+                        {req.details ? Object.entries(req.details).map(([k, v]) => {
+                          const strVal = String(v || "");
+                          const isFile = strVal.startsWith("http://") || 
+                                         strVal.startsWith("https://") || 
+                                         strVal.startsWith("/uploads/") || 
+                                         [".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx"].some(ext => strVal.toLowerCase().endsWith(ext));
+
+                          return (
+                            <div key={k} className="flex justify-between items-center text-[10px] gap-2 border-b border-slate-50 dark:border-slate-850 last:border-b-0 pb-1">
+                              <span className="text-slate-400 capitalize">{k.replace(/_/g, ' ')}</span>
+                              {isFile ? (
+                                <a
+                                  href={strVal}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 font-semibold truncate max-w-[180px]"
+                                >
+                                  <FileText size={11} className="flex-shrink-0" />
+                                  <span className="truncate">{strVal.split("/").pop()}</span>
+                                  <ExternalLink size={9} className="flex-shrink-0 opacity-70" />
+                                </a>
+                              ) : (
+                                <span className="truncate max-w-[200px] text-slate-800 dark:text-slate-200">{strVal}</span>
+                              )}
+                            </div>
+                          );
+                        }) : null}
                       </div>
                       {req.notes && (
                         <div className={`p-3 border rounded-xl flex flex-col gap-2.5 ${
@@ -1274,29 +1347,91 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
                     Tidak ada parameter rincian tambahan untuk layanan ini.
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-3">
-                    {Object.entries(serviceDetails).map(([key, val]) => (
-                      <div key={key} className="flex flex-col gap-1">
-                        <label className="text-[10px] uppercase font-bold text-slate-400">
-                          {key.replace(/_/g, ' ')}
-                        </label>
-                        {typeof val === 'string' && val.length > 80 ? (
-                          <textarea
-                            rows={3}
-                            value={val}
-                            onChange={(e) => handleServiceDetailChange(key, e.target.value)}
-                            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 focus:ring-2 focus:ring-amber-500 focus:outline-none dark:text-white text-xs font-semibold leading-relaxed"
-                          />
-                        ) : (
-                          <input
-                            type="text"
-                            value={String(val || "")}
-                            onChange={(e) => handleServiceDetailChange(key, e.target.value)}
-                            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none dark:text-white text-xs font-semibold"
-                          />
-                        )}
-                      </div>
-                    ))}
+                  <div className="flex flex-col gap-4">
+                    {Object.entries(serviceDetails).map(([key, val]) => {
+                      const isFile = isFileField(key, val);
+                      const isUploading = !!uploadingServiceFiles[key];
+
+                      if (isFile) {
+                        return (
+                          <div key={key} className="flex flex-col gap-2 p-3.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 rounded-2xl">
+                            <div className="flex items-center justify-between">
+                              <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                                <FileText size={13} className="text-amber-500" />
+                                <span>{key.replace(/_/g, ' ')}</span>
+                              </label>
+                              {val && (
+                                <a
+                                  href={String(val)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 font-bold"
+                                >
+                                  <span>Lihat Berkas Sebelumnya</span>
+                                  <ExternalLink size={10} />
+                                </a>
+                              )}
+                            </div>
+
+                            {/* File Upload Input */}
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                              <label className="relative flex-1 cursor-pointer">
+                                <input
+                                  type="file"
+                                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.zip,.rar,application/pdf,image/*"
+                                  onChange={(e) => handleServiceFileUpload(key, e.target.files[0])}
+                                  disabled={isUploading}
+                                  className="w-full text-xs file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-[11px] file:font-bold file:bg-amber-500/10 file:text-amber-700 dark:file:text-amber-400 hover:file:bg-amber-500/20 text-slate-500 dark:text-slate-400 cursor-pointer bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl pr-3 focus:outline-none py-1.5"
+                                />
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="URL Berkas..."
+                                value={String(val || "")}
+                                onChange={(e) => handleServiceDetailChange(key, e.target.value)}
+                                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:outline-none dark:text-white text-xs font-semibold sm:w-44 truncate"
+                              />
+                            </div>
+
+                            {/* Upload status indicator */}
+                            {isUploading && (
+                              <span className="text-[10px] text-amber-600 dark:text-amber-400 font-bold animate-pulse flex items-center gap-1">
+                                <RefreshCw size={11} className="animate-spin" />
+                                Mengunggah berkas baru ke server...
+                              </span>
+                            )}
+                            {val && !isUploading && (
+                              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold truncate">
+                                ✓ Berkas aktif: {String(val).split("/").pop()}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div key={key} className="flex flex-col gap-1">
+                          <label className="text-[10px] uppercase font-bold text-slate-400">
+                            {key.replace(/_/g, ' ')}
+                          </label>
+                          {typeof val === 'string' && val.length > 80 ? (
+                            <textarea
+                              rows={3}
+                              value={val}
+                              onChange={(e) => handleServiceDetailChange(key, e.target.value)}
+                              className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 focus:ring-2 focus:ring-amber-500 focus:outline-none dark:text-white text-xs font-semibold leading-relaxed"
+                            />
+                          ) : (
+                            <input
+                              type="text"
+                              value={String(val || "")}
+                              onChange={(e) => handleServiceDetailChange(key, e.target.value)}
+                              className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none dark:text-white text-xs font-semibold"
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -1316,11 +1451,17 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
                 </button>
                 <button
                   type="submit"
-                  disabled={submittingServiceEdit}
+                  disabled={submittingServiceEdit || Object.values(uploadingServiceFiles).some(Boolean)}
                   className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all shadow-md shadow-amber-600/15 flex items-center gap-1.5 focus:outline-none active:scale-95 disabled:opacity-50"
                 >
                   <CheckSquare size={14} />
-                  <span>{submittingServiceEdit ? "Mengirim..." : "Kirim Ulang Perbaikan"}</span>
+                  <span>
+                    {submittingServiceEdit 
+                      ? "Mengirim..." 
+                      : Object.values(uploadingServiceFiles).some(Boolean)
+                        ? "Sedang Mengunggah Berkas..."
+                        : "Kirim Ulang Perbaikan"}
+                  </span>
                 </button>
               </div>
 
