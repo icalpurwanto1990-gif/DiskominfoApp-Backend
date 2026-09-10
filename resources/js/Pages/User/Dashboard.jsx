@@ -37,6 +37,16 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
   const [uploadingKtp, setUploadingKtp] = useState(false);
   const [submittingTte, setSubmittingTte] = useState(false);
 
+  // Service Request (Tiket Layanan Digital) Edit Modal States
+  const [editServiceModalOpen, setEditServiceModalOpen] = useState(false);
+  const [editingService, setEditingService] = useState(null);
+  const [serviceApplicantName, setServiceApplicantName] = useState("");
+  const [serviceApplicantPhone, setServiceApplicantPhone] = useState("");
+  const [serviceApplicantEmail, setServiceApplicantEmail] = useState("");
+  const [serviceInstansi, setServiceInstansi] = useState("");
+  const [serviceDetails, setServiceDetails] = useState({});
+  const [submittingServiceEdit, setSubmittingServiceEdit] = useState(false);
+
   useEffect(() => {
     const userSessionStr = localStorage.getItem("userSession");
     if (userSessionStr) {
@@ -299,6 +309,69 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
       alert("Terjadi kesalahan koneksi.");
     } finally {
       setSubmittingTte(false);
+    }
+  };
+
+  const openEditServiceModal = (req) => {
+    setEditingService(req);
+    setServiceApplicantName(req.applicantName || (user ? user.name : ""));
+    setServiceApplicantPhone(req.applicantPhone || (user ? user.phone || "" : ""));
+    setServiceApplicantEmail(req.applicantEmail || (user ? user.email : ""));
+    setServiceInstansi(req.instansi || (user ? user.instansi || "" : ""));
+    setServiceDetails(req.details ? { ...req.details } : {});
+    setEditServiceModalOpen(true);
+  };
+
+  const handleServiceDetailChange = (key, value) => {
+    setServiceDetails(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  const handleServiceEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!editingService) return;
+
+    if (!serviceApplicantName || !serviceApplicantEmail || !serviceApplicantPhone || !serviceInstansi) {
+      alert("Harap lengkapi semua identitas pemohon.");
+      return;
+    }
+
+    setSubmittingServiceEdit(true);
+
+    const payload = {
+      ticketNumber: editingService.ticketNumber,
+      applicantName: serviceApplicantName,
+      applicantEmail: serviceApplicantEmail,
+      applicantPhone: serviceApplicantPhone,
+      instansi: serviceInstansi,
+      details: serviceDetails
+    };
+
+    try {
+      const res = await fetch("/api/layanan/pengajuan/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || ""
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert(data.message || "Perbaikan berhasil dikirim ulang ke Admin.");
+        setEditServiceModalOpen(false);
+        setEditingService(null);
+        handleRefresh();
+      } else {
+        alert(data.error || "Gagal mengirim perbaikan pengajuan.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan koneksi saat mengirim perbaikan.");
+    } finally {
+      setSubmittingServiceEdit(false);
     }
   };
 
@@ -573,18 +646,31 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
                         )) : null}
                       </div>
                       {req.notes && (
-                        <div className={`p-3 border rounded-xl flex gap-2 ${
-                          req.status === "PERBAIKAN"
+                        <div className={`p-3 border rounded-xl flex flex-col gap-2.5 ${
+                          req.status === "PERBAIKAN" || req.status === "REVISI"
                             ? "bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-400"
                             : "bg-emerald-500/5 border-emerald-500/10 text-emerald-700 dark:text-emerald-400"
                         }`}>
-                          <CheckCircle2 size={13} className="flex-shrink-0 mt-0.5" />
-                          <div className="flex flex-col">
-                            <span className="font-bold text-[9px] uppercase tracking-wider leading-none">
-                              {req.status === "PERBAIKAN" ? "Instruksi Perbaikan Admin" : "Respon Admin"}
-                            </span>
-                            <p className="text-[10px] font-semibold mt-1">{req.notes}</p>
+                          <div className="flex gap-2">
+                            <CheckCircle2 size={13} className="flex-shrink-0 mt-0.5" />
+                            <div className="flex flex-col">
+                              <span className="font-bold text-[9px] uppercase tracking-wider leading-none">
+                                {req.status === "PERBAIKAN" || req.status === "REVISI" ? "Instruksi Perbaikan Admin" : "Respon Admin"}
+                              </span>
+                              <p className="text-[10px] font-semibold mt-1">{req.notes}</p>
+                            </div>
                           </div>
+
+                          {(req.status === "PERBAIKAN" || req.status === "REVISI") && (
+                            <button
+                              type="button"
+                              onClick={() => openEditServiceModal(req)}
+                              className="mt-1 flex items-center justify-center gap-1.5 px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-[10px] uppercase tracking-wider transition-all self-end shadow-md shadow-amber-600/15 active:scale-95 focus:outline-none"
+                            >
+                              <Edit2 size={11} />
+                              <span>Perbaiki Pengajuan</span>
+                            </button>
+                          )}
                         </div>
                       )}
                     </div>
@@ -1073,6 +1159,168 @@ export default function UserDashboard({ serviceRequests: initialSrv, ppidRequest
                 >
                   <CheckSquare size={13} />
                   <span>Kirim Permohonan</span>
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Service Request Revision / Edit Modal */}
+      {editServiceModalOpen && editingService && (
+        <div className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-xl p-6 md:p-8 rounded-3xl shadow-2xl flex flex-col gap-6 relative max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => {
+                setEditServiceModalOpen(false);
+                setEditingService(null);
+              }}
+              className="absolute top-6 right-6 p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-lg focus:outline-none"
+            >
+              <ArrowLeft size={16} />
+            </button>
+
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-600 flex items-center gap-1.5">
+                <RefreshCw size={13} className="animate-spin-slow" />
+                Perbaikan Usulan Layanan Digital
+              </span>
+              <h3 className="font-extrabold text-base text-slate-900 dark:text-white">
+                Tiket #{editingService.ticketNumber}
+              </h3>
+              <span className="text-xs text-slate-400">
+                Tipe Layanan: <strong className="text-slate-700 dark:text-slate-200">{editingService.serviceType}</strong>
+              </span>
+            </div>
+
+            {/* Admin Instruction Banner */}
+            {editingService.notes && (
+              <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex gap-3 text-amber-800 dark:text-amber-400">
+                <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider">
+                    Catatan Perbaikan dari Verifikator / Admin:
+                  </span>
+                  <p className="text-xs font-semibold leading-relaxed">
+                    {editingService.notes}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleServiceEditSubmit} className="flex flex-col gap-5 text-xs font-semibold text-slate-700 dark:text-slate-350">
+              
+              {/* Section: Identitas Pemohon */}
+              <div className="flex flex-col gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                  1. Data Kontak Pemohon
+                </span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] uppercase font-bold text-slate-400">Nama Lengkap</label>
+                    <input
+                      type="text"
+                      required
+                      value={serviceApplicantName}
+                      onChange={(e) => setServiceApplicantName(e.target.value)}
+                      className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none dark:text-white text-xs font-semibold"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] uppercase font-bold text-slate-400">No. HP / WhatsApp</label>
+                    <input
+                      type="text"
+                      required
+                      value={serviceApplicantPhone}
+                      onChange={(e) => setServiceApplicantPhone(e.target.value)}
+                      className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none dark:text-white text-xs font-semibold"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] uppercase font-bold text-slate-400">Email Pemohon</label>
+                    <input
+                      type="email"
+                      required
+                      value={serviceApplicantEmail}
+                      onChange={(e) => setServiceApplicantEmail(e.target.value)}
+                      className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none dark:text-white text-xs font-semibold"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] uppercase font-bold text-slate-400">Instansi / Unit Kerja / OPD</label>
+                    <input
+                      type="text"
+                      required
+                      value={serviceInstansi}
+                      onChange={(e) => setServiceInstansi(e.target.value)}
+                      className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none dark:text-white text-xs font-semibold"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section: Rincian Usulan Layanan */}
+              <div className="flex flex-col gap-3">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                  2. Rincian Formulir Usulan
+                </span>
+                
+                {Object.keys(serviceDetails).length === 0 ? (
+                  <div className="p-3 bg-slate-50 dark:bg-slate-950/50 rounded-xl text-slate-400 text-xs italic">
+                    Tidak ada parameter rincian tambahan untuk layanan ini.
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    {Object.entries(serviceDetails).map(([key, val]) => (
+                      <div key={key} className="flex flex-col gap-1">
+                        <label className="text-[10px] uppercase font-bold text-slate-400">
+                          {key.replace(/_/g, ' ')}
+                        </label>
+                        {typeof val === 'string' && val.length > 80 ? (
+                          <textarea
+                            rows={3}
+                            value={val}
+                            onChange={(e) => handleServiceDetailChange(key, e.target.value)}
+                            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 focus:ring-2 focus:ring-amber-500 focus:outline-none dark:text-white text-xs font-semibold leading-relaxed"
+                          />
+                        ) : (
+                          <input
+                            type="text"
+                            value={String(val || "")}
+                            onChange={(e) => handleServiceDetailChange(key, e.target.value)}
+                            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none dark:text-white text-xs font-semibold"
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-2.5 mt-2 border-t border-slate-100 dark:border-slate-800 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditServiceModalOpen(false);
+                    setEditingService(null);
+                  }}
+                  disabled={submittingServiceEdit}
+                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs uppercase tracking-wider transition-all focus:outline-none"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingServiceEdit}
+                  className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all shadow-md shadow-amber-600/15 flex items-center gap-1.5 focus:outline-none active:scale-95 disabled:opacity-50"
+                >
+                  <CheckSquare size={14} />
+                  <span>{submittingServiceEdit ? "Mengirim..." : "Kirim Ulang Perbaikan"}</span>
                 </button>
               </div>
 
