@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title inertia>{{ config('app.name', 'Portal Diskominfo') }}</title>
+        <title inertia>{{ config('app.name', 'Diskominfo Banggai Kepulauan | Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan') }}</title>
 
         <!-- Favicon & App Icons -->
         <!-- Cara ganti: replace file di public/images/ dengan nama yang sama, lalu hard-refresh browser (Ctrl+Shift+R) -->
@@ -14,10 +14,36 @@
         <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
         <link rel="shortcut icon" href="/images/favicon.png">
 
-        <!-- SEO Meta -->
-        <meta name="description" content="Portal Resmi Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan — Layanan Digital, PPID, Satu Data, dan Smart Government SPBE.">
-        <meta name="keywords" content="Diskominfo, Banggai Kepulauan, SPBE, Layanan Digital, PPID, Satu Data">
+        <!-- Primary SEO Meta Tags -->
+        <meta name="title" content="Diskominfo Banggai Kepulauan | Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan">
+        <meta name="description" content="Portal Resmi Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan — Layanan Publik Digital, PPID, Satu Data Daerah, dan Smart Government SPBE Bangkep.">
+        <meta name="keywords" content="Diskominfo Banggai Kepulauan, Dinas Komunikasi dan Informatika Banggai Kepulauan, Diskominfo Bangkep, SPBE Banggai Kepulauan, PPID Bangkep, Satu Data Banggai Kepulauan, Pemkab Banggai Kepulauan">
+        <meta name="author" content="Diskominfo Kabupaten Banggai Kepulauan">
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+        <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+        <link rel="canonical" href="{{ url()->current() }}">
+
+        <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
+        <meta property="og:site_name" content="Diskominfo Kabupaten Banggai Kepulauan">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:title" content="Diskominfo Banggai Kepulauan | Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan">
+        <meta property="og:description" content="Portal Resmi Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan — Layanan Digital, PPID, Satu Data, dan Smart Government SPBE.">
+        <meta property="og:image" content="{{ asset('images/favicon.png') }}">
+        <meta property="og:locale" content="id_ID">
+
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:url" content="{{ url()->current() }}">
+        <meta name="twitter:title" content="Diskominfo Banggai Kepulauan | Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan">
+        <meta name="twitter:description" content="Portal Resmi Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan — Layanan Digital, PPID, Satu Data, dan Smart Government SPBE.">
+        <meta name="twitter:image" content="{{ asset('images/favicon.png') }}">
+
+        <!-- Google Site Verification (Opsional via .env GOOGLE_SITE_VERIFICATION) -->
+        @if(env('GOOGLE_SITE_VERIFICATION'))
+        <meta name="google-site-verification" content="{{ env('GOOGLE_SITE_VERIFICATION') }}">
+        @endif
+
         <meta name="theme-color" content="#059669">
 
         <!-- Google Fonts: Inter -->

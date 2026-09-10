@@ -225,18 +225,18 @@ export const Layanan = () => {
     );
   }
 
-  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const officialUrl = "https://diskominfo.banggaikep.go.id/layanan";
 
   return (
     <MainLayout>
       <Head>
-        <title>Portal Layanan Digital - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan</title>
-        <meta name="description" content="Pelayanan mandiri urusan persandian, infrastruktur TIK, & sistem informatika pemerintah daerah Kabupaten Banggai Kepulauan." />
-        <meta name="keywords" content="Layanan Digital Banggai Kepulauan, Pengajuan TTE, Domain Desa, Hosting Pemda" />
-        <link rel="canonical" href={pageUrl || "http://localhost:3001/layanan"} />
-        <meta property="og:title" content="Portal Layanan Digital - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan" />
+        <title>Layanan Digital SPBE | Diskominfo Banggai Kepulauan</title>
+        <meta name="description" content="Portal pengajuan pelayanan mandiri urusan persandian TTE, infrastruktur TIK, & sistem informatika daerah Diskominfo Kabupaten Banggai Kepulauan." />
+        <meta name="keywords" content="Layanan Digital Banggai Kepulauan, Pengajuan TTE Bangkep, Domain Desa Bangkep, Hosting Pemda Banggai Kepulauan, Diskominfo Bangkep" />
+        <link rel="canonical" href={officialUrl} />
+        <meta property="og:title" content="Layanan Digital SPBE | Diskominfo Banggai Kepulauan" />
         <meta property="og:description" content="Pelayanan mandiri urusan persandian, infrastruktur TIK, & sistem informatika pemerintah daerah Kabupaten Banggai Kepulauan." />
-        <meta property="og:url" content={pageUrl || "http://localhost:3001/layanan"} />
+        <meta property="og:url" content={officialUrl} />
         <meta property="og:type" content="website" />
       </Head>
       {/* Premium Page Hero */}

@@ -195,31 +195,47 @@ export const Home = ({ dbStats, sliderImages, dbServices, welcomeSpeech, latestN
     value: `${s.value}${s.suffix || ""}`,
   }));
 
-  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
-  const siteOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+  const officialUrl = "https://diskominfo.banggaikep.go.id";
 
   return (
     <MainLayout>
       <Head>
-        <title>Beranda - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan</title>
-        <meta name="description" content="Portal Resmi Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan — Layanan Digital, PPID, Satu Data, dan Smart Government SPBE." />
-        <meta name="keywords" content="Diskominfo, Banggai Kepulauan, SPBE, Layanan Digital, PPID, Satu Data, Portal Resmi" />
-        <link rel="canonical" href={pageUrl || "http://localhost:3001/"} />
-        <meta property="og:title" content="Beranda - Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan" />
+        <title>Diskominfo Banggai Kepulauan | Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan</title>
+        <meta name="description" content="Portal Resmi Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan — Layanan Publik Digital, PPID, Satu Data Daerah, dan Smart Government SPBE." />
+        <meta name="keywords" content="Diskominfo Banggai Kepulauan, Dinas Komunikasi dan Informatika Banggai Kepulauan, Diskominfo Bangkep, SPBE Banggai Kepulauan, Layanan Digital Bangkep, PPID Bangkep, Satu Data Banggai Kepulauan, Portal Resmi Bangkep" />
+        <link rel="canonical" href={officialUrl} />
+        <meta property="og:title" content="Diskominfo Banggai Kepulauan | Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan" />
         <meta property="og:description" content="Portal Resmi Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan — Layanan Digital, PPID, Satu Data, dan Smart Government SPBE." />
-        <meta property="og:url" content={pageUrl || "http://localhost:3001/"} />
+        <meta property="og:url" content={officialUrl} />
         <meta property="og:type" content="website" />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "GovernmentOrganization",
             "name": "Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan",
-            "url": siteOrigin || "http://localhost:3001",
-            "logo": `${siteOrigin || "http://localhost:3001"}/images/favicon.png`,
+            "alternateName": [
+              "Diskominfo Banggai Kepulauan",
+              "Diskominfo Bangkep",
+              "Dinas Kominfo Banggai Kepulauan"
+            ],
+            "url": officialUrl,
+            "logo": `${officialUrl}/images/favicon.png`,
+            "description": "Portal Resmi Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan — Layanan Publik Digital, Satu Data Daerah, PPID, dan Smart Government SPBE Bangkep.",
+            "parentOrganization": {
+              "@type": "GovernmentOrganization",
+              "name": "Pemerintah Kabupaten Banggai Kepulauan",
+              "url": "https://banggaikep.go.id"
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Salakan",
+              "addressRegion": "Sulawesi Tengah",
+              "addressCountry": "ID"
+            },
             "contactPoint": {
               "@type": "ContactPoint",
-              "telephone": "+62-811-XXXX-XXXX",
-              "contactType": "Customer Service"
+              "contactType": "Customer Service",
+              "availableLanguage": ["Indonesian"]
             }
           })}
         </script>

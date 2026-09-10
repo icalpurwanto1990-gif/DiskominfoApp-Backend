@@ -53,25 +53,24 @@ export const BeritaDetail = ({ post, categories }) => {
     );
   }
 
-  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
-  const siteOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+  const articleUrl = `https://diskominfo.banggaikep.go.id/berita/${post.slug}`;
   const plainDesc = post ? stripHtml(post.content).substring(0, 160) + "..." : "";
-  const postImage = post && post.image ? (post.image.startsWith("http") ? post.image : `${siteOrigin}${post.image}`) : `${siteOrigin}/images/default-news.png`;
+  const postImage = post && post.image ? (post.image.startsWith("http") ? post.image : `https://diskominfo.banggaikep.go.id${post.image}`) : `https://diskominfo.banggaikep.go.id/images/default-news.png`;
 
   return (
     <MainLayout>
       <Head>
-        <title>{`${post.title} - Dinas Komunikasi dan Informatika`}</title>
+        <title>{`${post.title} | Diskominfo Banggai Kepulauan`}</title>
         <meta name="description" content={plainDesc} />
-        <meta name="keywords" content={`Berita, Banggai Kepulauan, ${post.category?.name || ""}, ${post.title}`} />
-        <link rel="canonical" href={pageUrl || `http://localhost:3001/berita/${post.slug}`} />
-        <meta property="og:title" content={`${post.title} - Dinas Komunikasi dan Informatika`} />
+        <meta name="keywords" content={`Berita Banggai Kepulauan, Diskominfo Bangkep, ${post.category?.name || ""}, ${post.title}`} />
+        <link rel="canonical" href={articleUrl} />
+        <meta property="og:title" content={`${post.title} | Diskominfo Banggai Kepulauan`} />
         <meta property="og:description" content={plainDesc} />
-        <meta property="og:url" content={pageUrl || `http://localhost:3001/berita/${post.slug}`} />
+        <meta property="og:url" content={articleUrl} />
         <meta property="og:type" content="article" />
         <meta property="og:image" content={postImage} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${post.title} - Dinas Komunikasi dan Informatika`} />
+        <meta name="twitter:title" content={`${post.title} | Diskominfo Banggai Kepulauan`} />
         <meta name="twitter:description" content={plainDesc} />
         <meta name="twitter:image" content={postImage} />
         <script type="application/ld+json">
@@ -89,9 +88,10 @@ export const BeritaDetail = ({ post, categories }) => {
             "publisher": {
               "@type": "Organization",
               "name": "Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan",
+              "url": "https://diskominfo.banggaikep.go.id",
               "logo": {
                 "@type": "ImageObject",
-                "url": `${siteOrigin}/images/favicon.png`
+                "url": "https://diskominfo.banggaikep.go.id/images/favicon.png"
               }
             },
             "description": plainDesc

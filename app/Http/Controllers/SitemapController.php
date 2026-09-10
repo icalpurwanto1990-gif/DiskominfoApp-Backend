@@ -10,7 +10,10 @@ class SitemapController extends Controller
 {
     public function index(Request $request)
     {
-        $baseUrl = $request->getSchemeAndHttpHost();
+        $host = $request->getHost();
+        $baseUrl = ($host && !str_contains($host, 'localhost') && !str_contains($host, '127.0.0.1'))
+            ? 'https://' . $host
+            : (config('app.url') && !str_contains(config('app.url'), 'localhost') ? rtrim(config('app.url'), '/') : 'https://diskominfo.banggaikep.go.id');
         $urls = [];
 
         // 1. Add static frontend routes

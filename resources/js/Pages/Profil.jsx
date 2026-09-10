@@ -53,18 +53,18 @@ export const Profil = ({ profileData, staff, documents }) => {
 
 
 
-  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const officialUrl = "https://diskominfo.banggaikep.go.id/profil";
 
   return (
     <MainLayout>
       <Head>
-        <title>Profil Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan</title>
-        <meta name="description" content="Profil resmi Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan — Visi & Misi, Tugas & Fungsi, Struktur Organisasi, dan Daftar Pegawai." />
-        <meta name="keywords" content="Profil Diskominfo, Visi Misi Diskominfo, Struktur Organisasi Diskominfo Banggai Kepulauan, Pegawai Diskominfo" />
-        <link rel="canonical" href={pageUrl || "http://localhost:3001/profil"} />
-        <meta property="og:title" content="Profil Dinas Komunikasi dan Informatika Kab. Banggai Kepulauan" />
-        <meta property="og:description" content="Profil resmi Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan — Visi & Misi, Tugas & Fungsi, Struktur Organisasi, dan Daftar Pegawai." />
-        <meta property="og:url" content={pageUrl || "http://localhost:3001/profil"} />
+        <title>Profil Diskominfo Banggai Kepulauan | Dinas Komunikasi dan Informatika</title>
+        <meta name="description" content="Profil resmi Dinas Komunikasi dan Informatika (Diskominfo) Kabupaten Banggai Kepulauan — Visi & Misi, Tugas Pokok & Fungsi, Struktur Organisasi, dan Sumber Daya Aparatur." />
+        <meta name="keywords" content="Profil Diskominfo Banggai Kepulauan, Visi Misi Diskominfo Bangkep, Struktur Organisasi Diskominfo Banggai Kepulauan, Pegawai Diskominfo Bangkep" />
+        <link rel="canonical" href={officialUrl} />
+        <meta property="og:title" content="Profil Diskominfo Banggai Kepulauan | Dinas Komunikasi dan Informatika" />
+        <meta property="og:description" content="Profil resmi Dinas Komunikasi dan Informatika (Diskominfo) Kabupaten Banggai Kepulauan — Visi & Misi, Tugas Pokok & Fungsi, dan Struktur Organisasi." />
+        <meta property="og:url" content={officialUrl} />
         <meta property="og:type" content="website" />
       </Head>
       {/* Premium Page Hero */}
