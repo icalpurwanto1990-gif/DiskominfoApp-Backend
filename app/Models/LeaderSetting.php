@@ -44,7 +44,11 @@ class LeaderSetting extends Model
     public static function getAllFormatted(): array
     {
         $defaults = static::getDefaults();
-        $dbData = static::pluck('value', 'key')->toArray();
+        try {
+            $dbData = static::pluck('value', 'key')->toArray();
+        } catch (\Throwable $e) {
+            $dbData = [];
+        }
         $merged = array_merge($defaults, array_filter($dbData, fn($val) => $val !== null && $val !== ''));
 
         // Format photo paths if they are saved via Filament upload disk

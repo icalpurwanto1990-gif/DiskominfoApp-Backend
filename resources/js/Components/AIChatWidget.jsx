@@ -15,9 +15,9 @@ export const AIChatWidget = () => {
   const messagesEndRef = useRef(null);
 
   const suggestedQuestions = [
+    "Siapa Wakil Bupati Banggai Kepulauan?",
     "Bagaimana cara mengajukan Sertifikat Elektronik TTE?",
     "Bagaimana prosedur memohon informasi publik ke PPID?",
-    "Di mana saya bisa mengadukan gangguan jaringan internet?",
     "Di mana lokasi kantor Diskominfo Banggai Kepulauan?",
   ];
 

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use App\Models\ProfileContent;
 use App\Models\DigitalService;
 use App\Models\Post;
+use App\Models\LeaderSetting;
 
 class AiChatController extends Controller
 {
@@ -14,6 +15,16 @@ class AiChatController extends Controller
     {
         $message = $request->input('message', '');
         $query = strtolower($message);
+
+        // Fetch dynamic leader settings for both Gemini RAG and fallback
+        $leaders = LeaderSetting::getAllFormatted();
+        $bupatiNama = $leaders['bupati']['nama'] ?? 'Bupati Banggai Kepulauan';
+        $bupatiJabatan = $leaders['bupati']['jabatan'] ?? 'Bupati Banggai Kepulauan';
+        $bupatiAktif = $leaders['bupati']['aktif'] ?? true;
+
+        $wakilBupatiNama = $leaders['wakilBupati']['nama'] ?? 'Wakil Bupati Banggai Kepulauan';
+        $wakilBupatiJabatan = $leaders['wakilBupati']['jabatan'] ?? 'Wakil Bupati Banggai Kepulauan';
+        $wakilBupatiAktif = $leaders['wakilBupati']['aktif'] ?? true;
 
         $apiKey = config('services.gemini.key');
 
@@ -49,7 +60,15 @@ class AiChatController extends Controller
 
                 // Build System Instruction
                 $systemInstruction = "Anda adalah Asisten AI resmi Dinas Komunikasi dan Informatika (Diskominfo) Kabupaten Banggai Kepulauan, Sulawesi Tengah.
-Tugas Anda adalah membantu menjawab pertanyaan warga mengenai profil dinas, berita terbaru, dan cara mengakses layanan digital di portal ini dengan ramah, sopan, singkat, dan profesional dalam Bahasa Indonesia.
+Tugas Anda adalah membantu menjawab pertanyaan warga mengenai pimpinan daerah, profil dinas, berita terbaru, dan cara mengakses layanan digital di portal ini dengan ramah, sopan, singkat, dan profesional dalam Bahasa Indonesia.
+
+PIMPINAN PEMERINTAH DAERAH KABUPATEN BANGGAI KEPULAUAN:
+- Kepala Daerah / Bupati: {$bupatiNama} ({$bupatiJabatan})" . ($bupatiAktif ? ' [Aktif]' : '') . "
+- Wakil Kepala Daerah / Wakil Bupati: {$wakilBupatiNama} ({$wakilBupatiJabatan})" . ($wakilBupatiAktif ? ' [Aktif]' : '') . "
+
+ATURAN PIMPINAN DAERAH:
+1. Jika pengguna bertanya tentang siapa Bupati, Pj. Bupati, atau Wakil Bupati Kabupaten Banggai Kepulauan, jawablah secara lugas, akurat, dan penuh hormat dengan menyebutkan nama lengkap beserta gelarnya dan jabatannya saat ini.
+2. Jika ditanya spesifik tentang Wakil Bupati Banggai Kepulauan, sebutkan secara jelas bahwa Wakil Bupati Kabupaten Banggai Kepulauan adalah {$wakilBupatiNama} ({$wakilBupatiJabatan}).
 
 ATURAN LOGIN & PENDAFTARAN AKUN:
 1. Untuk mengajukan LAYANAN INTERNAL (seperti pengajuan Sertifikat Elektronik TTE, pengajuan link Zoom/Vicon, pengajuan subdomain, aduan gangguan jaringan), pengguna WAJIB mendaftar akun terlebih dahulu di halaman Daftar (/auth/register) dan melakukan Login di halaman Masuk (/auth/login). Setelah login, pengajuan dilakukan melalui Dashboard Pengguna.
@@ -128,7 +147,11 @@ ATURAN MENJAWAB (PENTING):
         // --- FALLBACK (Rule-Based Keyword Matching) ---
         $reply = '';
 
-        if (str_contains($query, 'tte') || str_contains($query, 'sertifikat elektronik') || str_contains($query, 'tanda tangan')) {
+        if (str_contains($query, 'wakil bupati') || str_contains($query, 'wabup') || str_contains($query, 'wakil bupat')) {
+            $reply = "Wakil Bupati Kabupaten Banggai Kepulauan saat ini adalah {$wakilBupatiNama} ({$wakilBupatiJabatan}).";
+        } elseif (str_contains($query, 'bupati') || str_contains($query, 'pj bupati') || str_contains($query, 'kepala daerah') || str_contains($query, 'pimpinan daerah') || str_contains($query, 'pemimpin bangkep')) {
+            $reply = "Kabupaten Banggai Kepulauan saat ini dipimpin oleh {$bupatiNama} ({$bupatiJabatan})" . ($wakilBupatiNama ? " bersama Wakil Bupati {$wakilBupatiNama} ({$wakilBupatiJabatan})." : ".");
+        } elseif (str_contains($query, 'tte') || str_contains($query, 'sertifikat elektronik') || str_contains($query, 'tanda tangan')) {
             $reply = "Untuk pengajuan Tanda Tangan Elektronik (TTE) bagi ASN Kabupaten Banggai Kepulauan, silakan masuk ke menu 'Layanan Digital' di bagian navigasi atas, pilih 'Sertifikat Elektronik (TTE)', isi formulir berupa nama, NIP, Jabatan, OPD, serta lampirkan surat rekomendasi instansi Anda.";
         } elseif (str_contains($query, 'ppid') || str_contains($query, 'informasi publik') || str_contains($query, 'mohon informasi')) {
             $reply = "Permohonan informasi publik secara online dapat diajukan melalui menu 'PPID' di atas, lalu pilih tab 'Permohonan Informasi Online'. Anda diwajibkan mengisi NIK, rincian data yang diminta, tujuan penggunaan, dan mengunggah salinan KTP pendukung.";
