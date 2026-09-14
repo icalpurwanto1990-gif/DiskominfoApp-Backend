@@ -11,6 +11,8 @@ export const Kontak = () => {
   const [phone, setPhone] = useState("");
   const [subject, setSubject] = useState("Aduan Jaringan");
   const [message, setMessage] = useState("");
+  const [faxNumber, setFaxNumber] = useState(""); // Anti-bot honeypot field
+  const [formLoadedAt] = useState(Date.now()); // Time-trap validation
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -31,8 +33,15 @@ export const Kontak = () => {
           phone,
           subject,
           message,
+          fax_number: faxNumber,
+          form_time: formLoadedAt,
         }),
       });
+
+      if (res.status === 429) {
+        alert("Peringatan Keamanan: Terlalu banyak pengaduan dikirim dari perangkat Anda dalam waktu singkat. Mohon tunggu beberapa menit sebelum mengirim kembali.");
+        return;
+      }
 
       const data = await res.json();
       if (data.success) {
@@ -41,6 +50,7 @@ export const Kontak = () => {
         setEmail("");
         setPhone("");
         setMessage("");
+        setFaxNumber("");
       } else {
         alert(data.message || "Gagal mengirim pengaduan. Silakan coba lagi.");
       }
@@ -151,6 +161,20 @@ export const Kontak = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-xs font-semibold">
+                {/* Anti-Bot Honeypot: Invisible to human users, traps spam bots */}
+                <div style={{ display: "none", opacity: 0, position: "absolute", left: "-9999px", pointerEvents: "none" }} aria-hidden="true">
+                  <label htmlFor="fax-number">Fax Number (Leave Blank)</label>
+                  <input
+                    id="fax-number"
+                    type="text"
+                    name="fax_number"
+                    value={faxNumber}
+                    onChange={(e) => setFaxNumber(e.target.value)}
+                    tabIndex="-1"
+                    autoComplete="off"
+                  />
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
                     <label htmlFor="contact-name" className="text-slate-700 dark:text-slate-300">Nama Lengkap</label>

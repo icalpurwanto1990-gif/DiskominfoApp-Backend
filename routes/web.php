@@ -40,14 +40,14 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 Route::get('/satu-data', [SatuDataController::class, 'index'])->name('satudata.index');
 Route::get('/gis', [GisController::class, 'index'])->name('gis.index');
 Route::get('/kontak', [KontakController::class, 'index'])->name('kontak.index');
-Route::post('/api/kontak', [KontakController::class, 'store'])->name('api.kontak');
+Route::post('/api/kontak', [KontakController::class, 'store'])->middleware('throttle:3,10')->name('api.kontak');
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // Survey & AI Chat client actions
-Route::post('/api/survey', [SurveyController::class, 'store'])->name('api.survey');
+Route::post('/api/survey', [SurveyController::class, 'store'])->middleware('throttle:5,10')->name('api.survey');
 Route::get('/api/survey/categories', [SurveyController::class, 'apiCategories']);
 Route::get('/api/leader-agendas', [AgendaController::class, 'apiAgendas']);
-Route::post('/api/ai-chat', [AiChatController::class, 'reply'])->name('api.aichat');
+Route::post('/api/ai-chat', [AiChatController::class, 'reply'])->middleware('throttle:30,1')->name('api.aichat');
 
 // Auth Routes (React Inertia Views)
 Route::get('/auth/login', [AuthController::class, 'showLogin'])->name('login');
