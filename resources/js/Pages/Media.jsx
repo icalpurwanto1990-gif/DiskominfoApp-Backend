@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { 
   Image, 
   Video, 
@@ -13,13 +13,353 @@ import {
   Calendar, 
   Sparkles,
   Share2,
-  Check
+  Check,
+  Home,
+  ArrowDown,
+  Play,
+  Pause,
+  Layers
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import MainLayout from "../Layouts/MainLayout";
-import PageHero from "../Components/PageHero";
 import ScrollReveal from "../Components/ScrollReveal";
+
+const defaultGallerySlides = [
+  {
+    url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1600&auto=format&fit=crop&q=80",
+    title: "Dokumentasi Panorama Bahari & Pembangunan Daerah Banggai Kepulauan",
+    meta: "Dokumentasi Daerah",
+    description: "Harmoni keindahan alam bahari, gugusan kepulauan eksotis, dan geliat pembangunan masyarakat Kabupaten Banggai Kepulauan."
+  },
+  {
+    url: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&auto=format&fit=crop&q=80",
+    title: "Transformasi Digital SPBE & Pelayanan Informasi Publik Terpadu",
+    meta: "Media Center",
+    description: "Pusat liputan jurnalistik kedinasan, dokumentasi visual resmi, serta edukasi digital masyarakat Kabupaten Banggai Kepulauan."
+  },
+  {
+    url: "https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=1600&auto=format&fit=crop&q=80",
+    title: "Dokumentasi Kegiatan Pelayanan & Inovasi Pemerintahan Daerah",
+    meta: "Kegiatan Dinas",
+    description: "Rangkuman liputan visual dan agenda operasional Pemerintah Kabupaten Banggai Kepulauan dalam melayani masyarakat."
+  }
+];
+
+/**
+ * MediaHeroSlider — Premium cinematic auto-rotating gallery hero banner
+ */
+const MediaHeroSlider = ({ slides = [], onOpenPhoto, fotoCount = 0, videoCount = 0, infografisCount = 0 }) => {
+  const activeSlides = slides.length > 0 ? slides : defaultGallerySlides;
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const INTERVAL = 5000;
+
+  // Auto-advance & progress bar
+  useEffect(() => {
+    if (activeSlides.length <= 1) return;
+    setProgress(0);
+    const start = Date.now();
+
+    const tickInterval = setInterval(() => {
+      if (!isPaused) {
+        const elapsed = Date.now() - start;
+        setProgress(Math.min((elapsed / INTERVAL) * 100, 100));
+      }
+    }, 40);
+
+    const advanceTimeout = setTimeout(() => {
+      if (!isPaused) {
+        setCurrentIndex((prev) => (prev + 1) % activeSlides.length);
+      }
+    }, INTERVAL);
+
+    return () => {
+      clearInterval(tickInterval);
+      clearTimeout(advanceTimeout);
+    };
+  }, [currentIndex, activeSlides.length, isPaused]);
+
+  const handlePrev = useCallback(() => {
+    setCurrentIndex((prev) => (prev === 0 ? activeSlides.length - 1 : prev - 1));
+  }, [activeSlides.length]);
+
+  const handleNext = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % activeSlides.length);
+  }, [activeSlides.length]);
+
+  const currentSlide = activeSlides[currentIndex] || activeSlides[0];
+
+  const scrollToContent = () => {
+    const el = document.getElementById("media-content");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  return (
+    <div 
+      className="relative w-full overflow-hidden bg-slate-950 text-white min-h-[520px] md:min-h-[580px] lg:min-h-[620px] flex flex-col justify-between"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      {/* Background Slideshow with AnimatePresence & Ken-Burns Zoom */}
+      <div className="absolute inset-0 z-0">
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={currentSlide.id || currentIndex}
+            initial={{ opacity: 0, scale: 1.08 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: "easeInOut" }}
+            className="absolute inset-0"
+          >
+            {currentSlide.url ? (
+              <img
+                src={currentSlide.url}
+                alt={currentSlide.title || "Galeri Diskominfo"}
+                className="w-full h-full object-cover object-center"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-950 to-black" />
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Multi-Stop Cinematic Vignette & Gradient Protection Overlays */}
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-slate-950/50 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-black/60 z-10" />
+        
+        {/* Subtle grid pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.04] pointer-events-none z-10"
+          style={{
+            backgroundImage: "linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)",
+            backgroundSize: "36px 36px",
+          }}
+        />
+      </div>
+
+      {/* Main Foreground Content */}
+      <div className="relative z-20 w-full max-w-7xl mx-auto px-4 md:px-8 pt-8 pb-10 flex flex-col justify-between flex-1 gap-8">
+        
+        {/* Top Bar: Breadcrumbs & Auto-Play Status Indicator */}
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+          <nav className="flex items-center gap-1.5 font-semibold text-slate-400">
+            <Link href="/" className="hover:text-emerald-400 flex items-center gap-1 transition-colors">
+              <Home size={13} />
+              <span>Beranda</span>
+            </Link>
+            <ChevronRight size={12} className="text-slate-600" />
+            <span className="text-slate-200">Media Center</span>
+          </nav>
+
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-[11px] font-bold text-slate-300">
+            <span className="relative flex h-2 w-2">
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isPaused ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${isPaused ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+            </span>
+            <span>{isPaused ? "Slide Dijeda (Hover)" : "Slide Otomatis"}</span>
+            <button
+              onClick={() => setIsPaused(!isPaused)}
+              className="ml-1 p-0.5 rounded hover:text-white transition-colors"
+              title={isPaused ? "Lanjutkan Slide" : "Jeda Slide"}
+            >
+              {isPaused ? <Play size={11} /> : <Pause size={11} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Center Row: Hero Title & Active Photo Showcase Card */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center my-auto">
+          
+          {/* Left Column (7 cols): Main Title & Description */}
+          <div className="lg:col-span-7 flex flex-col gap-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-pink-500/20 to-purple-500/10 border border-pink-500/30 text-pink-300 text-xs font-black uppercase tracking-wider backdrop-blur-md w-fit">
+              <Sparkles size={14} className="text-pink-400" />
+              <span>Galeri Foto & Multimedia Resmi</span>
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight text-white drop-shadow-sm">
+              Dokumentasi Visual <br />
+              <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
+                Kabupaten Banggai Kepulauan
+              </span>
+            </h1>
+
+            <p className="text-sm md:text-base text-slate-300/90 font-medium leading-relaxed max-w-xl">
+              Eksplorasi dokumentasi resmi kegiatan kedinasan, peliputan pimpinan daerah, video edukasi pelayanan publik, dan infografis sektoral daerah secara terpadu.
+            </p>
+
+            {/* Quick Action Buttons */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <button
+                onClick={scrollToContent}
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-emerald-600/30 transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer"
+              >
+                <ArrowDown size={15} />
+                <span>Jelajahi Semua Galeri</span>
+              </button>
+
+              {slides.length > 0 && (
+                <button
+                  onClick={() => onOpenPhoto && onOpenPhoto(currentIndex % slides.length)}
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-xs uppercase tracking-wider backdrop-blur-md transition-all duration-300 cursor-pointer"
+                >
+                  <Maximize2 size={14} className="text-emerald-400" />
+                  <span>Buka Foto Layar Penuh</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column (5 cols): Active Photo Preview Floating Glass Card */}
+          <div className="lg:col-span-5 flex flex-col justify-center">
+            <motion.div
+              key={currentSlide.id || currentIndex}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+              className="relative p-5 sm:p-6 rounded-3xl bg-slate-900/80 backdrop-blur-xl border border-white/15 shadow-2xl shadow-black/50 flex flex-col gap-4 overflow-hidden"
+            >
+              {/* Top Accent Line */}
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500" />
+
+              {/* Tag & Slide Count */}
+              <div className="flex items-center justify-between gap-2">
+                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[11px] font-black uppercase tracking-wider">
+                  <Calendar size={12} />
+                  <span>{currentSlide.meta || "Dokumentasi Pilihan"}</span>
+                </span>
+
+                <span className="text-xs font-mono font-bold text-slate-400">
+                  {String(currentIndex + 1).padStart(2, "0")} / {String(activeSlides.length).padStart(2, "0")}
+                </span>
+              </div>
+
+              {/* Photo Title */}
+              <div className="flex flex-col gap-1.5">
+                <h3 className="text-base sm:text-lg font-black text-white leading-snug line-clamp-2">
+                  {currentSlide.title || "Dokumentasi Resmi Diskominfo"}
+                </h3>
+                {currentSlide.description && (
+                  <p className="text-xs text-slate-300/80 leading-relaxed line-clamp-2 font-normal">
+                    {currentSlide.description}
+                  </p>
+                )}
+              </div>
+
+              {/* Thumbnail Mini Preview Strip with View Action */}
+              <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-12 rounded-xl overflow-hidden border border-white/20 flex-shrink-0 bg-slate-800">
+                    <img 
+                      src={currentSlide.url} 
+                      alt="" 
+                      className="w-full h-full object-cover" 
+                    />
+                  </div>
+                  <div className="flex flex-col text-[11px]">
+                    <span className="font-bold text-slate-200">Foto {currentIndex + 1} dari {activeSlides.length}</span>
+                    <span className="text-slate-400 text-[10px]">Klik tombol untuk zoom</span>
+                  </div>
+                </div>
+
+                {slides.length > 0 && (
+                  <button
+                    onClick={() => onOpenPhoto && onOpenPhoto(currentIndex % slides.length)}
+                    className="p-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold transition-transform hover:scale-105 cursor-pointer shadow-md"
+                    title="Buka Foto Penuh"
+                  >
+                    <ZoomIn size={16} />
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          </div>
+
+        </div>
+
+        {/* Bottom Bar: Stats Pills, Slider Controls & Running Progress Line */}
+        <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            
+            {/* Stats Pills */}
+            <div className="flex flex-wrap gap-2.5">
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-slate-200 text-xs font-semibold backdrop-blur-sm">
+                <Image size={14} className="text-emerald-400" />
+                <span className="font-bold text-white">{fotoCount}</span>
+                <span className="text-slate-400 text-[11px]">Galeri Foto</span>
+              </div>
+
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-slate-200 text-xs font-semibold backdrop-blur-sm">
+                <Video size={14} className="text-pink-400" />
+                <span className="font-bold text-white">{videoCount}</span>
+                <span className="text-slate-400 text-[11px]">Video Dinas</span>
+              </div>
+
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-slate-200 text-xs font-semibold backdrop-blur-sm">
+                <FileImage size={14} className="text-cyan-400" />
+                <span className="font-bold text-white">{infografisCount}</span>
+                <span className="text-slate-400 text-[11px]">Infografis</span>
+              </div>
+            </div>
+
+            {/* Slider Navigation Buttons & Dots Indicator */}
+            <div className="flex items-center gap-3">
+              {/* Prev / Next buttons */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={handlePrev}
+                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white transition-colors cursor-pointer"
+                  title="Foto Sebelumnya"
+                  aria-label="Previous Slide"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <button
+                  onClick={handleNext}
+                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white transition-colors cursor-pointer"
+                  title="Foto Berikutnya"
+                  aria-label="Next Slide"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+
+              {/* Dots Pagination (Limit to max 8 dots to avoid clutter) */}
+              <div className="hidden sm:flex items-center gap-1.5">
+                {activeSlides.slice(0, 8).map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentIndex(idx)}
+                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                      currentIndex === idx
+                        ? "w-6 bg-emerald-400 shadow-sm shadow-emerald-400/50"
+                        : "w-2 bg-white/20 hover:bg-white/40"
+                    }`}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
+
+          </div>
+
+          {/* Running Progress Bar Line at Very Bottom */}
+          <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-100 ease-linear rounded-full"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+};
 
 const getYoutubeId = (url) => {
   if (!url) return null;
@@ -100,24 +440,16 @@ export const Media = ({ mediaList = [] }) => {
         <meta property="og:type" content="website" />
       </Head>
 
-      {/* Premium Page Hero */}
-      <PageHero
-        label="MEDIA CENTER DISKOMINFO"
-        title="Galeri & Media Center"
-        subtitle="Dokumentasi kegiatan dinas, video edukasi pelayanan publik, dan infografis statistik daerah Kabupaten Banggai Kepulauan"
-        icon={Image}
-        gradient="from-pink-950 via-slate-900 to-slate-950"
-        accentColor="text-pink-400"
-        blobColor="bg-pink-500"
-        breadcrumbs={[{ label: "Media Center" }]}
-        stats={[
-          { label: "Galeri Foto", value: fotoItems.length, icon: Image },
-          { label: "Video Dinas", value: videoItems.length, icon: Video },
-          { label: "Infografis", value: infografisItems.length, icon: FileImage },
-        ]}
+      {/* Dynamic Auto-Rotating Gallery Hero Header */}
+      <MediaHeroSlider
+        slides={fotoItems}
+        onOpenPhoto={(idx) => setActivePhotoIndex(idx)}
+        fotoCount={fotoItems.length}
+        videoCount={videoItems.length}
+        infografisCount={infografisItems.length}
       />
 
-      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-12 flex flex-col gap-10">
+      <div id="media-content" className="w-full max-w-7xl mx-auto px-4 md:px-8 py-12 flex flex-col gap-10">
 
         {/* Tabs Menu */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
