@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Star, CheckCircle, Send, X } from "lucide-react";
+import { Star, CheckCircle, Send, X, ExternalLink } from "lucide-react";
 
 export const SurveyModal = ({ isOpen, onClose }) => {
   const [rating, setRating] = useState(0);
@@ -15,24 +15,40 @@ export const SurveyModal = ({ isOpen, onClose }) => {
     "Pengajuan TTE",
     "Aduan Jaringan",
   ]);
+  const [config, setConfig] = useState({
+    is_enabled: true,
+    title: "Survey Kepuasan Layanan",
+    subtitle: "Bantu kami terus berbenah dan meningkatkan kualitas pelayanan publik dengan memberikan ulasan singkat Anda.",
+    qr_image: "/images/survey-qr.png",
+    qr_caption: "Scan QR Code di samping untuk mengisi survey kepuasan layanan secara langsung dari ponsel Anda.",
+    show_qr_code: true,
+    direct_survey_url: "",
+    thank_you_message: "Penilaian Anda telah kami simpan. Masukan Anda sangat berharga dalam meningkatkan kualitas pelayanan publik di Kabupaten Banggai Kepulauan.",
+  });
 
-  // Fetch categories from backend
+  // Fetch settings & categories from backend
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchConfig = async () => {
       try {
-        const response = await fetch("/api/survey/categories");
+        const response = await fetch("/api/survey/widget-config");
         if (response.ok) {
           const data = await response.json();
-          if (Array.isArray(data) && data.length > 0) {
-            setCategories(data);
-            setCategory(data[0]);
+          if (data.categories && Array.isArray(data.categories) && data.categories.length > 0) {
+            setCategories(data.categories);
+            setCategory(data.categories[0]);
+          }
+          if (data.settings) {
+            setConfig((prev) => ({
+              ...prev,
+              ...data.settings,
+            }));
           }
         }
       } catch (error) {
-        console.error("Gagal mengambil kategori survey:", error);
+        console.error("Gagal mengambil konfigurasi survey modal:", error);
       }
     };
-    fetchCategories();
+    fetchConfig();
   }, []);
 
   // Auto-close on successful submit after a short delay
@@ -98,7 +114,7 @@ export const SurveyModal = ({ isOpen, onClose }) => {
             <div className="flex flex-col gap-1.5">
               <h4 className="font-extrabold text-base text-emerald-600 dark:text-emerald-450 uppercase tracking-wider">Terima Kasih!</h4>
               <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs leading-relaxed font-semibold">
-                Penilaian Anda telah kami simpan. Masukan Anda sangat berharga dalam meningkatkan kualitas pelayanan publik di Kabupaten Banggai Kepulauan.
+                {config.thank_you_message || "Penilaian Anda telah kami simpan. Masukan Anda sangat berharga dalam meningkatkan kualitas pelayanan publik di Kabupaten Banggai Kepulauan."}
               </p>
             </div>
           </div>
@@ -109,30 +125,52 @@ export const SurveyModal = ({ isOpen, onClose }) => {
                 Umpan Balik Masyarakat
               </div>
               <h3 className="font-extrabold text-base text-slate-900 dark:text-white tracking-wide">
-                Survey Kepuasan Layanan
+                {config.title || "Survey Kepuasan Layanan"}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                Bantu kami terus berbenah dan meningkatkan kualitas pelayanan publik dengan memberikan ulasan singkat Anda.
+                {config.subtitle || "Bantu kami terus berbenah dan meningkatkan kualitas pelayanan publik dengan memberikan ulasan singkat Anda."}
               </p>
             </div>
 
             {/* QR Code Section */}
-            <div className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl">
-              <img
-                src="/images/survey-qr.png"
-                alt="QR Code Survey Kepuasan Masyarakat Diskominfo Bangkep"
-                className="w-20 h-20 object-contain rounded-lg flex-shrink-0"
-                loading="lazy"
-              />
-              <div className="flex flex-col gap-1">
-                <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                  📱 Scan via Ponsel
-                </p>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                  Scan QR Code di samping untuk mengisi survey kepuasan layanan secara langsung dari ponsel Anda.
-                </p>
+            {config.show_qr_code !== false && (
+              <div className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl">
+                {config.direct_survey_url ? (
+                  <a
+                    href={config.direct_survey_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative group block flex-shrink-0"
+                    title="Buka Formulir Survey"
+                  >
+                    <img
+                      src={config.qr_image || "/images/survey-qr.png"}
+                      alt="QR Code Survey Kepuasan Masyarakat Diskominfo Bangkep"
+                      className="w-20 h-20 object-contain rounded-lg flex-shrink-0"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-emerald-600/10 opacity-0 group-hover:opacity-100 rounded-lg flex items-center justify-center transition">
+                      <ExternalLink size={14} className="text-emerald-700 dark:text-emerald-400" />
+                    </div>
+                  </a>
+                ) : (
+                  <img
+                    src={config.qr_image || "/images/survey-qr.png"}
+                    alt="QR Code Survey Kepuasan Masyarakat Diskominfo Bangkep"
+                    className="w-20 h-20 object-contain rounded-lg flex-shrink-0"
+                    loading="lazy"
+                  />
+                )}
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                    📱 Scan via Ponsel
+                  </p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                    {config.qr_caption || "Scan QR Code di samping untuk mengisi survey kepuasan layanan secara langsung dari ponsel Anda."}
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Divider */}
             <div className="flex items-center gap-2">
