@@ -130,6 +130,11 @@ class ModulePermissionSeeder extends Seeder
                 'roles' => ['SUPERADMIN', 'ADMIN'],
             ],
             [
+                'name' => 'Hasil & Respon Survey',
+                'class' => 'App\Filament\Resources\SurveyResponseResource',
+                'roles' => ['SUPERADMIN', 'ADMIN'],
+            ],
+            [
                 'name' => 'Agenda Pimpinan',
                 'class' => 'App\Filament\Resources\LeaderAgendaResource',
                 'roles' => ['SUPERADMIN', 'ADMIN', 'PROTOKOL', 'OPD'],
