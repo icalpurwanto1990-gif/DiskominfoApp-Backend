@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Star, CheckCircle, Send } from "lucide-react";
+import { Star, CheckCircle, Send, ExternalLink, QrCode } from "lucide-react";
 
 export const SurveyWidget = () => {
   const [rating, setRating] = useState(0);
@@ -8,6 +8,7 @@ export const SurveyWidget = () => {
   const [comment, setComment] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [categories, setCategories] = useState([
     "Layanan Informasi",
     "Layanan PPID",
@@ -16,22 +17,39 @@ export const SurveyWidget = () => {
     "Aduan Jaringan",
   ]);
 
+  const [config, setConfig] = useState({
+    title: "Survey Kepuasan Masyarakat",
+    subtitle: "Bantu kami meningkatkan pelayanan publik dengan memberikan penilaian Anda.",
+    qr_image: "/images/survey-qr.png",
+    qr_caption: "📱 Scan QR untuk mengisi survey via ponsel",
+    qr_link: null,
+    show_qr: true,
+    divider_text: "atau isi di sini",
+    thank_you_title: "Terima Kasih!",
+    thank_you_message: "Umpan balik Anda telah kami terima. Data ini sangat berharga untuk meningkatkan kualitas pelayanan publik digital di Kabupaten Banggai Kepulauan.",
+    is_active: true,
+  });
+
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchWidgetConfig = async () => {
       try {
-        const response = await fetch("/api/survey/categories");
+        const response = await fetch("/api/survey/widget-config");
         if (response.ok) {
           const data = await response.json();
-          if (Array.isArray(data) && data.length > 0) {
-            setCategories(data);
-            setCategory(data[0]);
+          if (data.settings) {
+            setConfig((prev) => ({ ...prev, ...data.settings }));
+          }
+          if (Array.isArray(data.categories) && data.categories.length > 0) {
+            setCategories(data.categories);
+            setCategory(data.categories[0]);
           }
         }
       } catch (error) {
-        console.error("Gagal mengambil kategori survey:", error);
+        console.error("Gagal memuat konfigurasi survey widget:", error);
       }
     };
-    fetchCategories();
+
+    fetchWidgetConfig();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -44,6 +62,7 @@ export const SurveyWidget = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
           "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || ""
         },
         body: JSON.stringify({ rating, category, comment }),
@@ -58,18 +77,35 @@ export const SurveyWidget = () => {
     }
   };
 
+  if (!config.is_active) {
+    return null;
+  }
+
   if (isSubmitted) {
     return (
-      <div className="w-full p-8 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/20 border border-emerald-200/60 dark:border-emerald-800/40 rounded-2xl flex flex-col items-center justify-center text-center gap-4">
+      <div className="w-full p-8 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/20 border border-emerald-200/60 dark:border-emerald-800/40 rounded-2xl flex flex-col items-center justify-center text-center gap-4 animate-fadeIn">
         <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/50 border-2 border-emerald-200 dark:border-emerald-700 flex items-center justify-center">
           <CheckCircle className="text-emerald-500 w-8 h-8 stroke-[2]" />
         </div>
         <div className="flex flex-col gap-1.5">
-          <h4 className="font-black text-base text-emerald-900 dark:text-emerald-300 uppercase tracking-wide">Terima Kasih!</h4>
+          <h4 className="font-black text-base text-emerald-900 dark:text-emerald-300 uppercase tracking-wide">
+            {config.thank_you_title || "Terima Kasih!"}
+          </h4>
           <p className="text-xs text-emerald-700 dark:text-emerald-400 max-w-xs leading-relaxed font-medium">
-            Umpan balik Anda telah kami terima. Data ini sangat berharga untuk meningkatkan kualitas pelayanan publik digital di Kabupaten Banggai Kepulauan.
+            {config.thank_you_message || "Umpan balik Anda telah kami terima. Data ini sangat berharga untuk meningkatkan kualitas pelayanan publik digital di Kabupaten Banggai Kepulauan."}
           </p>
         </div>
+        <button
+          type="button"
+          onClick={() => {
+            setIsSubmitted(false);
+            setRating(0);
+            setComment("");
+          }}
+          className="mt-2 px-4 py-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-700 rounded-xl hover:bg-emerald-50 dark:hover:bg-slate-800 transition"
+        >
+          Kirim Penilaian Lain
+        </button>
       </div>
     );
   }
@@ -77,32 +113,64 @@ export const SurveyWidget = () => {
   return (
     <div className="w-full p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-sm">
       <div className="flex flex-col gap-1 mb-5">
-        <h3 className="font-black text-sm text-slate-900 dark:text-white tracking-wide">Survey Kepuasan Masyarakat</h3>
-        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-          Bantu kami meningkatkan pelayanan publik dengan memberikan penilaian Anda.
-        </p>
+        <h3 className="font-black text-sm text-slate-900 dark:text-white tracking-wide">
+          {config.title || "Survey Kepuasan Masyarakat"}
+        </h3>
+        {config.subtitle && (
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+            {config.subtitle}
+          </p>
+        )}
       </div>
 
-      {/* QR Code Section */}
-      <div className="flex flex-col items-center gap-2 mb-4 p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl">
-        <img
-          src="/images/survey-qr.png"
-          alt="QR Code Survey Kepuasan Masyarakat Diskominfo Bangkep"
-          className="w-28 h-28 object-contain rounded-lg"
-          loading="lazy"
-        />
-        <p className="text-[10px] text-slate-500 dark:text-slate-400 text-center font-medium leading-relaxed">
-          📱 Scan QR untuk mengisi survey<br />
-          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">via ponsel</span>
-        </p>
-      </div>
+      {/* QR Code Section (Only if enabled in admin) */}
+      {config.show_qr && (
+        <>
+          <div className="flex flex-col items-center gap-2 mb-4 p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl">
+            {config.qr_link ? (
+              <a
+                href={config.qr_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative block transition-transform hover:scale-105"
+                title="Buka Formulir Survey Eksternal"
+              >
+                <img
+                  src={config.qr_image || "/images/survey-qr.png"}
+                  alt="QR Code Survey Kepuasan Masyarakat Diskominfo Bangkep"
+                  className="w-28 h-28 object-contain rounded-lg"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-emerald-600/10 opacity-0 group-hover:opacity-100 rounded-lg flex items-center justify-center transition">
+                  <ExternalLink size={16} className="text-emerald-700 dark:text-emerald-400 drop-shadow" />
+                </div>
+              </a>
+            ) : (
+              <img
+                src={config.qr_image || "/images/survey-qr.png"}
+                alt="QR Code Survey Kepuasan Masyarakat Diskominfo Bangkep"
+                className="w-28 h-28 object-contain rounded-lg"
+                loading="lazy"
+              />
+            )}
 
-      {/* Divider */}
-      <div className="flex items-center gap-2 mb-1">
-        <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
-        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-widest">atau isi di sini</span>
-        <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
-      </div>
+            {config.qr_caption && (
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 text-center font-medium leading-relaxed whitespace-pre-line">
+                {config.qr_caption}
+              </p>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-widest">
+              {config.divider_text || "atau isi di sini"}
+            </span>
+            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+          </div>
+        </>
+      )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-xs font-semibold">
 
@@ -166,7 +234,7 @@ export const SurveyWidget = () => {
         <button
           type="submit"
           disabled={rating === 0 || isSubmitting}
-          className="mt-2 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-emerald-600/20 hover:shadow-emerald-600/30 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
+          className="mt-2 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-emerald-600/20 hover:shadow-emerald-600/30 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] cursor-pointer"
         >
           {isSubmitting ? (
             <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -179,4 +247,5 @@ export const SurveyWidget = () => {
     </div>
   );
 };
+
 export default SurveyWidget;

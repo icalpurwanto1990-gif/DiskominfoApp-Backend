@@ -17,7 +17,9 @@ use App\Models\PpidRequest;
 use App\Models\ProfileContent;
 use App\Models\ServiceRequest;
 use App\Models\Staff;
+use App\Models\SurveyCategory;
 use App\Models\SurveyResponse;
+use App\Models\SurveyWidgetSetting;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -1074,6 +1076,169 @@ class AdminApiController extends Controller
             $this->logAudit(request(), 'DELETE', 'STATISTICS', "Statistik '{$label}' (ID: {$id}) dihapus.");
 
             return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    // ==========================================
+    // SURVEY CATEGORIES & WIDGET SETTINGS CRUD
+    // ==========================================
+
+    public function getSurveyCategories(Request $request)
+    {
+        try {
+            $categories = SurveyCategory::orderBy('name', 'asc')->get();
+
+            // Count responses per category
+            $responseCounts = SurveyResponse::selectRaw('category, count(*) as count')
+                ->groupBy('category')
+                ->pluck('count', 'category')
+                ->toArray();
+
+            $data = $categories->map(function ($cat) use ($responseCounts) {
+                return [
+                    'id' => $cat->id,
+                    'name' => $cat->name,
+                    'active' => (bool) $cat->active,
+                    'responses_count' => $responseCounts[$cat->name] ?? 0,
+                    'created_at' => $cat->created_at ? $cat->created_at->format('Y-m-d H:i:s') : null,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'categories' => $data,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function saveSurveyCategory(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'id' => 'nullable|string',
+                'name' => 'required|string|max:255',
+                'active' => 'nullable|boolean',
+            ]);
+
+            if (! empty($validated['id'])) {
+                $category = SurveyCategory::findOrFail($validated['id']);
+                $oldName = $category->name;
+                $category->update([
+                    'name' => $validated['name'],
+                    'active' => $request->boolean('active', true),
+                ]);
+                $this->logAudit($request, 'UPDATE', 'SURVEY', "Kategori survey '{$oldName}' diubah menjadi '{$category->name}'.");
+            } else {
+                $exists = SurveyCategory::where('name', $validated['name'])->exists();
+                if ($exists) {
+                    return response()->json(['success' => false, 'error' => 'Kategori dengan nama ini sudah ada.'], 422);
+                }
+
+                $category = SurveyCategory::create([
+                    'name' => $validated['name'],
+                    'active' => $request->boolean('active', true),
+                ]);
+                $this->logAudit($request, 'CREATE', 'SURVEY', "Kategori survey '{$category->name}' dibuat.");
+            }
+
+            return response()->json([
+                'success' => true,
+                'category' => $category,
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['success' => false, 'error' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function deleteSurveyCategory($id)
+    {
+        try {
+            $category = SurveyCategory::findOrFail($id);
+            $name = $category->name;
+            $category->delete();
+
+            $this->logAudit(request(), 'DELETE', 'SURVEY', "Kategori survey '{$name}' (ID: {$id}) dihapus.");
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getSurveySettings()
+    {
+        try {
+            $settings = SurveyWidgetSetting::getActiveSettings();
+
+            return response()->json([
+                'success' => true,
+                'settings' => $settings,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function saveSurveySettings(Request $request)
+    {
+        try {
+            $settings = SurveyWidgetSetting::getActiveSettings();
+
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'subtitle' => 'required|string|max:1000',
+                'qr_caption' => 'nullable|string|max:500',
+                'qr_link' => 'nullable|string|max:1000',
+                'show_qr' => 'nullable',
+                'divider_text' => 'nullable|string|max:100',
+                'thank_you_title' => 'nullable|string|max:255',
+                'thank_you_message' => 'nullable|string|max:1000',
+                'is_active' => 'nullable',
+                'qr_image_file' => 'nullable|file|mimes:jpeg,png,jpg,svg,webp|max:5120',
+            ]);
+
+            $qrImagePath = $settings->qr_image;
+
+            if ($request->hasFile('qr_image_file')) {
+                $file = $request->file('qr_image_file');
+                $filename = 'survey_qr_' . time() . '.' . $file->getClientOriginalExtension();
+                $destPath = public_path('uploads/settings');
+                if (! File::isDirectory($destPath)) {
+                    File::makeDirectory($destPath, 0755, true, true);
+                }
+                $file->move($destPath, $filename);
+                $qrImagePath = '/uploads/settings/' . $filename;
+            } elseif ($request->has('qr_image') && ! empty($request->input('qr_image'))) {
+                $qrImagePath = $request->input('qr_image');
+            }
+
+            $settings->update([
+                'title' => $validated['title'],
+                'subtitle' => $validated['subtitle'],
+                'qr_image' => $qrImagePath,
+                'qr_caption' => $validated['qr_caption'] ?? '📱 Scan QR untuk mengisi survey via ponsel',
+                'qr_link' => $validated['qr_link'] ?? null,
+                'show_qr' => filter_var($request->input('show_qr', true), FILTER_VALIDATE_BOOLEAN),
+                'divider_text' => $validated['divider_text'] ?? 'atau isi di sini',
+                'thank_you_title' => $validated['thank_you_title'] ?? 'Terima Kasih!',
+                'thank_you_message' => $validated['thank_you_message'] ?? 'Umpan balik Anda telah kami terima.',
+                'is_active' => filter_var($request->input('is_active', true), FILTER_VALIDATE_BOOLEAN),
+            ]);
+
+            $this->logAudit($request, 'UPDATE', 'SURVEY', 'Pengaturan tampilan Survey Widget diperbarui.');
+
+            return response()->json([
+                'success' => true,
+                'settings' => $settings,
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['success' => false, 'error' => $e->errors()], 422);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }

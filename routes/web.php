@@ -46,6 +46,7 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 // Survey & AI Chat client actions
 Route::post('/api/survey', [SurveyController::class, 'store'])->middleware('throttle:5,10')->name('api.survey');
 Route::get('/api/survey/categories', [SurveyController::class, 'apiCategories']);
+Route::get('/api/survey/widget-config', [SurveyController::class, 'widgetConfig']);
 Route::get('/api/leader-agendas', [AgendaController::class, 'apiAgendas']);
 Route::post('/api/ai-chat', [AiChatController::class, 'reply'])->middleware('throttle:30,1')->name('api.aichat');
 
@@ -177,6 +178,11 @@ Route::prefix('api')->group(function () {
         Route::get('/audit-logs', [AdminApiController::class, 'getAuditLogs']);
         Route::get('/survey-responses', [AdminApiController::class, 'getSurveyResponses']);
         Route::delete('/survey-responses/{id}', [AdminApiController::class, 'deleteSurveyResponse']);
+        Route::get('/survey-categories', [AdminApiController::class, 'getSurveyCategories']);
+        Route::post('/survey-categories', [AdminApiController::class, 'saveSurveyCategory']);
+        Route::delete('/survey-categories/{id}', [AdminApiController::class, 'deleteSurveyCategory']);
+        Route::get('/survey-settings', [AdminApiController::class, 'getSurveySettings']);
+        Route::post('/survey-settings', [AdminApiController::class, 'saveSurveySettings']);
         // Statistics Realtime CRUD
         Route::get('/statistics', [AdminApiController::class, 'getStatistics']);
         Route::post('/statistics', [AdminApiController::class, 'saveStatistic']);
