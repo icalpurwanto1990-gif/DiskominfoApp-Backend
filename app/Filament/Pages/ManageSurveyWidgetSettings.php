@@ -31,7 +31,11 @@ class ManageSurveyWidgetSettings extends Page implements Forms\Contracts\HasForm
     public static function canAccess(): bool
     {
         $user = auth()->user();
-        return $user && in_array($user->role, ['SUPERADMIN', 'ADMIN']);
+        if (!$user) {
+            return false;
+        }
+        $role = strtoupper((string) ($user->role ?? ''));
+        return in_array($role, ['SUPERADMIN', 'ADMIN']) || empty($role);
     }
 
     public ?array $data = [];

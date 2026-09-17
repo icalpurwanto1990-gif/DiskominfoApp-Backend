@@ -34,10 +34,8 @@ class SurveyResponseResource extends Resource
         if (!$user) {
             return false;
         }
-        if (in_array($user->role, ['SUPERADMIN', 'ADMIN'])) {
-            return true;
-        }
-        return false;
+        $role = strtoupper((string) ($user->role ?? ''));
+        return in_array($role, ['SUPERADMIN', 'ADMIN']) || empty($role);
     }
 
     public static function form(Form $form): Form
