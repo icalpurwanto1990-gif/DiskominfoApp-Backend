@@ -85,14 +85,45 @@ class HomeController extends Controller
             ->take(3)
             ->get();
 
-        return Inertia::render('Home', [
-            'dbStats' => $dbStats,
-            'sliderImages' => $banners,
-            'dbServices' => $dbServices,
-            'welcomeSpeech' => $welcomeSpeech,
-            'latestNewsItems' => $latestNewsItems,
-            'latestAnnouncements' => $latestAnnouncements,
-        ]);
+        // 7. Fetch active popup modal configuration
+        $popupModal = null;
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('popup_modal_settings')) {
+                $setting = \App\Models\PopupModalSetting::getActiveSetting();
+                $popupModal = [
+                    'is_active'             => (bool) $setting->is_active,
+                    'content_type'          => $setting->content_type ?? 'IMAGE',
+                    'title'                 => $setting->title,
+                    'image_url'             => $setting->image_url,
+                    'caption'               => $setting->caption,
+                    'link_url'              => $setting->link_url,
+                    'button_text'           => $setting->button_text,
+                    'show_once_per_session' => (bool) $setting->show_once_per_session,
+                    'delay_seconds'         => (int) ($setting->delay_seconds ?? 2),
+                ];
+            }
+        } catch (\Throwable $e) {
+            $popupModal = null;
+        }
 
+        return Inertia::render('Home', [
+            'dbStats'             => $dbStats,
+            'sliderImages'        => $banners,
+            'dbServices'          => $dbServices,
+            'welcomeSpeech'       => $welcomeSpeech,
+            'latestNewsItems'     => $latestNewsItems,
+            'latestAnnouncements' => $latestAnnouncements,
+            'popupModal'          => $popupModal,
+        ]);
+    }
+
+    public function getPopupModalConfig()
+    {
+        try {
+            $setting = \App\Models\PopupModalSetting::getActiveSetting();
+            return response()->json($setting);
+        } catch (\Throwable $e) {
+            return response()->json(['is_active' => false]);
+        }
     }
 }

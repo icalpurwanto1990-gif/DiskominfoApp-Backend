@@ -9,7 +9,7 @@ import {
 import MainLayout from "../Layouts/MainLayout";
 import HeroSlider from "../Components/HeroSlider";
 import SurveyWidget from "../Components/SurveyWidget";
-import SurveyModal from "../Components/SurveyModal";
+import PopupModal from "../Components/PopupModal";
 import ScrollReveal from "../Components/ScrollReveal";
 
 const stripHtml = (html) => {
@@ -151,19 +151,11 @@ const StatCard = ({ label, value, suffix, desc, icon: iconName, color: colorKey 
   );
 };
 
-export const Home = ({ dbStats, sliderImages, dbServices, welcomeSpeech, latestNewsItems, latestAnnouncements }) => {
+export const Home = ({ dbStats, sliderImages, dbServices, welcomeSpeech, latestNewsItems, latestAnnouncements, popupModal }) => {
   const [trackQuery, setTrackQuery] = useState("");
   const [trackResult, setTrackResult] = useState(null);
   const [trackError, setTrackError] = useState("");
   const [isTracking, setIsTracking] = useState(false);
-  const [isSurveyOpen, setIsSurveyOpen] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsSurveyOpen(true);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleTrackSubmit = async (e) => {
     e.preventDefault();
@@ -790,8 +782,8 @@ export const Home = ({ dbStats, sliderImages, dbServices, welcomeSpeech, latestN
           </ScrollReveal>
         </section>
 
-        {/* Dynamic Satisfaction Survey Popup */}
-        <SurveyModal isOpen={isSurveyOpen} onClose={() => setIsSurveyOpen(false)} />
+        {/* Dynamic Announcement / Poster Popup Modal */}
+        <PopupModal initialConfig={popupModal} />
       </div>
     </MainLayout>
   );

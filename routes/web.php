@@ -47,6 +47,7 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 Route::post('/api/survey', [SurveyController::class, 'store'])->middleware('throttle:5,10')->name('api.survey');
 Route::get('/api/survey/categories', [SurveyController::class, 'apiCategories']);
 Route::get('/api/survey/widget-config', [SurveyController::class, 'widgetConfig']);
+Route::get('/api/popup-modal', [HomeController::class, 'getPopupModalConfig'])->name('api.popup-modal');
 Route::get('/api/leader-agendas', [AgendaController::class, 'apiAgendas']);
 Route::post('/api/ai-chat', [AiChatController::class, 'reply'])->middleware('throttle:30,1')->name('api.aichat');
 
