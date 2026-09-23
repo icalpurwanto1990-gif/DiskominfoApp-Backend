@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "@inertiajs/react";
-import { Shield, Mail, Lock, LogIn, ChevronLeft, AlertCircle } from "lucide-react";
+import { Shield, Mail, Lock, LogIn, ChevronLeft, AlertCircle, RefreshCw } from "lucide-react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -8,9 +8,39 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [isUnverified, setIsUnverified] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendNote, setResendNote] = useState("");
 
   const [show2fa, setShow2fa] = useState(false);
   const [code2fa, setCode2fa] = useState("");
+
+  const handleResendFromLogin = async () => {
+    if (!email) return;
+    setResendLoading(true);
+    setResendNote("");
+    try {
+      const res = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || ""
+        },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setResendNote(data.message || "Tautan verifikasi telah dikirim ke email Anda.");
+      } else {
+        setResendNote(data.message || "Gagal mengirim ulang email verifikasi.");
+      }
+    } catch (err) {
+      setResendNote("Terjadi kesalahan sistem saat meminta kirim ulang.");
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -42,6 +72,7 @@ export default function Login() {
 
       const data = await res.json();
       if (res.ok && data.success) {
+        setIsUnverified(false);
         if (data.two_factor_required) {
           setShow2fa(true);
           setSuccessMsg(data.message);
@@ -59,6 +90,11 @@ export default function Login() {
           }
         }
       } else {
+        if (data.is_unverified) {
+          setIsUnverified(true);
+        } else {
+          setIsUnverified(false);
+        }
         const errMsg = data.errors 
           ? Object.values(data.errors).flat().join(" ") 
           : (data.message || "Email, password, atau kode 2FA salah.");
@@ -112,12 +148,31 @@ export default function Login() {
 
         {/* Error Notification */}
         {error && (
-          <div className="mb-6 p-4 bg-red-950/30 border border-red-500/35 rounded-2xl flex gap-3 text-red-300 items-start">
-            <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
-            <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider leading-none">Gagal Masuk</span>
-              <p className="text-[11px] font-semibold leading-relaxed mt-1 text-red-200/80">{error}</p>
+          <div className="mb-6 p-4 bg-red-950/30 border border-red-500/35 rounded-2xl flex flex-col gap-2 text-red-300">
+            <div className="flex gap-3 items-start">
+              <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider leading-none">Gagal Masuk</span>
+                <p className="text-[11px] font-semibold leading-relaxed mt-1 text-red-200/80">{error}</p>
+              </div>
             </div>
+
+            {isUnverified && (
+              <div className="mt-2 pt-2 border-t border-red-500/20 flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={handleResendFromLogin}
+                  disabled={resendLoading}
+                  className="w-full py-2 px-3 bg-red-900/40 hover:bg-red-800/50 text-white rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all"
+                >
+                  <RefreshCw size={12} className={resendLoading ? "animate-spin" : ""} />
+                  <span>{resendLoading ? "Mengirim..." : "Kirim Ulang Tautan Verifikasi Email"}</span>
+                </button>
+                {resendNote && (
+                  <p className="text-[11px] text-amber-300 text-center font-medium">{resendNote}</p>
+                )}
+              </div>
+            )}
           </div>
         )}
 

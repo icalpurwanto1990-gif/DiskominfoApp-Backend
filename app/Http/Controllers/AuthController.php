@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\VerifyAccountMail;
 
 class AuthController extends Controller
 {
@@ -47,42 +48,93 @@ class AuthController extends Controller
             'verification_token' => $token,
         ]);
 
+        $verificationUrl = route('auth.verify', ['token' => $token]);
+        $mailSent = false;
+        $mailErrorMessage = null;
+
         try {
-            Mail::send([], [], function ($message) use ($user, $token, $validated) {
-                $message->to($validated['email'])
-                    ->subject('Verifikasi Email - Portal Diskominfo Bangkep')
-                    ->html('
-                        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
-                            <div style="text-align: center; margin-bottom: 24px;">
-                                <h2 style="color: #059669; font-weight: 800; font-size: 24px; margin: 0;">Portal Diskominfo Bangkep</h2>
-                            </div>
-                            <p style="color: #334155; font-size: 16px; line-height: 1.6;">Halo ' . htmlspecialchars($user->name) . ',</p>
-                            <p style="color: #334155; font-size: 16px; line-height: 1.6;">Akun Anda telah berhasil dibuat. Silakan klik tombol di bawah ini untuk memverifikasi alamat email Anda dan mengaktifkan akun Anda:</p>
-                            <div style="margin: 32px 0; text-align: center;">
-                                <a href="' . route('auth.verify', ['token' => $token]) . '" style="background-color: #059669; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; letter-spacing: 0.5px; text-transform: uppercase;">Aktifkan Akun Saya</a>
-                            </div>
-                            <p style="color: #64748b; font-size: 13px; line-height: 1.6; border-top: 1px solid #f1f5f9; padding-top: 16px; margin-top: 24px;">
-                                Jika tombol di atas tidak berfungsi, Anda juga dapat menyalin tautan berikut ke browser Anda:<br>
-                                <a href="' . route('auth.verify', ['token' => $token]) . '" style="color: #3b82f6; word-break: break-all;">' . route('auth.verify', ['token' => $token]) . '</a>
-                            </p>
-                            <p style="color: #94a3b8; font-size: 12px; text-align: center; margin-top: 32px;">&copy; ' . date('Y') . ' Dinas Komunikasi dan Informatika Kabupaten Banggai Kepulauan</p>
-                        </div>
-                    ');
-            });
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Mail send failed: ' . $e->getMessage());
+            Mail::to($user->email)->send(new VerifyAccountMail($user, $verificationUrl));
+            $mailSent = true;
+        } catch (\Throwable $e) {
+            $mailErrorMessage = $e->getMessage();
+            \Illuminate\Support\Facades\Log::error('Mail send failed on user registration: ' . $mailErrorMessage, [
+                'email' => $user->email,
+                'exception' => $e,
+            ]);
         }
 
         $responseData = [
             'success' => true,
-            'message' => 'Pendaftaran berhasil. Silakan cek kotak masuk email Anda (termasuk folder spam) untuk melakukan verifikasi akun.',
+            'mail_sent' => $mailSent,
+            'email' => $user->email,
+            'message' => $mailSent
+                ? 'Pendaftaran berhasil. Silakan periksa kotak masuk atau spam email Anda untuk mengaktifkan akun.'
+                : 'Pendaftaran akun berhasil dibuat, namun sistem pengiriman email sedang terkendala. Anda dapat menggunakan fitur kirim ulang verifikasi.',
         ];
 
         if (config('app.env') === 'local') {
-            $responseData['verification_link'] = route('auth.verify', ['token' => $token]);
+            $responseData['verification_link'] = $verificationUrl;
         }
 
         return response()->json($responseData);
+    }
+
+    public function resendVerification(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $user = User::where('email', $validated['email'])->first();
+
+        if (! $user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Alamat email tidak ditemukan dalam sistem.',
+            ], 404);
+        }
+
+        if ($user->email_verified_at) {
+            return response()->json([
+                'success' => true,
+                'already_verified' => true,
+                'message' => 'Akun Anda sudah terverifikasi sebelumnya. Silakan langsung masuk.',
+            ]);
+        }
+
+        if (empty($user->verification_token)) {
+            $user->verification_token = Str::random(60);
+            $user->save();
+        }
+
+        $verificationUrl = route('auth.verify', ['token' => $user->verification_token]);
+
+        try {
+            Mail::to($user->email)->send(new VerifyAccountMail($user, $verificationUrl));
+
+            $responseData = [
+                'success' => true,
+                'mail_sent' => true,
+                'message' => 'Tautan verifikasi baru berhasil dikirim ke ' . $user->email . '. Silakan periksa kotak masuk atau spam email Anda.',
+            ];
+
+            if (config('app.env') === 'local') {
+                $responseData['verification_link'] = $verificationUrl;
+            }
+
+            return response()->json($responseData);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Resend verification mail failed: ' . $e->getMessage(), [
+                'email' => $user->email,
+                'exception' => $e,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'mail_sent' => false,
+                'message' => 'Gagal mengirim email: Terjadi kendala koneksi ke server email (' . $e->getMessage() . '). Silakan hubungi Administrator atau coba beberapa saat lagi.',
+            ], 500);
+        }
     }
 
     public function verifyEmail($token)
@@ -114,6 +166,8 @@ class AuthController extends Controller
             if (is_null($user->email_verified_at)) {
                 return response()->json([
                     'success' => false,
+                    'is_unverified' => true,
+                    'email' => $user->email,
                     'message' => 'Akun Anda belum aktif. Silakan verifikasi email Anda terlebih dahulu.',
                 ], 422);
             }

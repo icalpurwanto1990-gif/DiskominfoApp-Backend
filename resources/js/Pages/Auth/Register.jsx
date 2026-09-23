@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "@inertiajs/react";
-import { User, Mail, Lock, UserPlus, ChevronLeft, AlertCircle, Building2, Briefcase, Award, CheckCircle } from "lucide-react";
+import { User, Mail, Lock, UserPlus, ChevronLeft, AlertCircle, Building2, Briefcase, Award, CheckCircle, RefreshCw } from "lucide-react";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -15,6 +15,39 @@ export default function Register() {
   const [successLink, setSuccessLink] = useState("");
   const [isRegistered, setIsRegistered] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
+  const [mailSent, setMailSent] = useState(true);
+  const [resending, setResending] = useState(false);
+  const [resendStatus, setResendStatus] = useState("");
+
+  const handleResend = async () => {
+    setResending(true);
+    setResendStatus("");
+    try {
+      const res = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || ""
+        },
+        body: JSON.stringify({ email: registeredEmail || email })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setResendStatus(data.message || "Tautan verifikasi baru berhasil dikirim!");
+        if (data.verification_link) {
+          setSuccessLink(data.verification_link);
+        }
+      } else {
+        setResendStatus(data.message || "Gagal mengirim ulang email. Silakan coba beberapa saat lagi.");
+      }
+    } catch (err) {
+      console.error(err);
+      setResendStatus("Terjadi kesalahan sistem saat meminta kirim ulang.");
+    } finally {
+      setResending(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,6 +83,7 @@ export default function Register() {
       if (res.ok && data.success) {
         setRegisteredEmail(email);
         setSuccessLink(data.verification_link || "");
+        setMailSent(data.mail_sent !== false);
         setIsRegistered(true);
       } else {
         const errMsg = data.errors 
@@ -95,11 +129,37 @@ export default function Register() {
             </div>
             <div className="p-5 bg-slate-900/60 border border-slate-800 rounded-2xl text-xs text-slate-300 leading-relaxed max-w-sm">
               <p className="font-extrabold text-slate-200 mb-2 uppercase tracking-wider text-[10px]">Pemberitahuan:</p>
-              Akun Anda telah berhasil dibuat. Silakan periksa kotak masuk email Anda **({registeredEmail})** (termasuk folder spam/promosi) untuk melakukan verifikasi dan mengaktifkan akun Anda.
+              Akun Anda telah berhasil dibuat. Silakan periksa kotak masuk email Anda <strong className="text-white">({registeredEmail})</strong> (termasuk folder spam/promosi) untuk melakukan verifikasi dan mengaktifkan akun Anda.
+              
+              {!mailSent && (
+                <div className="mt-3 p-2.5 bg-amber-950/40 border border-amber-500/30 rounded-xl text-amber-300 text-[11px] flex items-start gap-2">
+                  <AlertCircle size={14} className="flex-shrink-0 mt-0.5" />
+                  <span>Sistem pengiriman email otomatis mendeteksi kendala pada server SMTP. Silakan gunakan tombol kirim ulang di bawah.</span>
+                </div>
+              )}
+            </div>
+
+            {/* Resend Verification Action */}
+            <div className="flex flex-col items-center gap-2 w-full max-w-sm">
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={resending}
+                className="w-full px-5 py-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-200 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 border border-slate-700"
+              >
+                <RefreshCw size={14} className={resending ? "animate-spin" : ""} />
+                <span>{resending ? "Mengirim Ulang..." : "Kirim Ulang Email Verifikasi"}</span>
+              </button>
+
+              {resendStatus && (
+                <div className="p-3 bg-slate-900/80 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs text-center w-full">
+                  {resendStatus}
+                </div>
+              )}
             </div>
             
             {successLink ? (
-              <div className="flex flex-col items-center gap-3 w-full">
+              <div className="flex flex-col items-center gap-3 w-full max-w-sm">
                 <a
                   href={successLink}
                   className="w-full px-6 py-3.5 bg-emerald-650 hover:bg-emerald-600 text-white rounded-2xl font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-600/20 active:scale-[0.98] flex items-center justify-center gap-2"
@@ -113,7 +173,7 @@ export default function Register() {
             ) : (
               <Link
                 href="/auth/login"
-                className="w-full px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
+                className="w-full max-w-sm px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
               >
                 <span>Kembali ke Halaman Login</span>
               </Link>
