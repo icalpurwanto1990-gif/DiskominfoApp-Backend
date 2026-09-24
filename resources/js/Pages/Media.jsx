@@ -184,13 +184,9 @@ const MediaHeroSlider = ({ slides = [], onOpenPhoto, fotoCount = 0, videoCount =
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight text-white drop-shadow-sm">
               Dokumentasi Visual <br />
               <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
-                Kabupaten Banggai Kepulauan
+                Dinas Komunikasi dan Informatika
               </span>
             </h1>
-
-            <p className="text-sm md:text-base text-slate-300/90 font-medium leading-relaxed max-w-xl">
-              Eksplorasi dokumentasi resmi kegiatan kedinasan, peliputan pimpinan daerah, video edukasi pelayanan publik, dan infografis sektoral daerah secara terpadu.
-            </p>
 
             {/* Quick Action Buttons */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
