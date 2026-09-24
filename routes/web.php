@@ -19,6 +19,7 @@ use App\Http\Controllers\SatuDataController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\UploadController;
+use App\Http\Controllers\EditorUploadController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +51,9 @@ Route::get('/api/survey/widget-config', [SurveyController::class, 'widgetConfig'
 Route::get('/api/popup-modal', [HomeController::class, 'getPopupModalConfig'])->name('api.popup-modal');
 Route::get('/api/leader-agendas', [AgendaController::class, 'apiAgendas']);
 Route::post('/api/ai-chat', [AiChatController::class, 'reply'])->middleware('throttle:30,1')->name('api.aichat');
+
+// Admin Editor Image Upload Route
+Route::post('/admin/editor/upload', [EditorUploadController::class, 'upload'])->name('admin.editor.upload');
 
 // Auth Routes (React Inertia Views)
 Route::get('/auth/login', [AuthController::class, 'showLogin'])->name('login');

@@ -16,11 +16,69 @@
 .post-entry img {
     max-width: 100%;
     height: auto;
-    border-radius: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.post-entry img:not([style*="float"]) {
+    display: block;
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
-    display: block;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.post-entry img[style*="float: left"],
+.post-entry img[style*="float:left"] {
+    float: left;
+    margin-right: 1.5rem;
+    margin-bottom: 1rem;
+    margin-top: 0.5rem;
+}
+
+.post-entry img[style*="float: right"],
+.post-entry img[style*="float:right"] {
+    float: right;
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+    margin-top: 0.5rem;
+}
+
+.post-entry p[style*="text-align: justify"],
+.post-entry div[style*="text-align: justify"] {
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+.post-entry p[style*="text-align: center"],
+.post-entry div[style*="text-align: center"] {
+    text-align: center;
+}
+
+.post-entry p[style*="text-align: right"],
+.post-entry div[style*="text-align: right"] {
+    text-align: right;
+}
+
+.post-entry p[style*="text-align: left"],
+.post-entry div[style*="text-align: left"] {
+    text-align: left;
+}
+
+.post-entry table {
+    width: 100%;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-collapse: collapse;
+}
+
+.post-entry table td,
+.post-entry table th {
+    border: 1px solid #cbd5e1;
+    padding: 0.5rem 0.75rem;
+}
+
+.dark .post-entry table td,
+.dark .post-entry table th {
+    border-color: #334155;
 }
 
 .post-entry figure {

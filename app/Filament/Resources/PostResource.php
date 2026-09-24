@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PostResource\Pages;
+use App\Forms\Components\TinyEditor;
 use App\Models\Post;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -75,14 +76,12 @@ class PostResource extends Resource
                             ->image()
                             ->maxSize(10240)
                             ->label('Gambar Utama Berita'),
-                        Forms\Components\RichEditor::make('content')
+                        TinyEditor::make('content')
                             ->required()
-                            ->fileAttachmentsDisk('uploads')
-                            ->fileAttachmentsDirectory('posts/attachments')
-                            ->fileAttachmentsVisibility('public')
                             ->columnSpanFull()
+                            ->minHeight(500)
                             ->label('Isi Berita')
-                            ->helperText('Gunakan toolbar untuk format teks, menyisipkan gambar, tabel, atau tautan.'),
+                            ->helperText('Gunakan editor visual untuk memformat teks, mengatur perataan paragraf (rata kiri, tengah, kanan, justify), dan menyisipkan gambar yang dapat di-resize ukurannya (drag sudut gambar).'),
                         Forms\Components\Toggle::make('published')
                             ->required()
                             ->default(false)
