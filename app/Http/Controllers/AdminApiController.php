@@ -23,6 +23,7 @@ use App\Models\SurveyWidgetSetting;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -682,6 +683,69 @@ class AdminApiController extends Controller
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function importGisInfrastructures(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'rows'                  => 'required|array|min:1|max:2000',
+                'rows.*.name'           => 'required|string|max:255',
+                'rows.*.type'           => 'required|in:BTS_TOWER,BLANKSPOT,VSAT,FIBER_OPTIK',
+                'rows.*.latitude'       => 'required|numeric|between:-90,90',
+                'rows.*.longitude'      => 'required|numeric|between:-180,180',
+                'rows.*.status'         => 'nullable|string|max:50',
+                'rows.*.description'    => 'nullable|string|max:500',
+            ]);
+
+            $inserted = 0;
+            $skipped  = 0;
+            $errors   = [];
+
+            DB::beginTransaction();
+
+            foreach ($validated['rows'] as $idx => $row) {
+                try {
+                    GisInfrastructure::create([
+                        'id'        => (string) Str::uuid(),
+                        'name'      => trim($row['name']),
+                        'type'      => strtoupper(trim($row['type'])),
+                        'latitude'  => (float) $row['latitude'],
+                        'longitude' => (float) $row['longitude'],
+                        'status'    => strtoupper(trim($row['status'] ?? 'AKTIF')),
+                        'details'   => [
+                            'description' => trim($row['description'] ?? ''),
+                        ],
+                    ]);
+                    $inserted++;
+                } catch (\Exception $rowErr) {
+                    $skipped++;
+                    $errors[] = "Baris " . ($idx + 2) . ": " . $rowErr->getMessage();
+                }
+            }
+
+            DB::commit();
+
+            $this->logAudit(
+                $request,
+                'IMPORT',
+                'GIS',
+                "Impor batch GIS: {$inserted} titik berhasil ditambahkan, {$skipped} baris dilewati."
+            );
+
+            return response()->json([
+                'success'  => true,
+                'inserted' => $inserted,
+                'skipped'  => $skipped,
+                'errors'   => $errors,
+                'message'  => "{$inserted} titik infrastruktur GIS berhasil diimpor" . ($skipped ? ", {$skipped} baris dilewati." : "."),
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['success' => false, 'error' => 'Data tidak valid: ' . implode(', ', \Illuminate\Support\Arr::flatten($e->errors()))], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }

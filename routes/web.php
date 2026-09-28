@@ -171,6 +171,7 @@ Route::prefix('api')->group(function () {
         Route::get('/gis', [AdminApiController::class, 'getGisInfrastructures']);
         Route::post('/gis', [AdminApiController::class, 'saveGisInfrastructure']);
         Route::delete('/gis/{id}', [AdminApiController::class, 'deleteGisInfrastructure']);
+        Route::post('/gis-import', [AdminApiController::class, 'importGisInfrastructures']);
         Route::get('/media', [AdminApiController::class, 'getMediaDb']);
         Route::post('/media', [AdminApiController::class, 'saveMediaDb']);
         Route::delete('/media/{id}', [AdminApiController::class, 'deleteMediaDb']);
