@@ -698,6 +698,7 @@ class AdminApiController extends Controller
                 'rows.*.longitude'      => 'required|numeric|between:-180,180',
                 'rows.*.status'         => 'nullable|string|max:50',
                 'rows.*.description'    => 'nullable|string|max:500',
+                'rows.*.image'          => 'nullable|string|max:255',
             ]);
 
             $inserted = 0;
@@ -715,6 +716,7 @@ class AdminApiController extends Controller
                         'latitude'  => (float) $row['latitude'],
                         'longitude' => (float) $row['longitude'],
                         'status'    => strtoupper(trim($row['status'] ?? 'AKTIF')),
+                        'image'     => !empty($row['image']) ? trim($row['image']) : null,
                         'details'   => [
                             'description' => trim($row['description'] ?? ''),
                         ],

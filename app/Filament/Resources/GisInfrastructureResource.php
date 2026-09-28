@@ -55,6 +55,15 @@ class GisInfrastructureResource extends Resource
                     ->maxLength(255)
                     ->default('AKTIF')
                     ->label('Status Operasional'),
+                Forms\Components\FileUpload::make('image')
+                    ->label('Foto Dokumentasi / Infrastruktur')
+                    ->disk('uploads')
+                    ->directory('gis')
+                    ->image()
+                    ->imageResizeMode('cover')
+                    ->maxSize(5120)
+                    ->helperText('Format: JPG, JPEG, PNG, WEBP. Maksimal 5MB. Foto akan ditampilkan di pop-up peta publik.')
+                    ->columnSpanFull(),
                 Forms\Components\KeyValue::make('details')
                     ->columnSpanFull()
                     ->label('Detail Informasi / Spesifikasi'),
@@ -65,6 +74,12 @@ class GisInfrastructureResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('image')
+                    ->disk('uploads')
+                    ->label('Foto')
+                    ->circular()
+                    ->getStateUsing(fn ($record) => $record->getRawImagePath())
+                    ->defaultImageUrl(url('/images/logo.png')),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()

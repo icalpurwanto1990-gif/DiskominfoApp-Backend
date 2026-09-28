@@ -101,18 +101,32 @@ export const GISMap = () => {
         const marker = L.marker([item.latitude, item.longitude], { icon: customIcon })
           .addTo(mapInstance);
 
+        const photoUrl = item.imageUrl || (item.image ? (item.image.startsWith('http') || item.image.startsWith('/') ? item.image : `/uploads/${item.image}`) : null);
+
+        const photoHtml = photoUrl ? `
+          <div style="margin-bottom: 8px; border-radius: 8px; overflow: hidden; background: #f1f5f9;">
+            <a href="${photoUrl}" target="_blank" rel="noopener noreferrer" title="Klik untuk membuka foto ukuran penuh">
+              <img src="${photoUrl}" alt="${item.name}" style="width: 100%; height: 120px; object-fit: cover; display: block;" onerror="this.parentElement.parentElement.style.display='none'" />
+            </a>
+          </div>
+        ` : '';
+
         const detailsHtml = Object.entries(item.details || {})
-          .map(([k, v]) => `<strong>${k}:</strong> ${v}`)
-          .join("<br/>");
+          .filter(([k, v]) => v && k !== 'image' && k !== 'foto' && k !== 'photoUrl')
+          .map(([k, v]) => `<div style="display: flex; justify-content: space-between; gap: 8px;"><span style="color: #64748b;">${k}:</span> <span style="font-weight: 600; color: #1e293b; text-align: right;">${v}</span></div>`)
+          .join("");
 
         marker.bindPopup(`
-          <div style="font-family: sans-serif; font-size: 11px; padding: 4px;">
-            <strong style="font-size: 13px; color: ${color};">${item.name}</strong><br/>
-            <span style="font-size: 10px; font-weight: bold; background: #e2e8f0; padding: 2px 6px; border-radius: 4px; display: inline-block; margin: 4px 0;">${item.type.replace("_", " ")}</span><br/>
-            <strong>Status:</strong> ${item.status}<br/>
-            ${detailsHtml}
+          <div style="font-family: system-ui, -apple-system, sans-serif; font-size: 11px; padding: 2px; min-width: 200px; max-width: 260px;">
+            ${photoHtml}
+            <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 4px; line-height: 1.3;">${item.name}</div>
+            <div style="display: flex; gap: 4px; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
+              <span style="font-size: 9px; font-weight: 700; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px;">${item.type.replace(/_/g, " ")}</span>
+              <span style="font-size: 9px; font-weight: 700; background: ${item.status === 'AKTIF' || item.status === 'NORMAL' ? '#dcfce7' : '#fee2e2'}; color: ${item.status === 'AKTIF' || item.status === 'NORMAL' ? '#15803d' : '#b91c1c'}; padding: 2px 6px; border-radius: 4px;">${item.status}</span>
+            </div>
+            ${detailsHtml ? `<div style="display: flex; flex-direction: column; gap: 4px; border-top: 1px solid #f1f5f9; padding-top: 6px; font-size: 10px;">${detailsHtml}</div>` : ''}
           </div>
-        `);
+        `, { maxWidth: 280 });
       });
     };
 

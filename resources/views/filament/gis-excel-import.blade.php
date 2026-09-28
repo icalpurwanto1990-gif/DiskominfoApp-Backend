@@ -88,7 +88,8 @@
                             latitude: lat,
                             longitude: lng,
                             status: String(r['status'] || r['Status'] || 'AKTIF').toUpperCase().trim() || 'AKTIF',
-                            description: String(r['description'] || r['Description'] || r['deskripsi'] || '').trim()
+                            description: String(r['description'] || r['Description'] || r['deskripsi'] || '').trim(),
+                            image: String(r['image'] || r['Image'] || r['foto'] || r['Foto'] || r['gambar'] || r['Gambar'] || '').trim()
                         });
                     }
                 });
@@ -122,13 +123,13 @@
         downloadTemplate() {
             this.loadSheetJs().then(XLSX => {
                 const ws = XLSX.utils.aoa_to_sheet([
-                    ['name','type','latitude','longitude','status','description'],
-                    ['BTS Menara Salakan','BTS_TOWER',-1.3597,123.5671,'AKTIF','Telkomsel, tinggi 42m'],
-                    ['VSAT Desa Tatakalai','VSAT',-1.4123,123.6012,'AKTIF',''],
-                    ['Blankspot Kec. Bulagi','BLANKSPOT',-1.5001,123.4801,'BERMASALAH','Area tanpa sinyal'],
-                    ['Fiber Optik Jl. Poros','FIBER_OPTIK',-1.3421,123.5500,'NORMAL','Kabel tanah 1.2km']
+                    ['name','type','latitude','longitude','status','description','image'],
+                    ['BTS Menara Salakan','BTS_TOWER',-1.3597,123.5671,'AKTIF','Telkomsel, tinggi 42m',''],
+                    ['VSAT Desa Tatakalai','VSAT',-1.4123,123.6012,'AKTIF','',''],
+                    ['Blankspot Kec. Bulagi','BLANKSPOT',-1.5001,123.4801,'BERMASALAH','Area tanpa sinyal',''],
+                    ['Fiber Optik Jl. Poros','FIBER_OPTIK',-1.3421,123.5500,'NORMAL','Kabel tanah 1.2km','']
                 ]);
-                ws['!cols'] = [{wch:35},{wch:14},{wch:12},{wch:13},{wch:12},{wch:35}];
+                ws['!cols'] = [{wch:35},{wch:14},{wch:12},{wch:13},{wch:12},{wch:35},{wch:25}];
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, 'GIS Import');
                 XLSX.writeFile(wb, 'template_import_gis.xlsx');
@@ -264,7 +265,8 @@
                         <th class="text-left pr-4 pb-1">latitude *</th>
                         <th class="text-left pr-4 pb-1">longitude *</th>
                         <th class="text-left pr-4 pb-1">status</th>
-                        <th class="text-left pb-1">description</th>
+                        <th class="text-left pr-4 pb-1">description</th>
+                        <th class="text-left pb-1">image</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -274,13 +276,14 @@
                         <td class="pr-4 font-mono">-1.3597</td>
                         <td class="pr-4 font-mono">123.5671</td>
                         <td class="pr-4">AKTIF</td>
-                        <td>Tinggi 42m</td>
+                        <td class="pr-4">Tinggi 42m</td>
+                        <td class="font-mono text-[10px]">gis/bts-salakan.jpg</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         <p class="text-xs text-info-600 font-semibold">
-            Tipe valid: <strong>BTS_TOWER</strong> · <strong>VSAT</strong> · <strong>FIBER_OPTIK</strong> · <strong>BLANKSPOT</strong>
+            Tipe valid: <strong>BTS_TOWER</strong> · <strong>VSAT</strong> · <strong>FIBER_OPTIK</strong> · <strong>BLANKSPOT</strong> (Kolom <em>image</em> opsional)
         </p>
         <button type="button" @click.prevent="downloadTemplate()"
             class="text-xs font-bold text-info-600 hover:text-info-800 dark:hover:text-info-300 underline mt-1">
