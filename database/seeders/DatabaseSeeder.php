@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             ModulePermissionSeeder::class,
             SurveyCategorySeeder::class,
             LeaderSettingSeeder::class,
+            InteroperabilitySeeder::class,
         ]);
 
         User::updateOrCreate(
