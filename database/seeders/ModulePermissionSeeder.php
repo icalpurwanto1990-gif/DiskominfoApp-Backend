@@ -144,6 +144,21 @@ class ModulePermissionSeeder extends Seeder
                 'class' => 'App\Filament\Resources\LeaderAgendaResource',
                 'roles' => ['SUPERADMIN', 'ADMIN', 'PROTOKOL', 'OPD'],
             ],
+            [
+                'name' => 'Klien API Interoperabilitas (MPP)',
+                'class' => 'App\Filament\Resources\ApiClientResource',
+                'roles' => ['SUPERADMIN', 'ADMIN'],
+            ],
+            [
+                'name' => 'Integrasi SPLP Pusat',
+                'class' => 'App\Filament\Resources\SplpConfigResource',
+                'roles' => ['SUPERADMIN'],
+            ],
+            [
+                'name' => 'Log Interoperabilitas',
+                'class' => 'App\Filament\Resources\InteropLogResource',
+                'roles' => ['SUPERADMIN'],
+            ],
         ];
 
         foreach ($modules as $mod) {

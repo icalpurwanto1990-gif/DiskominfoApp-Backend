@@ -15,6 +15,8 @@ use Illuminate\Support\Str;
 
 class ApiClientResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
+
     protected static ?string $model = ApiClient::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-key';
@@ -90,8 +92,7 @@ class ApiClientResource extends Resource
                 Tables\Columns\TextColumn::make('allowed_scopes')
                     ->label('Scopes')
                     ->badge()
-                    ->color('success')
-                    ->separator(','),
+                    ->color('success'),
 
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean()

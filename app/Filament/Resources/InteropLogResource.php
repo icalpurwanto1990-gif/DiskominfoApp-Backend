@@ -11,6 +11,8 @@ use Filament\Tables\Table;
 
 class InteropLogResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
+
     protected static ?string $model = InteropLog::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';

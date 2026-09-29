@@ -14,6 +14,8 @@ use Filament\Tables\Table;
 
 class SplpConfigResource extends Resource
 {
+    use \App\Traits\HasDynamicPermission;
+
     protected static ?string $model = SplpConfig::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-arrows-right-left';
@@ -131,7 +133,8 @@ class SplpConfigResource extends Resource
                     ->label('Test Koneksi')
                     ->icon('heroicon-o-bolt')
                     ->color('info')
-                    ->action(function (SplpConfig $record, SplpClientService $splpService) {
+                    ->action(function (SplpConfig $record) {
+                        $splpService = app(SplpClientService::class);
                         $result = $splpService->testConnection($record);
 
                         if ($result['success']) {
