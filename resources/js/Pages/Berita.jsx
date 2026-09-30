@@ -8,13 +8,27 @@ import PageHero from "../Components/PageHero";
 const stripHtml = (html) => {
   if (!html) return "";
   return html
+    .replace(/<br\s*[\/]?>/gi, " ")
+    .replace(/<\/(p|div|h[1-6]|li|blockquote|td|th)>/gi, " ")
     .replace(/<[^>]*>/g, "")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "'");
+    .replace(/&#039;/g, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+const formatExcerpt = (content, seoDesc, maxLength = 160) => {
+  if (seoDesc && seoDesc.trim()) {
+    return seoDesc.trim();
+  }
+  const clean = stripHtml(content);
+  if (!clean) return "";
+  if (clean.length <= maxLength) return clean;
+  return clean.substring(0, maxLength).trim() + "...";
 };
 
 const estimateReadTime = (content) => {
@@ -253,8 +267,8 @@ export const Berita = ({ categories = [] }) => {
                       </h3>
 
                       {/* Excerpt */}
-                      <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400 font-semibold line-clamp-3 flex-1">
-                        {stripHtml(post.content)}
+                      <p className="text-xs md:text-[13px] leading-relaxed text-slate-600 dark:text-slate-400 font-normal line-clamp-3 flex-1">
+                        {formatExcerpt(post.content, post.seoDesc, 180)}
                       </p>
 
                       {/* Footer row */}

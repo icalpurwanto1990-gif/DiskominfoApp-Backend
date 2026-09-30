@@ -39,28 +39,32 @@
 /* 2. Lists Support (Fix Tailwind reset) */
 .post-entry ul {
     list-style-type: disc !important;
-    padding-left: 1.75rem !important;
+    padding-left: 2rem !important;
     margin-top: 1rem !important;
     margin-bottom: 1rem !important;
 }
 .post-entry ol {
     list-style-type: decimal !important;
-    padding-left: 1.75rem !important;
+    padding-left: 2rem !important;
     margin-top: 1rem !important;
     margin-bottom: 1rem !important;
 }
 .post-entry li {
-    margin-top: 0.35rem !important;
-    margin-bottom: 0.35rem !important;
-    line-height: 1.75;
+    display: list-item !important;
+    list-style: inherit !important;
+    margin-top: 0.4rem !important;
+    margin-bottom: 0.4rem !important;
+    line-height: 1.8;
 }
 .post-entry ul ul {
     list-style-type: circle !important;
+    padding-left: 1.5rem !important;
     margin-top: 0.25rem !important;
     margin-bottom: 0.25rem !important;
 }
 .post-entry ol ol {
     list-style-type: lower-alpha !important;
+    padding-left: 1.5rem !important;
     margin-top: 0.25rem !important;
     margin-bottom: 0.25rem !important;
 }
@@ -100,9 +104,14 @@
 }
 
 .post-entry p {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    margin-top: 0.85rem;
+    margin-bottom: 0.85rem;
     line-height: 1.85;
+}
+
+.post-entry p:empty,
+.post-entry p:has(> br:only-child) {
+    min-height: 1.5rem;
 }
 
 .post-entry strong,

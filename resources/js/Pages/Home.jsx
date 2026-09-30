@@ -15,13 +15,27 @@ import ScrollReveal from "../Components/ScrollReveal";
 const stripHtml = (html) => {
   if (!html) return "";
   return html
+    .replace(/<br\s*[\/]?>/gi, " ")
+    .replace(/<\/(p|div|h[1-6]|li|blockquote|td|th)>/gi, " ")
     .replace(/<[^>]*>/g, "")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "'");
+    .replace(/&#039;/g, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+const formatExcerpt = (content, seoDesc, maxLength = 160) => {
+  if (seoDesc && seoDesc.trim()) {
+    return seoDesc.trim();
+  }
+  const clean = stripHtml(content);
+  if (!clean) return "";
+  if (clean.length <= maxLength) return clean;
+  return clean.substring(0, maxLength).trim() + "...";
 };
 
 const iconMap = {
@@ -659,8 +673,8 @@ export const Home = ({ dbStats, sliderImages, dbServices, welcomeSpeech, latestN
                             <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition leading-snug line-clamp-2">
                               {news.title}
                             </h3>
-                            <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400 font-medium line-clamp-2">
-                              {stripHtml(news.content)}
+                            <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400 font-normal line-clamp-3">
+                              {formatExcerpt(news.content, news.seoDesc, 160)}
                             </p>
                           </div>
                           <div className="flex items-center gap-2 text-[9px] text-slate-400 font-bold uppercase tracking-wider">
@@ -730,8 +744,8 @@ export const Home = ({ dbStats, sliderImages, dbServices, welcomeSpeech, latestN
                             <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition line-clamp-2">
                               {ann.title}
                             </h4>
-                            <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium leading-relaxed line-clamp-2">
-                              {stripHtml(ann.content)}
+                            <p className="text-xs text-slate-600 dark:text-slate-400 font-normal leading-relaxed line-clamp-3">
+                              {formatExcerpt(ann.content, ann.seoDesc, 160)}
                             </p>
                           </div>
                           <div className="flex items-center gap-2 mt-auto pt-1">
