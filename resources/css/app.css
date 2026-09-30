@@ -12,7 +12,173 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-/* Post Content & Article Styling */
+/* ==========================================================================
+   Post Content & Rich Text Editor (TinyMCE) Styling
+   Ensures 100% fidelity with the formatting created in the admin editor.
+   ========================================================================== */
+
+/* 1. Universal Text Alignment */
+.post-entry [style*="text-align: justify"],
+.post-entry [style*="text-align:justify"] {
+    text-align: justify !important;
+    text-justify: inter-word;
+}
+.post-entry [style*="text-align: center"],
+.post-entry [style*="text-align:center"] {
+    text-align: center !important;
+}
+.post-entry [style*="text-align: right"],
+.post-entry [style*="text-align:right"] {
+    text-align: right !important;
+}
+.post-entry [style*="text-align: left"],
+.post-entry [style*="text-align:left"] {
+    text-align: left !important;
+}
+
+/* 2. Lists Support (Fix Tailwind reset) */
+.post-entry ul {
+    list-style-type: disc !important;
+    padding-left: 1.75rem !important;
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+}
+.post-entry ol {
+    list-style-type: decimal !important;
+    padding-left: 1.75rem !important;
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+}
+.post-entry li {
+    margin-top: 0.35rem !important;
+    margin-bottom: 0.35rem !important;
+    line-height: 1.75;
+}
+.post-entry ul ul {
+    list-style-type: circle !important;
+    margin-top: 0.25rem !important;
+    margin-bottom: 0.25rem !important;
+}
+.post-entry ol ol {
+    list-style-type: lower-alpha !important;
+    margin-top: 0.25rem !important;
+    margin-bottom: 0.25rem !important;
+}
+
+/* 3. Typography & Headings */
+.post-entry h1 {
+    font-size: 1.75rem !important;
+    font-weight: 800 !important;
+    line-height: 1.3 !important;
+    margin-top: 2rem !important;
+    margin-bottom: 1rem !important;
+    color: inherit;
+}
+.post-entry h2 {
+    font-size: 1.4rem !important;
+    font-weight: 700 !important;
+    line-height: 1.35 !important;
+    margin-top: 1.75rem !important;
+    margin-bottom: 0.75rem !important;
+    color: inherit;
+}
+.post-entry h3 {
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
+    line-height: 1.4 !important;
+    margin-top: 1.5rem !important;
+    margin-bottom: 0.5rem !important;
+    color: inherit;
+}
+.post-entry h4 {
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    line-height: 1.4 !important;
+    margin-top: 1.25rem !important;
+    margin-bottom: 0.5rem !important;
+    color: inherit;
+}
+
+.post-entry p {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    line-height: 1.85;
+}
+
+.post-entry strong,
+.post-entry b {
+    font-weight: 700 !important;
+}
+
+.post-entry em,
+.post-entry i {
+    font-style: italic !important;
+}
+
+.post-entry u {
+    text-decoration: underline !important;
+}
+
+.post-entry s,
+.post-entry strike {
+    text-decoration: line-through !important;
+}
+
+.post-entry blockquote {
+    border-left: 4px solid #0284c7;
+    padding-left: 1.25rem;
+    font-style: italic;
+    margin: 1.5rem 0;
+    color: #475569;
+}
+.dark .post-entry blockquote {
+    border-left-color: #38bdf8;
+    color: #94a3b8;
+}
+
+.post-entry a {
+    color: #0284c7;
+    text-decoration: underline;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+.post-entry a:hover {
+    color: #0369a1;
+}
+.dark .post-entry a {
+    color: #38bdf8;
+}
+.dark .post-entry a:hover {
+    color: #7dd3fc;
+}
+
+/* 4. Table Styling */
+.post-entry table {
+    width: 100% !important;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-collapse: collapse !important;
+    display: table;
+}
+.post-entry table td,
+.post-entry table th {
+    border: 1px solid #cbd5e1;
+    padding: 0.65rem 0.85rem;
+    line-height: 1.5;
+}
+.post-entry table th {
+    background-color: #f1f5f9;
+    font-weight: 700;
+}
+.dark .post-entry table th {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+.dark .post-entry table td {
+    border-color: #334155;
+}
+
+/* 5. Images inside Content */
 .post-entry img {
     max-width: 100%;
     height: auto;
@@ -42,45 +208,6 @@
     margin-top: 0.5rem;
 }
 
-.post-entry p[style*="text-align: justify"],
-.post-entry div[style*="text-align: justify"] {
-    text-align: justify;
-    text-justify: inter-word;
-}
-
-.post-entry p[style*="text-align: center"],
-.post-entry div[style*="text-align: center"] {
-    text-align: center;
-}
-
-.post-entry p[style*="text-align: right"],
-.post-entry div[style*="text-align: right"] {
-    text-align: right;
-}
-
-.post-entry p[style*="text-align: left"],
-.post-entry div[style*="text-align: left"] {
-    text-align: left;
-}
-
-.post-entry table {
-    width: 100%;
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-    border-collapse: collapse;
-}
-
-.post-entry table td,
-.post-entry table th {
-    border: 1px solid #cbd5e1;
-    padding: 0.5rem 0.75rem;
-}
-
-.dark .post-entry table td,
-.dark .post-entry table th {
-    border-color: #334155;
-}
-
 .post-entry figure {
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
@@ -105,4 +232,3 @@
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
 }
-

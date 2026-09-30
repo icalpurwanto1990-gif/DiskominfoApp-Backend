@@ -704,27 +704,46 @@ export const Home = ({ dbStats, sliderImages, dbServices, welcomeSpeech, latestN
                 latestAnnouncements.map((ann, idx) => (
                   <ScrollReveal key={ann.id} delay={idx * 80}>
                     <Link href={`/berita/${ann.slug}`} className="group block">
-                      <div className="p-5 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/20 border border-emerald-200/60 dark:border-emerald-800/40 rounded-2xl flex gap-4 shadow-sm hover:shadow-md hover:border-emerald-400/60 dark:hover:border-emerald-600/60 transition-all duration-300">
-                        <div className="p-3 bg-white dark:bg-slate-900 text-emerald-600 rounded-xl h-fit shadow-sm border border-emerald-100 dark:border-emerald-900 flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                          <Megaphone size={16} />
-                        </div>
-                        <div className="flex flex-col gap-1.5 min-w-0">
-                          <h4 className="font-bold text-sm text-slate-900 dark:text-white leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition line-clamp-2">
-                            {ann.title}
-                          </h4>
-                          <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium leading-relaxed line-clamp-2">
-                            {stripHtml(ann.content)}
-                          </p>
-                          <div className="flex items-center gap-2 mt-1">
+                      <div className="p-4 sm:p-5 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/20 border border-emerald-200/60 dark:border-emerald-800/40 rounded-2xl flex gap-3.5 sm:gap-4 shadow-sm hover:shadow-md hover:border-emerald-400/60 dark:hover:border-emerald-600/60 transition-all duration-300">
+                        {/* Thumbnail Image or Fallback Megaphone Icon */}
+                        {ann.image ? (
+                          <div className="w-24 sm:w-28 h-24 sm:h-28 rounded-xl overflow-hidden flex-shrink-0 bg-slate-100 dark:bg-slate-800 border border-emerald-100 dark:border-emerald-900/60 shadow-sm relative group-hover:shadow-md transition duration-300">
+                            <img
+                              src={ann.image}
+                              alt={ann.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              loading="lazy"
+                            />
+                            <div className="absolute top-1.5 left-1.5 p-1 bg-emerald-600/90 backdrop-blur-sm text-white rounded-lg shadow-sm">
+                              <Megaphone size={11} />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="p-3 bg-white dark:bg-slate-900 text-emerald-600 rounded-xl h-fit shadow-sm border border-emerald-100 dark:border-emerald-900 flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                            <Megaphone size={16} />
+                          </div>
+                        )}
+
+                        {/* Announcement Info */}
+                        <div className="flex flex-col justify-between gap-1.5 min-w-0 flex-1">
+                          <div className="flex flex-col gap-1">
+                            <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition line-clamp-2">
+                              {ann.title}
+                            </h4>
+                            <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium leading-relaxed line-clamp-2">
+                              {stripHtml(ann.content)}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2 mt-auto pt-1">
                             <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">
                               {ann.createdAt
                                 ? new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "long", year: "numeric" }).format(new Date(ann.createdAt))
                                 : "-"}
                             </span>
                             <span className="text-slate-300 dark:text-slate-600 text-[9px]">·</span>
-                            <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                            <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                               <ArrowRight size={9} className="group-hover:translate-x-0.5 transition-transform" />
-                              Baca
+                              Baca Pengumuman
                             </span>
                           </div>
                         </div>

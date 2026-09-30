@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Head } from "@inertiajs/react";
 
 const stripHtml = (html) => {
@@ -12,13 +12,32 @@ const stripHtml = (html) => {
     .replace(/&quot;/g, '"')
     .replace(/&#039;/g, "'");
 };
-import { ArrowLeft, Calendar, Eye, Tag, User, FileText, Search, ChevronRight } from "lucide-react";
+import { ArrowLeft, Calendar, Eye, Tag, User, FileText, Search, ChevronRight, Maximize2, X } from "lucide-react";
 import MainLayout from "../Layouts/MainLayout";
 import ShareButtons from "../Components/ShareButtons";
 import PageHero from "../Components/PageHero";
 
 export const BeritaDetail = ({ post, categories }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setIsLightboxOpen(false);
+      }
+    };
+    if (isLightboxOpen) {
+      document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", handleKeyDown);
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isLightboxOpen]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -130,14 +149,36 @@ export const BeritaDetail = ({ post, categories }) => {
             <span>Kembali ke Semua Berita</span>
           </Link>
 
-          {/* Featured Image */}
+          {/* Featured Image - Adaptive Auto-Fit Frame with Ambient Blur & Fullscreen Zoom */}
           {post.image && (
-            <div className="w-full aspect-video md:max-h-[480px] bg-slate-100 dark:bg-slate-900 rounded-3xl overflow-hidden shadow-md relative border border-slate-200/60 dark:border-slate-800/80">
-              <img
-                src={post.image}
-                alt={post.title}
-                className="w-full h-full object-cover"
+            <div className="relative group w-full rounded-3xl overflow-hidden shadow-md border border-slate-200/70 dark:border-slate-800/80 bg-slate-100 dark:bg-slate-900/60">
+              {/* Ambient blurred backdrop for aesthetic framing of any aspect ratio */}
+              <div 
+                className="absolute inset-0 bg-cover bg-center blur-2xl opacity-20 dark:opacity-25 scale-110 pointer-events-none"
+                style={{ backgroundImage: `url(${post.image})` }}
               />
+
+              {/* Main Adaptive Image */}
+              <div className="relative z-10 flex items-center justify-center p-2 sm:p-4 min-h-[240px]">
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="max-h-[550px] md:max-h-[680px] w-auto max-w-full h-auto object-contain rounded-2xl shadow-sm transition-transform duration-300 group-hover:scale-[1.01] cursor-zoom-in"
+                  onClick={() => setIsLightboxOpen(true)}
+                  loading="lazy"
+                />
+              </div>
+
+              {/* Zoom hint badge */}
+              <button
+                type="button"
+                onClick={() => setIsLightboxOpen(true)}
+                className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 bg-black/60 hover:bg-black/80 backdrop-blur-md text-white text-[11px] font-bold rounded-xl transition duration-200 shadow-md cursor-pointer"
+                title="Lihat Gambar Ukuran Penuh"
+              >
+                <Maximize2 size={13} />
+                <span>Lihat Ukuran Penuh</span>
+              </button>
             </div>
           )}
 
@@ -165,8 +206,8 @@ export const BeritaDetail = ({ post, categories }) => {
             </span>
           </div>
 
-          {/* News Article Content (renders HTML block) */}
-          <article className="prose prose-slate dark:prose-invert max-w-none text-xs md:text-[13px] font-semibold leading-relaxed text-slate-700 dark:text-slate-350 mt-2 post-entry">
+          {/* News Article Content (renders HTML block with TinyMCE fidelity) */}
+          <article className="prose prose-slate dark:prose-invert max-w-none text-sm md:text-base leading-relaxed text-slate-800 dark:text-slate-200 mt-2 post-entry">
             <div 
               dangerouslySetInnerHTML={{ __html: post.content }} 
             />
@@ -255,6 +296,39 @@ export const BeritaDetail = ({ post, categories }) => {
         </div>
 
       </div>
+
+      {/* Lightbox / Fullscreen Image Modal */}
+      {isLightboxOpen && post.image && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-4 md:p-8 animate-fadeIn"
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          {/* Close button */}
+          <button
+            type="button"
+            onClick={() => setIsLightboxOpen(false)}
+            className="absolute top-4 right-4 md:top-6 md:right-6 p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition duration-200 cursor-pointer shadow-lg"
+            title="Tutup (Esc)"
+          >
+            <X size={24} />
+          </button>
+
+          {/* Modal Container */}
+          <div 
+            className="max-w-5xl max-h-[88vh] flex flex-col items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={post.image}
+              alt={post.title}
+              className="max-h-[80vh] w-auto max-w-full object-contain rounded-2xl shadow-2xl border border-white/10"
+            />
+            <p className="text-white/80 text-xs md:text-sm font-semibold mt-3 text-center max-w-2xl line-clamp-2 px-4">
+              {post.title}
+            </p>
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 };
