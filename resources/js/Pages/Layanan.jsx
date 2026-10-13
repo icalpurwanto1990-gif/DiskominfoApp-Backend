@@ -440,9 +440,16 @@ export const Layanan = () => {
             ) : (
               <div>
                 <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-indigo-500/10 text-indigo-500 rounded-xl">
-                      <Cpu size={20} />
+                  <div className="flex items-center gap-3.5">
+                    <div className={`p-2.5 rounded-2xl border min-w-[52px] min-h-[52px] flex items-center justify-center shadow-sm ${currentService?.color || 'bg-indigo-500/10 border-indigo-500/20 text-indigo-500'}`}>
+                      {isCustomIcon(currentService?.icon) ? (
+                        <img src={getCustomIconUrl(currentService.icon)} alt={currentService.title} className="w-10 h-10 object-contain drop-shadow-sm" />
+                      ) : (
+                        (() => {
+                          const FormIcon = getIcon(currentService?.icon);
+                          return <FormIcon size={28} className="stroke-[2.2]" />;
+                        })()
+                      )}
                     </div>
                     <div className="flex flex-col">
                       <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
@@ -688,8 +695,8 @@ export const Layanan = () => {
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
                     className={`px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-all ${selectedCategory === cat
-                        ? "bg-indigo-600 text-white shadow-sm"
-                        : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800"
+                      ? "bg-indigo-600 text-white shadow-sm"
+                      : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800"
                       }`}
                   >
                     {cat}
@@ -732,17 +739,17 @@ export const Layanan = () => {
                   <div
                     key={srv.slug}
                     className={`group bg-white dark:bg-slate-900 text-slate-950 dark:text-slate-100 border rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between gap-5 relative overflow-hidden ${isCurrentActive
-                        ? "border-indigo-500 ring-2 ring-indigo-500/20"
-                        : "border-slate-200 dark:border-slate-800 hover:border-indigo-500/50"
+                      ? "border-indigo-500 ring-2 ring-indigo-500/20"
+                      : "border-slate-200 dark:border-slate-800 hover:border-indigo-500/50"
                       }`}
                   >
                     {/* Top Row: Icon + Badges */}
                     <div className="flex items-start justify-between gap-3">
-                      <div className={`p-3.5 rounded-2xl border w-fit transition-transform group-hover:scale-105 ${srv.color || 'bg-slate-100 border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-300'}`}>
+                      <div className={`p-3 md:p-3.5 rounded-2xl border min-w-[64px] min-h-[64px] flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm ${srv.color || 'bg-slate-100 border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-300'}`}>
                         {customIcon ? (
-                          <img src={getCustomIconUrl(srv.icon)} alt={srv.title} className="w-5 h-5 object-contain" />
+                          <img src={getCustomIconUrl(srv.icon)} alt={srv.title} className="w-14 h-14 md:w-16 md:h-16 max-w-[64px] max-h-[64px] object-contain drop-shadow-sm" />
                         ) : (
-                          <Icon size={50} className="stroke-[2.5]" />
+                          <Icon size={34} className="stroke-[2.2]" />
                         )}
                       </div>
 
@@ -789,10 +796,10 @@ export const Layanan = () => {
                       type="button"
                       onClick={() => handleServiceClick(srv)}
                       className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-95 ${isExternal
-                          ? "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
-                          : user
-                            ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
-                            : "bg-slate-100 hover:bg-indigo-50 dark:bg-slate-800 dark:hover:bg-indigo-950/40 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500"
+                        ? "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
+                        : user
+                          ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                          : "bg-slate-100 hover:bg-indigo-50 dark:bg-slate-800 dark:hover:bg-indigo-950/40 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500"
                         }`}
                     >
                       {isExternal ? (
@@ -859,9 +866,16 @@ export const Layanan = () => {
 
             {/* Kartu Cuplikan Layanan yang Dipilih */}
             {pendingService && (
-              <div className="p-4 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-750 rounded-2xl flex items-center gap-3">
-                <div className="p-2.5 bg-indigo-500/10 text-indigo-500 rounded-xl flex-shrink-0">
-                  <Cpu size={18} />
+              <div className="p-4 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-750 rounded-2xl flex items-center gap-3.5">
+                <div className={`p-2.5 rounded-2xl border min-w-[48px] min-h-[48px] flex items-center justify-center flex-shrink-0 shadow-sm ${pendingService.color || 'bg-indigo-500/10 border-indigo-500/20 text-indigo-500'}`}>
+                  {isCustomIcon(pendingService.icon) ? (
+                    <img src={getCustomIconUrl(pendingService.icon)} alt={pendingService.title} className="w-10 h-10 object-contain drop-shadow-sm" />
+                  ) : (
+                    (() => {
+                      const ModalIcon = getIcon(pendingService.icon);
+                      return <ModalIcon size={24} className="stroke-[2.2]" />;
+                    })()
+                  )}
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="text-xs font-extrabold text-slate-900 dark:text-white truncate">
