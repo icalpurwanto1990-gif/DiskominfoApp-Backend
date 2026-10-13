@@ -30,9 +30,7 @@ import {
   LogIn,
   UserPlus,
   ArrowRight,
-  AlertCircle,
-  Sparkles,
-  Info
+  AlertCircle
 } from "lucide-react";
 import MainLayout from "../Layouts/MainLayout";
 import PageHero from "../Components/PageHero";
@@ -386,60 +384,7 @@ export const Layanan = () => {
         ]}
       />
 
-      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-10 flex flex-col gap-8">
-
-        {/* =========================================================================
-            A. BANNER INFORMASI KATALOG PUBLIK
-            ========================================================================= */}
-        <div className="w-full bg-gradient-to-r from-slate-900 via-indigo-950/60 to-slate-900 border border-indigo-500/20 rounded-3xl p-6 md:p-8 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="flex items-start gap-4">
-            <div className="p-3.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-2xl flex-shrink-0 mt-0.5">
-              <Sparkles className="w-6 h-6 stroke-[2]" />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 px-2.5 py-0.5 rounded-full">
-                  Katalog Terbuka Publik
-                </span>
-                {user ? (
-                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
-                    <CheckCircle2 size={10} /> Terverifikasi sebagai: {user.name} ({user.instansi || "Pemohon"})
-                  </span>
-                ) : (
-                  <span className="text-[10px] font-semibold text-slate-400">
-                    Mode Penjelajahan Terbuka
-                  </span>
-                )}
-              </div>
-              <h2 className="text-base md:text-lg font-extrabold text-white leading-tight">
-                Jelajahi Berbagai Layanan Publik & Tata Kelola SPBE Daerah
-              </h2>
-              <p className="text-xs text-slate-300/80 leading-relaxed max-w-3xl">
-                Seluruh masyarakat, aparatur sipil negara, dan instansi OPD dapat meninjau rincian katalog, persyaratan, dan dokumen SOP resmi tanpa perlu login. Untuk melakukan pengajuan permohonan secara mandiri, Anda akan diarahkan untuk masuk menggunakan akun pemohon terverifikasi.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 flex-shrink-0 self-stretch md:self-auto justify-end">
-            {!user ? (
-              <Link
-                href="/auth/login?redirect=/layanan"
-                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-550 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all shadow-md active:scale-95"
-              >
-                <LogIn size={14} />
-                <span>Masuk Akun</span>
-              </Link>
-            ) : (
-              <Link
-                href="/user/dashboard"
-                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-bold rounded-xl text-xs uppercase tracking-wider transition-all shadow-sm active:scale-95"
-              >
-                <Layout size={14} />
-                <span>Dashboard Saya</span>
-              </Link>
-            )}
-          </div>
-        </div>
+      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-8 flex flex-col gap-8">
 
         {/* Notifikasi Pengajuan Sukses */}
         {successTicket && (
