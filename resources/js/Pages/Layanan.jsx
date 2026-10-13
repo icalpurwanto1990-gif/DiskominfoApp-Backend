@@ -406,7 +406,7 @@ export const Layanan = () => {
             ========================================================================= */}
         {selectedService && (
           <div className="w-full max-w-3xl mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 md:p-10 rounded-3xl shadow-xl animate-fadeIn">
-            
+
             {/* Guard Proteksi: Jika Belum Login Tapi Berada di Mode Form */}
             {!user ? (
               <div className="flex flex-col items-center text-center gap-5 py-8">
@@ -557,7 +557,7 @@ export const Layanan = () => {
                             <label className="text-slate-700 dark:text-slate-300">
                               {label} {isRequired && <span className="text-red-500">*</span>}
                             </label>
-                            
+
                             {type === "textarea" ? (
                               <textarea
                                 required={isRequired}
@@ -658,7 +658,7 @@ export const Layanan = () => {
             C. KATALOG UTAMA (TERBUKA UNTUK PUBLIK / SEMUA PENGUNJUNG)
             ========================================================================= */}
         <div className="flex flex-col gap-6">
-          
+
           {/* Baris Kontrol: Pencarian & Filter Kategori */}
           <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
             <div className="relative flex-1 max-w-md">
@@ -687,11 +687,10 @@ export const Layanan = () => {
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-all ${
-                      selectedCategory === cat
+                    className={`px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-all ${selectedCategory === cat
                         ? "bg-indigo-600 text-white shadow-sm"
                         : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800"
-                    }`}
+                      }`}
                   >
                     {cat}
                   </button>
@@ -732,11 +731,10 @@ export const Layanan = () => {
                 return (
                   <div
                     key={srv.slug}
-                    className={`group bg-white dark:bg-slate-900 text-slate-950 dark:text-slate-100 border rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between gap-5 relative overflow-hidden ${
-                      isCurrentActive
+                    className={`group bg-white dark:bg-slate-900 text-slate-950 dark:text-slate-100 border rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between gap-5 relative overflow-hidden ${isCurrentActive
                         ? "border-indigo-500 ring-2 ring-indigo-500/20"
                         : "border-slate-200 dark:border-slate-800 hover:border-indigo-500/50"
-                    }`}
+                      }`}
                   >
                     {/* Top Row: Icon + Badges */}
                     <div className="flex items-start justify-between gap-3">
@@ -744,7 +742,7 @@ export const Layanan = () => {
                         {customIcon ? (
                           <img src={getCustomIconUrl(srv.icon)} alt={srv.title} className="w-5 h-5 object-contain" />
                         ) : (
-                          <Icon size={22} className="stroke-[2.5]" />
+                          <Icon size={50} className="stroke-[2.5]" />
                         )}
                       </div>
 
@@ -790,13 +788,12 @@ export const Layanan = () => {
                     <button
                       type="button"
                       onClick={() => handleServiceClick(srv)}
-                      className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-95 ${
-                        isExternal
+                      className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-95 ${isExternal
                           ? "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
                           : user
-                          ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
-                          : "bg-slate-100 hover:bg-indigo-50 dark:bg-slate-800 dark:hover:bg-indigo-950/40 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500"
-                      }`}
+                            ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                            : "bg-slate-100 hover:bg-indigo-50 dark:bg-slate-800 dark:hover:bg-indigo-950/40 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500"
+                        }`}
                     >
                       {isExternal ? (
                         <>
@@ -895,7 +892,7 @@ export const Layanan = () => {
                 <LogIn size={14} />
                 <span>Masuk Sekarang</span>
               </Link>
-              
+
               <Link
                 href={
                   pendingService
