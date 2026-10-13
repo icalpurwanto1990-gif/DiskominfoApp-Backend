@@ -42,8 +42,40 @@ export default function Login() {
     }
   };
 
+  const [redirectUrl, setRedirectUrl] = useState(null);
+
+  // Mitigasi Keamanan Siber: Mencegah serangan Open Redirect & XSS
+  const getSafeRedirect = () => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const target = params.get("redirect");
+      if (!target || typeof target !== "string") return null;
+
+      // Hanya terima path internal relatif yang diawali '/' tunggal,
+      // bukan protocol-relative '//', bukan backslash '\', dan tidak mengandung scheme '://' atau 'javascript:'
+      const trimmed = target.trim();
+      if (
+        trimmed.startsWith("/") &&
+        !trimmed.startsWith("//") &&
+        !trimmed.includes("\\") &&
+        !trimmed.includes("://") &&
+        !trimmed.toLowerCase().startsWith("/\\")
+      ) {
+        return trimmed;
+      }
+    } catch (e) {
+      console.error("Kesalahan parsing redirect:", e);
+    }
+    return null;
+  };
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const safeTarget = getSafeRedirect();
+    if (safeTarget) {
+      setRedirectUrl(safeTarget);
+    }
+
     if (params.get("verified") === "1") {
       setSuccessMsg("Akun Anda berhasil diaktifkan! Silakan masuk.");
     } else if (params.get("error") === "invalid_token") {
@@ -77,16 +109,18 @@ export default function Login() {
           setShow2fa(true);
           setSuccessMsg(data.message);
         } else {
+          const safeTarget = getSafeRedirect();
+
           // Save session locally
           if (data.user.role === "SUPERADMIN" || data.user.role === "ADMIN") {
             localStorage.setItem("adminSession", JSON.stringify(data.user));
             localStorage.setItem("userSession", JSON.stringify(data.user));
             alert("Login Administrator berhasil!");
-            window.location.href = "/admin";
+            window.location.href = safeTarget || "/admin";
           } else {
             localStorage.setItem("userSession", JSON.stringify(data.user));
             alert("Login berhasil!");
-            window.location.href = "/user/dashboard";
+            window.location.href = safeTarget || "/user/dashboard";
           }
         }
       } else {
@@ -134,6 +168,19 @@ export default function Login() {
             Dinas Komunikasi & Informatika
           </span>
         </div>
+
+        {/* Context Notification for Protected Redirection */}
+        {redirectUrl && (
+          <div className="mb-6 p-4 bg-indigo-950/40 border border-indigo-500/35 rounded-2xl flex gap-3 text-indigo-300 items-start animate-fadeIn">
+            <Shield size={16} className="flex-shrink-0 mt-0.5 text-indigo-400" />
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider leading-none text-indigo-400">Autentikasi Diperlukan</span>
+              <p className="text-[11px] font-semibold leading-relaxed mt-1 text-indigo-200/90">
+                Silakan masuk menggunakan akun terverifikasi untuk mengakses formulir pengajuan layanan yang Anda tuju.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Success Notification */}
         {successMsg && (
@@ -281,7 +328,7 @@ export default function Login() {
 
         {/* Footer Link */}
         <div className="mt-8 text-center text-[10px] text-slate-500 font-semibold uppercase tracking-wider">
-          Belum punya akun? <Link href="/auth/register" className="text-emerald-500 hover:underline">Daftar Sekarang</Link>
+          Belum punya akun? <Link href={redirectUrl ? `/auth/register?redirect=${encodeURIComponent(redirectUrl)}` : "/auth/register"} className="text-emerald-500 hover:underline">Daftar Sekarang</Link>
         </div>
 
       </div>

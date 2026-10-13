@@ -35,25 +35,43 @@ class LayananController extends Controller
     {
         try {
             $validated = $request->validate([
-                'serviceType' => 'required|string',
-                'applicantName' => 'required|string',
-                'applicantEmail' => 'required|email',
-                'applicantPhone' => 'required|string',
-                'instansi' => 'required|string',
+                'serviceType' => 'required|string|max:100',
+                'applicantName' => 'required|string|max:255',
+                'applicantEmail' => 'required|email|max:255',
+                'applicantPhone' => 'required|string|max:50',
+                'instansi' => 'required|string|max:255',
                 'details' => 'nullable|array',
             ]);
+
+            // Mitigasi Keamanan Siber: Sanitasi input untuk mencegah serangan Stored XSS
+            $serviceType = strip_tags(trim($validated['serviceType']));
+            $applicantName = strip_tags(trim($validated['applicantName']));
+            $applicantPhone = strip_tags(trim($validated['applicantPhone']));
+            $instansi = strip_tags(trim($validated['instansi']));
+
+            $cleanDetails = [];
+            if (!empty($validated['details']) && is_array($validated['details'])) {
+                foreach ($validated['details'] as $key => $val) {
+                    $cleanKey = strip_tags((string)$key);
+                    if (is_string($val)) {
+                        $cleanDetails[$cleanKey] = strip_tags(trim($val));
+                    } else {
+                        $cleanDetails[$cleanKey] = $val;
+                    }
+                }
+            }
 
             $ticketNumber = 'SRV-2026-'.rand(1000, 9999);
 
             $newRequest = ServiceRequest::create([
                 'id' => (string) Str::uuid(),
-                'serviceType' => $validated['serviceType'],
+                'serviceType' => $serviceType,
                 'ticketNumber' => $ticketNumber,
-                'applicantName' => $validated['applicantName'],
+                'applicantName' => $applicantName,
                 'applicantEmail' => $validated['applicantEmail'],
-                'applicantPhone' => $validated['applicantPhone'],
-                'instansi' => $validated['instansi'],
-                'details' => $validated['details'] ?? [],
+                'applicantPhone' => $applicantPhone,
+                'instansi' => $instansi,
+                'details' => $cleanDetails,
                 'status' => 'PENDING',
             ]);
 

@@ -123,7 +123,7 @@ Route::prefix('api')->group(function () {
     Route::post('/ppid/permohonan', [PpidController::class, 'storePermohonan']);
     Route::post('/ppid/keberatan', [PpidController::class, 'storeKeberatan']);
     Route::get('/layanan', [LayananController::class, 'apiIndex']);
-    Route::post('/layanan/pengajuan', [LayananController::class, 'storePengajuan']);
+    Route::post('/layanan/pengajuan', [LayananController::class, 'storePengajuan'])->middleware('throttle:10,1');
     Route::post('/layanan/pengajuan/update', [LayananController::class, 'updatePengajuan']);
     Route::get('/layanan/pengajuan', [LayananController::class, 'apiPengajuanIndex']);
     Route::get('/satu-data', [SatuDataController::class, 'apiIndex']);

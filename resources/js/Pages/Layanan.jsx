@@ -1,15 +1,51 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link, Head } from "@inertiajs/react";
-import { ShieldCheck, Shield, Database, Mail, Server, Video, Link as LinkIcon, Globe, Network, Send, CheckCircle2, Cpu, FileText, File, Lock, Wifi, Monitor, HardDrive, Layers, Users, Phone, Wrench, Layout, ExternalLink } from "lucide-react";
+import {
+  ShieldCheck,
+  Shield,
+  Database,
+  Mail,
+  Server,
+  Video,
+  Link as LinkIcon,
+  Globe,
+  Network,
+  Send,
+  CheckCircle2,
+  Cpu,
+  FileText,
+  File,
+  Lock,
+  Wifi,
+  Monitor,
+  HardDrive,
+  Layers,
+  Users,
+  Phone,
+  Wrench,
+  Layout,
+  ExternalLink,
+  Search,
+  X,
+  LogIn,
+  UserPlus,
+  ArrowRight,
+  AlertCircle,
+  Sparkles,
+  Info
+} from "lucide-react";
 import MainLayout from "../Layouts/MainLayout";
 import PageHero from "../Components/PageHero";
-import ScrollReveal from "../Components/ScrollReveal";
 
 export const Layanan = () => {
   const [selectedService, setSelectedService] = useState(null);
+  const [pendingService, setPendingService] = useState(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [successTicket, setSuccessTicket] = useState(null);
   const [loading, setLoading] = useState(false);
   const [services, setServices] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("Semua");
 
   // Session State
   const [user, setUser] = useState(null);
@@ -23,16 +59,34 @@ export const Layanan = () => {
 
   // Dynamic JSON details depending on selected service
   const [details, setDetails] = useState({});
+  const [uploadingFields, setUploadingFields] = useState({});
 
   const currentService = services.find((s) => s.slug === selectedService);
   const formSchema = currentService?.form_schema || currentService?.formSchema || [];
 
+  // Sanitasi & Keamanan URL Dokumen SOP
   const getSopUrl = (path) => {
-    if (!path) return "";
-    if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
-      return path;
+    if (!path || typeof path !== "string") return "";
+    const trimmed = path.trim();
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("/")) {
+      return trimmed;
     }
-    return `/uploads/${path}`;
+    return `/uploads/${trimmed}`;
+  };
+
+  // Mitigasi Keamanan Siber: Validasi ketat pembukaan URL eksternal (mencegah XSS javascript: dsb)
+  const handleExternalClick = (url) => {
+    if (!url || typeof url !== "string") return;
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+        window.open(url, "_blank", "noopener,noreferrer");
+      } else {
+        alert("Protokol URL eksternal tidak diizinkan demi keamanan.");
+      }
+    } catch (e) {
+      alert("Tautan eksternal tidak valid.");
+    }
   };
 
   useEffect(() => {
@@ -40,10 +94,25 @@ export const Layanan = () => {
     setUploadingFields({});
   }, [selectedService]);
 
-  const [uploadingFields, setUploadingFields] = useState({});
+  // Listener keyboard ESC untuk menutup modal autentikasi
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && showAuthModal) {
+        setShowAuthModal(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showAuthModal]);
 
   const handleFileUpload = async (fieldName, file) => {
     if (!file) return;
+
+    // Validasi ukuran file di sisi client (maksimal 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert("Ukuran berkas terlalu besar. Maksimum ukuran berkas adalah 10 MB.");
+      return;
+    }
 
     setUploadingFields((prev) => ({ ...prev, [fieldName]: true }));
 
@@ -78,7 +147,6 @@ export const Layanan = () => {
   };
 
   const iconMap = {
-    // Preset icons yang tersedia di Filament admin
     Globe,
     Shield,
     ShieldCheck,
@@ -86,7 +154,6 @@ export const Layanan = () => {
     Database,
     FileText,
     File,
-    // Alias tambahan untuk toleransi nama yang bervariasi
     Mail,
     Email: Mail,
     Network,
@@ -99,7 +166,6 @@ export const Layanan = () => {
     Phone,
     Wrench,
     Layout,
-    // Link aliases
     Link: LinkIcon,
     LinkIcon: LinkIcon,
     ExternalLink: LinkIcon,
@@ -167,26 +233,90 @@ export const Layanan = () => {
     fetchServices();
   }, []);
 
+  // Periksa parameter URL ?type=...
   useEffect(() => {
     if (services.length === 0) return;
     const urlParams = new URLSearchParams(window.location.search);
     const type = urlParams.get("type");
     if (type && services.some((s) => s.slug === type)) {
-      setSelectedService(type);
+      const matched = services.find((s) => s.slug === type);
+      if (user) {
+        setSelectedService(type);
+      } else {
+        // Jika pengunjung belum login, arahkan konteks ke modal autentikasi
+        setPendingService(matched);
+        setShowAuthModal(true);
+      }
     }
+  }, [services, user]);
+
+  // Handler Klik Kartu Layanan di Katalog Publik
+  const handleServiceClick = (srv) => {
+    const isExternal = srv.slug && (srv.slug.startsWith("http://") || srv.slug.startsWith("https://"));
+    if (isExternal) {
+      handleExternalClick(srv.slug);
+      return;
+    }
+
+    if (user) {
+      // Pengguna sudah terautentikasi -> Langsung tampilkan form pengajuan
+      setSelectedService(srv.slug);
+      setSuccessTicket(null);
+      window.scrollTo({ top: 380, behavior: "smooth" });
+    } else {
+      // Pengguna belum login -> Buka dialog instruksi login terproteksi
+      setPendingService(srv);
+      setShowAuthModal(true);
+    }
+  };
+
+  // Kategori unik untuk filter chips
+  const categories = useMemo(() => {
+    const cats = new Set(["Semua"]);
+    services.forEach((s) => {
+      if (s.category && typeof s.category === "string" && s.category.trim() !== "") {
+        cats.add(s.category.trim());
+      }
+    });
+    return Array.from(cats);
   }, [services]);
+
+  // Filter layanan berdasarkan pencarian dan kategori
+  const filteredServices = useMemo(() => {
+    return services.filter((srv) => {
+      const q = searchQuery.toLowerCase().trim();
+      const matchesSearch =
+        !q ||
+        (srv.title && srv.title.toLowerCase().includes(q)) ||
+        (srv.description && srv.description.toLowerCase().includes(q));
+
+      const matchesCat =
+        selectedCategory === "Semua" ||
+        (srv.category && srv.category.trim() === selectedCategory);
+
+      return matchesSearch && matchesCat;
+    });
+  }, [services, searchQuery, selectedCategory]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Verifikasi keamanan ganda di client
+    if (!user) {
+      alert("Anda wajib masuk terlebih dahulu untuk mengirim pengajuan layanan.");
+      setShowAuthModal(true);
+      return;
+    }
+
     setLoading(true);
     setSuccessTicket(null);
 
     const payload = {
       serviceType: selectedService?.toUpperCase(),
-      applicantName,
-      applicantEmail,
-      applicantPhone,
-      instansi,
+      applicantName: applicantName.trim(),
+      applicantEmail: applicantEmail.trim(),
+      applicantPhone: applicantPhone.trim(),
+      instansi: instansi.trim(),
       details,
     };
 
@@ -202,8 +332,8 @@ export const Layanan = () => {
       const data = await res.json();
       if (res.ok && data.success) {
         setSuccessTicket(data.ticketNumber);
-        // Do not clear fields entirely to keep user profile prefilled
         setDetails({});
+        window.scrollTo({ top: 400, behavior: "smooth" });
       } else {
         alert(data.error || "Gagal mengirim pengajuan.");
       }
@@ -218,8 +348,8 @@ export const Layanan = () => {
   if (!isMounted) {
     return (
       <MainLayout>
-        <div className="p-10 text-center font-bold text-xs text-slate-500 uppercase tracking-widest animate-pulse">
-          Memuat Portal Layanan...
+        <div className="p-16 text-center font-bold text-xs text-slate-500 uppercase tracking-widest animate-pulse">
+          Memuat Portal Layanan Digital...
         </div>
       </MainLayout>
     );
@@ -230,19 +360,20 @@ export const Layanan = () => {
   return (
     <MainLayout>
       <Head>
-        <title>Layanan Digital SPBE | Diskominfo Banggai Kepulauan</title>
-        <meta name="description" content="Portal pengajuan pelayanan mandiri urusan persandian TTE, infrastruktur TIK, & sistem informatika daerah Diskominfo Kabupaten Banggai Kepulauan." />
-        <meta name="keywords" content="Layanan Digital Banggai Kepulauan, Pengajuan TTE Bangkep, Domain Desa Bangkep, Hosting Pemda Banggai Kepulauan, Diskominfo Bangkep" />
+        <title>Katalog Layanan Digital SPBE | Diskominfo Banggai Kepulauan</title>
+        <meta name="description" content="Katalog resmi pelayanan mandiri urusan persandian TTE, infrastruktur TIK, & sistem informatika daerah Diskominfo Kabupaten Banggai Kepulauan." />
+        <meta name="keywords" content="Katalog Layanan Digital Banggai Kepulauan, Pengajuan TTE Bangkep, Domain Desa Bangkep, Hosting Pemda Banggai Kepulauan, Diskominfo Bangkep" />
         <link rel="canonical" href={officialUrl} />
-        <meta property="og:title" content="Layanan Digital SPBE | Diskominfo Banggai Kepulauan" />
-        <meta property="og:description" content="Pelayanan mandiri urusan persandian, infrastruktur TIK, & sistem informatika pemerintah daerah Kabupaten Banggai Kepulauan." />
+        <meta property="og:title" content="Katalog Layanan Digital SPBE | Diskominfo Banggai Kepulauan" />
+        <meta property="og:description" content="Katalog pelayanan mandiri urusan persandian, infrastruktur TIK, & sistem informatika pemerintah daerah Kabupaten Banggai Kepulauan." />
         <meta property="og:url" content={officialUrl} />
         <meta property="og:type" content="website" />
       </Head>
+
       {/* Premium Page Hero */}
       <PageHero
         label="PORTAL PELAYANAN DIGITAL HUB"
-        title={<>Pengajuan <span className="text-indigo-400">Layanan Digital</span></>}
+        title={<>Katalog & Pengajuan <span className="text-indigo-400">Layanan Digital</span></>}
         subtitle="Pelayanan mandiri urusan persandian, infrastruktur TIK, & sistem informatika pemerintah daerah Kabupaten Banggai Kepulauan"
         icon={Cpu}
         gradient="from-indigo-950 via-slate-900 to-slate-950"
@@ -250,115 +381,141 @@ export const Layanan = () => {
         blobColor="bg-indigo-500"
         breadcrumbs={[{ label: "Layanan" }]}
         stats={[
-          { label: "Jenis Layanan", value: services.length || "...", icon: Server },
-          { label: "Login Diperlukan", value: user ? "Aktif" : "Belum Login", icon: ShieldCheck },
+          { label: "Katalog Layanan", value: services.length || "...", icon: Server },
+          { label: "Status Akses", value: user ? `Masuk: ${user.name?.split(" ")[0]}` : "Akses Publik", icon: ShieldCheck },
         ]}
       />
 
-      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-12 flex flex-col gap-10">
+      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-10 flex flex-col gap-8">
 
-        {/* Auth Wall if not logged in */}
-        {!user ? (
-          <div className="w-full max-w-xl mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-3xl shadow-xl flex flex-col gap-6 items-center text-center animate-fadeIn my-4">
-            <div className="p-4 bg-emerald-500/10 text-emerald-600 rounded-2xl border border-emerald-500/20">
-              <ShieldCheck size={40} className="stroke-[2.5]" />
+        {/* =========================================================================
+            A. BANNER INFORMASI KATALOG PUBLIK
+            ========================================================================= */}
+        <div className="w-full bg-gradient-to-r from-slate-900 via-indigo-950/60 to-slate-900 border border-indigo-500/20 rounded-3xl p-6 md:p-8 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-2xl flex-shrink-0 mt-0.5">
+              <Sparkles className="w-6 h-6 stroke-[2]" />
             </div>
-            <div className="flex flex-col gap-2">
-              <h2 className="font-extrabold text-lg uppercase tracking-wider text-slate-900 dark:text-white">Akses Terproteksi</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm">
-                Untuk mengakses formulir pengajuan layanan digital pemerintah, Anda wajib masuk menggunakan akun pemohon yang telah terverifikasi.
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 px-2.5 py-0.5 rounded-full">
+                  Katalog Terbuka Publik
+                </span>
+                {user ? (
+                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <CheckCircle2 size={10} /> Terverifikasi sebagai: {user.name} ({user.instansi || "Pemohon"})
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-semibold text-slate-400">
+                    Mode Penjelajahan Terbuka
+                  </span>
+                )}
+              </div>
+              <h2 className="text-base md:text-lg font-extrabold text-white leading-tight">
+                Jelajahi Berbagai Layanan Publik & Tata Kelola SPBE Daerah
+              </h2>
+              <p className="text-xs text-slate-300/80 leading-relaxed max-w-3xl">
+                Seluruh masyarakat, aparatur sipil negara, dan instansi OPD dapat meninjau rincian katalog, persyaratan, dan dokumen SOP resmi tanpa perlu login. Untuk melakukan pengajuan permohonan secara mandiri, Anda akan diarahkan untuk masuk menggunakan akun pemohon terverifikasi.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 w-full mt-2 justify-center">
+          </div>
+
+          <div className="flex items-center gap-3 flex-shrink-0 self-stretch md:self-auto justify-end">
+            {!user ? (
               <Link
-                href="/auth/login"
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-750 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all shadow-md active:scale-[0.98]"
+                href="/auth/login?redirect=/layanan"
+                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-550 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all shadow-md active:scale-95"
               >
-                <span>Masuk Sekarang</span>
+                <LogIn size={14} />
+                <span>Masuk Akun</span>
               </Link>
+            ) : (
               <Link
-                href="/auth/register"
-                className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs uppercase tracking-wider transition-all"
+                href="/user/dashboard"
+                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-bold rounded-xl text-xs uppercase tracking-wider transition-all shadow-sm active:scale-95"
               >
-                <span>Daftar Akun Baru</span>
+                <Layout size={14} />
+                <span>Dashboard Saya</span>
               </Link>
+            )}
+          </div>
+        </div>
+
+        {/* Notifikasi Pengajuan Sukses */}
+        {successTicket && (
+          <div className="p-6 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-3xl flex gap-3 text-xs leading-relaxed text-slate-900 dark:text-slate-100 font-semibold shadow-md animate-fadeIn">
+            <CheckCircle2 size={22} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+            <div className="flex flex-col gap-1">
+              <span className="font-extrabold uppercase text-sm text-emerald-600 dark:text-emerald-400">
+                Pengajuan Berhasil Dikirim!
+              </span>
+              <span>
+                Nomor Tiket Layanan Anda: <strong className="text-slate-950 dark:text-white px-2 py-0.5 bg-emerald-500/10 rounded font-mono text-sm">{successTicket}</strong>. Permohonan Anda telah terdaftar dan sedang ditelaah oleh tim verifikator Diskominfo. Mohon simpan nomor tiket ini untuk melacak perkembangan status.
+              </span>
             </div>
           </div>
-        ) : (
-          <div className="w-full flex flex-col gap-8">
+        )}
+
+        {/* =========================================================================
+            B. TAMPILAN FORMULIR PENGAJUAN (Hanya Aktif Jika Layanan Dipilih)
+            ========================================================================= */}
+        {selectedService && (
+          <div className="w-full max-w-3xl mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 md:p-10 rounded-3xl shadow-xl animate-fadeIn">
             
-            {successTicket && (
-              <div className="p-6 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900 rounded-3xl flex gap-3 text-xs leading-relaxed text-slate-900 dark:text-slate-350 font-semibold">
-                <CheckCircle2 size={20} className="text-emerald-550 flex-shrink-0" />
-                <div className="flex flex-col gap-1">
-                  <span className="font-extrabold uppercase text-sm text-emerald-600 dark:text-emerald-450">Pengajuan Sukses!</span>
-                  <span>Nomor Tiket Layanan Anda: <strong>{successTicket}</strong>. Permohonan Anda telah masuk ke sistem antrean verifikasi dan sedang ditelaah oleh administrator Diskominfo. Mohon simpan tiket ini.</span>
+            {/* Guard Proteksi: Jika Belum Login Tapi Berada di Mode Form */}
+            {!user ? (
+              <div className="flex flex-col items-center text-center gap-5 py-8">
+                <div className="p-4 bg-indigo-500/10 text-indigo-500 rounded-2xl border border-indigo-500/20">
+                  <Lock size={36} className="stroke-[2.5]" />
+                </div>
+                <div className="flex flex-col gap-1.5 max-w-md">
+                  <h3 className="font-extrabold text-base uppercase tracking-wider text-slate-900 dark:text-white">
+                    Autentikasi Diperlukan
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Untuk melengkapi dan mengirim formulir pengajuan <strong>{currentService?.title}</strong>, Anda wajib masuk terlebih dahulu dengan akun terverifikasi.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs justify-center mt-2">
+                  <Link
+                    href={`/auth/login?redirect=${encodeURIComponent(`/layanan?type=${selectedService}`)}`}
+                    className="flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all shadow-md active:scale-95"
+                  >
+                    <LogIn size={14} />
+                    <span>Masuk Sekarang</span>
+                  </Link>
+                  <button
+                    onClick={() => setSelectedService(null)}
+                    className="px-5 py-3 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs uppercase tracking-wider transition-all"
+                  >
+                    Batal
+                  </button>
                 </div>
               </div>
-            )}
-
-            {services.length === 0 ? (
-              <div className="p-10 text-center font-bold text-xs text-slate-550 uppercase tracking-widest animate-pulse">
-                Memuat Layanan Digital...
-              </div>
-            ) : !selectedService ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {services.map((srv) => {
-                  const customIcon = isCustomIcon(srv.icon);
-                  const Icon = !customIcon ? getIcon(srv.icon) : null;
-                  const isExternal = srv.slug && (srv.slug.startsWith("http://") || srv.slug.startsWith("https://"));
-                  return (
-                    <button
-                      key={srv.slug}
-                      onClick={() => {
-                        if (isExternal) {
-                          window.open(srv.slug, "_blank", "noopener,noreferrer");
-                        } else {
-                          setSelectedService(srv.slug);
-                        }
-                      }}
-                      className="p-6 bg-white dark:bg-slate-900 text-slate-950 dark:text-slate-100 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm text-left flex flex-col gap-4 hover:border-emerald-500/50 transition focus:outline-none focus:ring-2 focus:ring-emerald-550"
-                    >
-                      <div className={`p-3 rounded-xl border w-fit ${srv.color || 'bg-slate-100 border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-350'}`}>
-                        {customIcon ? (
-                          <img src={getCustomIconUrl(srv.icon)} alt={srv.title} className="w-5 h-5 object-contain" />
-                        ) : (
-                          <Icon size={20} className="stroke-[2.5]" />
-                        )}
-                      </div>
-                      <div className="flex flex-col gap-1 w-full">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="font-bold text-xs text-slate-900 dark:text-white leading-tight">{srv.title}</h3>
-                          {isExternal && (
-                            <span className="text-[8px] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">Eksternal</span>
-                          )}
-                        </div>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed font-semibold mt-1">{srv.description}</p>
-                        {srv.sop_file && (
-                          <span className="mt-2 inline-flex items-center gap-1 text-[9px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold w-fit">
-                            <FileText size={10} />
-                            <span>Ada SOP / Panduan</span>
-                          </span>
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
             ) : (
-              <div className="w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-3xl shadow-sm animate-fadeIn">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="font-extrabold text-sm text-slate-900 dark:text-white uppercase tracking-wider">
-                    Formulir: {services.find((s) => s.slug === selectedService)?.title}
-                  </h3>
+              <div>
+                <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-indigo-500/10 text-indigo-500 rounded-xl">
+                      <Cpu size={20} />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                        Formulir Permohonan
+                      </span>
+                      <h3 className="font-extrabold text-sm md:text-base text-slate-900 dark:text-white leading-tight">
+                        {currentService?.title || "Pengajuan Layanan"}
+                      </h3>
+                    </div>
+                  </div>
                   <button
                     onClick={() => {
                       setSelectedService(null);
                       setSuccessTicket(null);
                     }}
-                    className="text-[10px] text-slate-400 hover:text-slate-950 dark:hover:text-white font-bold uppercase tracking-wider focus:outline-none"
+                    className="text-[10px] px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg font-bold uppercase tracking-wider transition focus:outline-none"
                   >
-                    Kembali
+                    Kembali ke Katalog
                   </button>
                 </div>
 
@@ -396,9 +553,10 @@ export const Layanan = () => {
                       <input
                         type="text"
                         required
+                        maxLength={255}
                         value={applicantName}
                         onChange={(e) => setApplicantName(e.target.value)}
-                        className="bg-slate-100 dark:bg-slate-800 border-0 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-emerald-600 focus:outline-none text-slate-900 dark:text-white font-medium"
+                        className="bg-slate-100 dark:bg-slate-800 border-0 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-900 dark:text-white font-medium"
                       />
                     </div>
                     <div className="flex flex-col gap-2">
@@ -406,10 +564,11 @@ export const Layanan = () => {
                       <input
                         type="text"
                         required
+                        maxLength={255}
                         value={instansi}
                         onChange={(e) => setInstansi(e.target.value)}
                         placeholder="Contoh: Bappeda, Dinas Kesehatan, dll"
-                        className="bg-slate-100 dark:bg-slate-800 border-0 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-emerald-600 focus:outline-none text-slate-900 dark:text-white font-medium"
+                        className="bg-slate-100 dark:bg-slate-800 border-0 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-900 dark:text-white font-medium"
                       />
                     </div>
                   </div>
@@ -420,9 +579,10 @@ export const Layanan = () => {
                       <input
                         type="email"
                         required
+                        maxLength={255}
                         value={applicantEmail}
                         onChange={(e) => setApplicantEmail(e.target.value)}
-                        className="bg-slate-100 dark:bg-slate-800 border-0 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-emerald-600 focus:outline-none text-slate-900 dark:text-white font-medium"
+                        className="bg-slate-100 dark:bg-slate-800 border-0 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-900 dark:text-white font-medium"
                       />
                     </div>
                     <div className="flex flex-col gap-2">
@@ -430,9 +590,10 @@ export const Layanan = () => {
                       <input
                         type="tel"
                         required
+                        maxLength={50}
                         value={applicantPhone}
                         onChange={(e) => setApplicantPhone(e.target.value)}
-                        className="bg-slate-100 dark:bg-slate-800 border-0 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-emerald-600 focus:outline-none text-slate-900 dark:text-white font-medium"
+                        className="bg-slate-100 dark:bg-slate-800 border-0 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-900 dark:text-white font-medium"
                       />
                     </div>
                   </div>
@@ -456,17 +617,18 @@ export const Layanan = () => {
                               <textarea
                                 required={isRequired}
                                 rows={3}
+                                maxLength={2000}
                                 value={details[fieldName] || ""}
                                 onChange={(e) => setDetails({ ...details, [fieldName]: e.target.value })}
                                 placeholder={placeholder}
-                                className="bg-slate-100 dark:bg-slate-800 border-0 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-emerald-600 focus:outline-none text-slate-900 dark:text-white font-medium resize-none"
+                                className="bg-slate-100 dark:bg-slate-800 border-0 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-900 dark:text-white font-medium resize-none"
                               />
                             ) : type === "select" ? (
                               <select
                                 required={isRequired}
                                 value={details[fieldName] || ""}
                                 onChange={(e) => setDetails({ ...details, [fieldName]: e.target.value })}
-                                className="bg-slate-100 dark:bg-slate-800 border-0 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-emerald-600 focus:outline-none text-slate-955 dark:text-white font-medium"
+                                className="bg-slate-100 dark:bg-slate-800 border-0 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-900 dark:text-white font-medium"
                               >
                                 <option value="">-- Pilih {label} --</option>
                                 {(field.options || "").split(",").map((opt) => {
@@ -507,10 +669,11 @@ export const Layanan = () => {
                               <input
                                 type={type}
                                 required={isRequired}
+                                maxLength={255}
                                 value={details[fieldName] || ""}
                                 onChange={(e) => setDetails({ ...details, [fieldName]: e.target.value })}
                                 placeholder={placeholder}
-                                className="bg-slate-100 dark:bg-slate-800 border-0 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-emerald-600 focus:outline-none text-slate-900 dark:text-white font-medium"
+                                className="bg-slate-100 dark:bg-slate-800 border-0 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-900 dark:text-white font-medium"
                               />
                             )}
                           </div>
@@ -523,10 +686,11 @@ export const Layanan = () => {
                       <textarea
                         required
                         rows={3}
+                        maxLength={2000}
                         value={details.purposeDescription || ""}
                         onChange={(e) => setDetails({ ...details, purposeDescription: e.target.value })}
                         placeholder="Jelaskan secara rinci detail permohonan Anda..."
-                        className="bg-slate-100 dark:bg-slate-800 border-0 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-emerald-600 focus:outline-none text-slate-900 dark:text-white font-medium resize-none"
+                        className="bg-slate-100 dark:bg-slate-800 border-0 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-900 dark:text-white font-medium resize-none"
                       />
                     </div>
                   )}
@@ -534,17 +698,286 @@ export const Layanan = () => {
                   <button
                     type="submit"
                     disabled={loading || Object.values(uploadingFields).some(Boolean)}
-                    className="mt-4 flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition disabled:opacity-40"
+                    className="mt-4 flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition disabled:opacity-40 shadow-md active:scale-95"
                   >
                     <Send size={14} />
-                    <span>Kirim Permohonan</span>
+                    <span>{loading ? "Mengirim Permohonan..." : "Kirim Permohonan Sekarang"}</span>
                   </button>
                 </form>
               </div>
             )}
           </div>
         )}
+
+        {/* =========================================================================
+            C. KATALOG UTAMA (TERBUKA UNTUK PUBLIK / SEMUA PENGUNJUNG)
+            ========================================================================= */}
+        <div className="flex flex-col gap-6">
+          
+          {/* Baris Kontrol: Pencarian & Filter Kategori */}
+          <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Cari layanan, kata kunci, TTE, email, domain..."
+                className="w-full pl-10 pr-9 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
+            {/* Chips Kategori */}
+            {categories.length > 1 && (
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-all ${
+                      selectedCategory === cat
+                        ? "bg-indigo-600 text-white shadow-sm"
+                        : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Grid Kartu Layanan */}
+          {services.length === 0 ? (
+            <div className="p-16 text-center font-bold text-xs text-slate-500 uppercase tracking-widest animate-pulse">
+              Memuat Data Katalog Layanan...
+            </div>
+          ) : filteredServices.length === 0 ? (
+            <div className="p-16 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl flex flex-col items-center gap-3">
+              <Search className="w-8 h-8 text-slate-400" />
+              <p className="text-xs font-bold text-slate-500">
+                Tidak ada layanan yang sesuai dengan pencarian "{searchQuery}"
+              </p>
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("Semua");
+                }}
+                className="text-[11px] text-indigo-500 hover:underline font-bold"
+              >
+                Reset Filter Pencarian
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {filteredServices.map((srv) => {
+                const customIcon = isCustomIcon(srv.icon);
+                const Icon = !customIcon ? getIcon(srv.icon) : null;
+                const isExternal = srv.slug && (srv.slug.startsWith("http://") || srv.slug.startsWith("https://"));
+                const isCurrentActive = selectedService === srv.slug;
+
+                return (
+                  <div
+                    key={srv.slug}
+                    className={`group bg-white dark:bg-slate-900 text-slate-950 dark:text-slate-100 border rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between gap-5 relative overflow-hidden ${
+                      isCurrentActive
+                        ? "border-indigo-500 ring-2 ring-indigo-500/20"
+                        : "border-slate-200 dark:border-slate-800 hover:border-indigo-500/50"
+                    }`}
+                  >
+                    {/* Top Row: Icon + Badges */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className={`p-3.5 rounded-2xl border w-fit transition-transform group-hover:scale-105 ${srv.color || 'bg-slate-100 border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-300'}`}>
+                        {customIcon ? (
+                          <img src={getCustomIconUrl(srv.icon)} alt={srv.title} className="w-5 h-5 object-contain" />
+                        ) : (
+                          <Icon size={22} className="stroke-[2.5]" />
+                        )}
+                      </div>
+
+                      <div className="flex flex-col items-end gap-1">
+                        {isExternal ? (
+                          <span className="text-[9px] bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 px-2 py-0.5 rounded-full uppercase font-bold tracking-wider flex items-center gap-1">
+                            <span>Eksternal</span>
+                            <ExternalLink size={9} />
+                          </span>
+                        ) : (
+                          <span className="text-[9px] bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
+                            Layanan Mandiri
+                          </span>
+                        )}
+
+                        {srv.sop_file && (
+                          <a
+                            href={getSopUrl(srv.sop_file)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 text-[9px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold transition"
+                            title="Unduh / Lihat SOP Layanan"
+                          >
+                            <FileText size={9} />
+                            <span>SOP</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Content Area */}
+                    <div className="flex flex-col gap-1.5 flex-1">
+                      <h3 className="font-extrabold text-sm text-slate-900 dark:text-white leading-snug group-hover:text-indigo-500 transition-colors">
+                        {srv.title}
+                      </h3>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium line-clamp-3">
+                        {srv.description}
+                      </p>
+                    </div>
+
+                    {/* Action Button: Mengarahkan Login jika Belum Login */}
+                    <button
+                      type="button"
+                      onClick={() => handleServiceClick(srv)}
+                      className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-95 ${
+                        isExternal
+                          ? "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
+                          : user
+                          ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                          : "bg-slate-100 hover:bg-indigo-50 dark:bg-slate-800 dark:hover:bg-indigo-950/40 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500"
+                      }`}
+                    >
+                      {isExternal ? (
+                        <>
+                          <span>Buka Layanan</span>
+                          <ExternalLink size={13} />
+                        </>
+                      ) : user ? (
+                        <>
+                          <span>Ajukan Sekarang</span>
+                          <ArrowRight size={13} />
+                        </>
+                      ) : (
+                        <>
+                          <Lock size={12} className="text-amber-500" />
+                          <span>Masuk untuk Akses</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
       </div>
+
+      {/* =========================================================================
+          D. MODAL DIALOG PROTEKSI LOGIN (Tampil Ketika Pengunjung Tamu Mengklik Layanan)
+          ========================================================================= */}
+      {showAuthModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn"
+          onClick={() => setShowAuthModal(false)}
+        >
+          <div
+            className="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative z-10 flex flex-col gap-6 animate-scaleUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Tombol Tutup */}
+            <button
+              onClick={() => setShowAuthModal(false)}
+              className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              aria-label="Tutup"
+            >
+              <X size={18} />
+            </button>
+
+            {/* Header Modal */}
+            <div className="flex items-center gap-4">
+              <div className="p-3.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 rounded-2xl flex-shrink-0">
+                <ShieldCheck size={32} className="stroke-[2.5]" />
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-500">
+                  Proteksi Akses Layanan
+                </span>
+                <h3 className="font-extrabold text-lg text-slate-900 dark:text-white leading-tight">
+                  Login Terlebih Dahulu
+                </h3>
+              </div>
+            </div>
+
+            {/* Kartu Cuplikan Layanan yang Dipilih */}
+            {pendingService && (
+              <div className="p-4 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-750 rounded-2xl flex items-center gap-3">
+                <div className="p-2.5 bg-indigo-500/10 text-indigo-500 rounded-xl flex-shrink-0">
+                  <Cpu size={18} />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs font-extrabold text-slate-900 dark:text-white truncate">
+                    {pendingService.title}
+                  </span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1">
+                    {pendingService.description}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Keterangan Edukasi Keamanan Siber */}
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              Untuk mengajukan permohonan layanan digital pemerintah Kabupaten Banggai Kepulauan, pemohon wajib masuk menggunakan akun yang telah terverifikasi demi menjamin keabsahan data, keamanan siber, dan pelacakan status tiket secara akuntabel.
+            </p>
+
+            {/* Tombol Aksi */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <Link
+                href={
+                  pendingService
+                    ? `/auth/login?redirect=${encodeURIComponent(`/layanan?type=${pendingService.slug}`)}`
+                    : "/auth/login?redirect=/layanan"
+                }
+                className="flex-1 flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all shadow-md active:scale-95 text-center"
+              >
+                <LogIn size={14} />
+                <span>Masuk Sekarang</span>
+              </Link>
+              
+              <Link
+                href={
+                  pendingService
+                    ? `/auth/register?redirect=${encodeURIComponent(`/layanan?type=${pendingService.slug}`)}`
+                    : "/auth/register"
+                }
+                className="flex-1 flex items-center justify-center gap-2 px-5 py-3 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs uppercase tracking-wider transition-all text-center"
+              >
+                <UserPlus size={14} />
+                <span>Daftar Akun Baru</span>
+              </Link>
+            </div>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setShowAuthModal(false)}
+                className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-semibold uppercase tracking-wider hover:underline"
+              >
+                Tetap Lihat Katalog Layanan
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </MainLayout>
   );
 };
